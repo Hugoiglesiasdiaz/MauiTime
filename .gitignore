@@ -1,0 +1,28 @@
+# --- Archivos de compilación de .NET (¡Crucial para el espacio!) ---
+[Bb]in/
+[Oo]bj/
+*.user
+*.userosscache
+*.sln.docstates
+*.db
+*.suo
+
+# --- Configuración personal del entorno ---
+.vs/
+.vscode/
+# Nota: Si quisieras compartir la configuración de tareas, podrías quitar el .vscode/ 
+# pero para mantener el USB limpio y evitar conflictos, es mejor ignorarlo.
+
+# --- Archivos temporales de NuGet ---
+*.csproj.user
+*.pubxml
+*.csproj.nuget.g.props
+*.csproj.nuget.g.targets
+
+# --- Otros archivos basura ---
+.DS_Store
+Thumbs.db
+desktop.ini
+*.bak
+*.tmp
+*.log
