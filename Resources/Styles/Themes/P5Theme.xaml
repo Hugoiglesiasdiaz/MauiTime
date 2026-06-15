@@ -1,0 +1,102 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <!-- Persona 5 theme colors E31D26-->
+    <Color x:Key="P5Red">#E31D26</Color>
+    <Color x:Key="P5Black">#000000</Color>
+    <Color x:Key="P5White">#FFFFFF</Color>
+    <Color x:Key="P5Gray">#202020</Color>
+
+    <SolidColorBrush x:Key="P5RedBrush"
+            Color="{StaticResource P5Red}"/>
+    <SolidColorBrush x:Key="P5BlackBrush"
+            Color="{StaticResource P5Black}"/>
+    <SolidColorBrush x:Key="P5WhiteBrush"
+            Color="{StaticResource P5White}"/>
+    <SolidColorBrush x:Key="P5GrayBrush"
+            Color="{StaticResource P5Gray}"/>
+
+    <x:String x:Key="P5FontFamily">HelveticaNowDisplay-ExtraBold</x:String>
+
+    <Style x:Key="P5ButtonBase"
+            TargetType="Button">
+        <Setter Property="TextColor"
+                Value="{StaticResource P5White}"/>
+        <Setter Property="BackgroundColor"
+                Value="{StaticResource P5Black}"/>
+        <Setter Property="BorderColor"
+                Value="{StaticResource P5White}"/>
+        <Setter Property="BorderWidth"
+                Value="3"/>
+        <Setter Property="CornerRadius"
+                Value="0"/>
+        <Setter Property="FontFamily"
+                Value="{StaticResource P5FontFamily}"/>
+        <Setter Property="FontSize"
+                Value="20"/>
+        <Setter Property="MinimumHeightRequest"
+                Value="60"/>
+        <Setter Property="Padding"
+                Value="14,10"/>
+        <Setter Property="HorizontalOptions"
+                Value="Fill"/>
+    </Style>
+
+    <Style TargetType="Button"
+            BasedOn="{StaticResource P5ButtonBase}"/>
+
+    <Style x:Key="P5AccentButton"
+            TargetType="Button"
+            BasedOn="{StaticResource P5ButtonBase}">
+        <Setter Property="BackgroundColor"
+                Value="{StaticResource P5Red}"/>
+        <Setter Property="BorderColor"
+                Value="{StaticResource P5Black}"/>
+    </Style>
+
+    <Style x:Key="P5Title"
+            TargetType="Label">
+        <Setter Property="TextColor"
+                Value="{StaticResource P5White}"/>
+        <Setter Property="FontFamily"
+                Value="{StaticResource P5FontFamily}"/>
+        <Setter Property="FontSize"
+                Value="64"/>
+        <Setter Property="FontAttributes"
+                Value="Bold"/>
+        <Setter Property="HorizontalOptions"
+                Value="Center"/>
+        <Setter Property="HorizontalTextAlignment"
+                Value="Center"/>
+    </Style>
+
+    <Style x:Key="P5TitleShadow"
+            TargetType="Label"
+            BasedOn="{StaticResource P5Title}">
+        <Setter Property="TextColor"
+                Value="{StaticResource P5Red}"/>
+        <Setter Property="TranslationX"
+                Value="5"/>
+        <Setter Property="TranslationY"
+                Value="5"/>
+    </Style>
+
+    <Style x:Key="P5BannerLabel"
+            TargetType="Label">
+        <Setter Property="TextColor"
+                Value="{StaticResource P5White}"/>
+        <Setter Property="FontFamily"
+                Value="{StaticResource P5FontFamily}"/>
+        <Setter Property="FontSize"
+                Value="24"/>
+        <Setter Property="Rotation"
+                Value="-90"/>
+    </Style>
+
+    <Style x:Key="P5Page"
+            TargetType="ContentPage">
+        <Setter Property="BackgroundColor"
+                Value="{StaticResource P5Black}"/>
+    </Style>
+
+</ResourceDictionary>
