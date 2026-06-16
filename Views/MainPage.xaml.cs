@@ -1,4 +1,4 @@
-﻿namespace MauiTime;
+﻿namespace MauiTime.Views;
 
 public partial class MainPage : ContentPage
 {
