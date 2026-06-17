@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using MauiTime.ViewModels;
+using MauiTime.Views;
+using Microsoft.Extensions.Logging;
 
 namespace MauiTime;
 
@@ -21,6 +23,9 @@ public static class MauiProgram
 		builder.Services.AddSingleton<Services.NotificationService>();
 		builder.Services.AddSingleton<Services.DiagnosticService>();
 		builder.Services.AddTransient<App>();
+		builder.Services.AddTransient<AgendaViewModel>();
+		builder.Services.AddTransient<AgendaPage>();
+		builder.Services.AddTransient<CalendarioPage>();
 
 #if DEBUG
 		builder.Logging.AddDebug();

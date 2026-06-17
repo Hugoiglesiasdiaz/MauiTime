@@ -8,11 +8,11 @@
 
     <TabBar>
         <Tab Title="Agenda" Icon="dotnet_bot.png">
-            <ShellContent ContentTemplate="{DataTemplate local:MainPage}" />
+            <ShellContent ContentTemplate="{DataTemplate local:AgendaPage}" />
         </Tab>
         
         <Tab Title="Calendario" Icon="dotnet_bot.png">
-            <ShellContent ContentTemplate="{DataTemplate local:StartPage}" />
+            <ShellContent ContentTemplate="{DataTemplate local:CalendarioPage}" />
         </Tab>
     </TabBar>
 

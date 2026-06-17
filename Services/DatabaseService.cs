@@ -24,6 +24,31 @@ public class DatabaseService
         return await _dbConnection!.Table<Evento>().ToListAsync();
     }
 
+    public async Task SeedDataAsync()
+{
+    await Init();
+
+    // Verificar si ya hay datos para no duplicar
+    var eventos = await _dbConnection!.Table<Evento>().ToListAsync();
+    if (eventos.Count == 0)
+    {
+        var mockEventos = new List<Evento>
+        {
+            new Evento { Titulo = "Reunión de Equipo", Descripcion = "Revisión de avances", FechaHora = DateTime.Now, EsAnual = false },
+            new Evento { Titulo = "Cumpleaños Mamá", Descripcion = "Comprar regalo", FechaHora = DateTime.Now.AddDays(2), EsAnual = true },
+            new Evento { Titulo = "Cita Médico", Descripcion = "Chequeo anual", FechaHora = DateTime.Now.AddDays(5), EsAnual = false },
+            new Evento { Titulo = "Entrega Proyecto", Descripcion = "Fecha límite de entrega", FechaHora = DateTime.Now.AddDays(7), EsAnual = false },
+            new Evento { Titulo = "Clase de Idiomas", Descripcion = "Nivel intermedio", FechaHora = DateTime.Now.AddDays(8), EsAnual = false },
+            new Evento { Titulo = "Aniversario", Descripcion = "Cena especial", FechaHora = DateTime.Now.AddDays(10), EsAnual = true },
+            new Evento { Titulo = "Gym", Descripcion = "Rutina de fuerza", FechaHora = DateTime.Now.AddDays(11), EsAnual = false },
+            new Evento { Titulo = "Revisión Coche", Descripcion = "Taller mecánico", FechaHora = DateTime.Now.AddDays(14), EsAnual = false },
+            new Evento { Titulo = "Pago Alquiler", Descripcion = "Transferencia bancaria", FechaHora = DateTime.Now.AddDays(15), EsAnual = true }
+        };
+
+        await _dbConnection.InsertAllAsync(mockEventos);
+    }
+}
+
     public async Task<int> GuardarEventoAsync(Evento evento)
     {
         await Init();
@@ -32,6 +57,12 @@ public class DatabaseService
             return await _dbConnection!.UpdateAsync(evento);
         else
             return await _dbConnection!.InsertAsync(evento);
+    }
+
+    public async Task ResetDatabaseAsync()
+    {
+        await Init();
+        await _dbConnection!.DeleteAllAsync<Evento>(); // Borra todos los registros actuales
     }
 
     public async Task<List<Evento>> ObtenerEventosPorMes(int mes, int anio)

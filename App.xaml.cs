@@ -1,28 +1,46 @@
-﻿using MauiTime;
+﻿namespace MauiTime;
+
 using MauiTime.Services;
 
-namespace MauiTime;
 public partial class App : Application
 {
-    private readonly DiagnosticService _diagnostic;
-
-    public App(DiagnosticService diagnostic)
+    public App() // Constructor simple, sin inyección
     {
         InitializeComponent();
-        _diagnostic = diagnostic;
     }
 
     protected override Window CreateWindow(IActivationState? activationState)
     {
-        // Definimos la ventana
         var window = new Window(new AppShell());
 
+        // Resolución directa de servicios
+        var diagnostic = IPlatformApplication.Current?.Services.GetService<DiagnosticService>();
+
+        // Ejecutamos todo en una sola secuencia lógica
+        Task.Run(async () =>
+        {
+            var dbService = IPlatformApplication.Current?.Services.GetService<DatabaseService>();
+            if (dbService != null)
+            {
+                // Solo resetea si realmente necesitas limpiar todo en cada inicio.
+                // Si quieres persistencia, comenta la línea de abajo.
+                await dbService.ResetDatabaseAsync();
+
+                // Ahora cargamos los datos
+                await dbService.SeedDataAsync();
+            }
+        });
+
+
         /*
-        // Disparamos el diagnóstico una vez creada la ventana
-        Task.Run(async () => {
-            await Task.Delay(1000); // Pequeña pausa para asegurar carga de UI
-            await _diagnostic.RunDiagnostic();
-        });*/
+        if (diagnostic != null)
+        {
+            Task.Run(async () => {
+                await Task.Delay(1000);
+                await diagnostic.RunDiagnostic();
+            });
+        }
+        */
 
         return window;
     }
