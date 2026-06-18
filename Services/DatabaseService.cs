@@ -1,5 +1,6 @@
 using SQLite;
 using MauiTime.Models;
+using static MauiTime.Models.Evento;
 
 namespace MauiTime.Services;
 
@@ -25,29 +26,30 @@ public class DatabaseService
     }
 
     public async Task SeedDataAsync()
-{
-    await Init();
-
-    // Verificar si ya hay datos para no duplicar
-    var eventos = await _dbConnection!.Table<Evento>().ToListAsync();
-    if (eventos.Count == 0)
     {
-        var mockEventos = new List<Evento>
-        {
-            new Evento { Titulo = "Reunión de Equipo", Descripcion = "Revisión de avances", FechaHora = DateTime.Now, EsAnual = false },
-            new Evento { Titulo = "Cumpleaños Mamá", Descripcion = "Comprar regalo", FechaHora = DateTime.Now.AddDays(2), EsAnual = true },
-            new Evento { Titulo = "Cita Médico", Descripcion = "Chequeo anual", FechaHora = DateTime.Now.AddDays(5), EsAnual = false },
-            new Evento { Titulo = "Entrega Proyecto", Descripcion = "Fecha límite de entrega", FechaHora = DateTime.Now.AddDays(7), EsAnual = false },
-            new Evento { Titulo = "Clase de Idiomas", Descripcion = "Nivel intermedio", FechaHora = DateTime.Now.AddDays(8), EsAnual = false },
-            new Evento { Titulo = "Aniversario", Descripcion = "Cena especial", FechaHora = DateTime.Now.AddDays(10), EsAnual = true },
-            new Evento { Titulo = "Gym", Descripcion = "Rutina de fuerza", FechaHora = DateTime.Now.AddDays(11), EsAnual = false },
-            new Evento { Titulo = "Revisión Coche", Descripcion = "Taller mecánico", FechaHora = DateTime.Now.AddDays(14), EsAnual = false },
-            new Evento { Titulo = "Pago Alquiler", Descripcion = "Transferencia bancaria", FechaHora = DateTime.Now.AddDays(15), EsAnual = true }
-        };
+        await Init();
 
-        await _dbConnection.InsertAllAsync(mockEventos);
+        // Verificar si ya hay datos para no duplicar
+        var eventos = await _dbConnection!.Table<Evento>().ToListAsync();
+        if (eventos.Count == 0)
+        {
+            var mockEventos = new List<Evento>
+{
+    new Evento { Titulo = "Meditación", Descripcion = "10 min de paz", FechaHora = DateTime.Now, Frecuencia = FrecuenciaEvento.Diario },
+    new Evento { Titulo = "Reunión de Equipo", Descripcion = "Avances", FechaHora = DateTime.Now.AddDays(1), Frecuencia = FrecuenciaEvento.Semanal },
+    new Evento { Titulo = "Pago Alquiler", Descripcion = "Transferencia", FechaHora = DateTime.Now.AddDays(2), Frecuencia = FrecuenciaEvento.Mensual },
+    new Evento { Titulo = "Cumpleaños Mamá", Descripcion = "Comprar regalo", FechaHora = DateTime.Now.AddDays(3), Frecuencia = FrecuenciaEvento.Anual },
+    new Evento { Titulo = "Cita Médico", Descripcion = "Chequeo", FechaHora = DateTime.Now.AddDays(5), Frecuencia = FrecuenciaEvento.Ninguna },
+    new Evento { Titulo = "Suscripción Revista", Descripcion = "Renovación", FechaHora = DateTime.Now.AddDays(7), Frecuencia = FrecuenciaEvento.Mensual },
+    new Evento { Titulo = "Clase de Idiomas", Descripcion = "Intermedio", FechaHora = DateTime.Now.AddDays(8), Frecuencia = FrecuenciaEvento.Semanal },
+    new Evento { Titulo = "Aniversario", Descripcion = "Cena", FechaHora = DateTime.Now.AddDays(10), Frecuencia = FrecuenciaEvento.Anual },
+    new Evento { Titulo = "Gym", Descripcion = "Fuerza", FechaHora = DateTime.Now.AddDays(11), Frecuencia = FrecuenciaEvento.Diario },
+    new Evento { Titulo = "Revisión Coche", Descripcion = "Taller", FechaHora = DateTime.Now.AddDays(14), Frecuencia = FrecuenciaEvento.Mensual }
+};
+
+            await _dbConnection.InsertAllAsync(mockEventos);
+        }
     }
-}
 
     public async Task<int> GuardarEventoAsync(Evento evento)
     {

@@ -108,19 +108,22 @@
                         ZIndex="2"
                         Padding="30,12">
                     <Border.Shadow>
-                        <Shadow Brush="Black" Offset="5,5" Radius="0" Opacity="0.8" />
+                        <Shadow Brush="Black"
+                                Offset="5,5"
+                                Radius="0"
+                                Opacity="0.8"/>
                     </Border.Shadow>
                     <Border.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="OnAgendaTabTapped" />
-                        <PointerGestureRecognizer PointerEntered="OnTabAgendaMouseIn" 
-                                                  PointerExited="OnTabAgendaMouseOut" />
+                        <TapGestureRecognizer Tapped="OnAgendaTabTapped"/>
+                        <PointerGestureRecognizer PointerEntered="OnTabAgendaMouseIn"
+                                                  PointerExited="OnTabAgendaMouseOut"/>
                     </Border.GestureRecognizers>
-                    
+
                     <!-- Cambiamos CharacterSpacing a 0 para que expanda horizontalmente en perfecta simetría -->
-                    <Label Text="AGENDA" 
-                           TextColor="#E31D26" 
-                           FontSize="21" 
-                           FontAttributes="Bold, Italic" 
+                    <Label Text="AGENDA"
+                           TextColor="#E31D26"
+                           FontSize="21"
+                           FontAttributes="Bold, Italic"
                            FontFamily="Impact"
                            CharacterSpacing="0"/>
                 </Border>
@@ -213,39 +216,153 @@
                                         <!-- Distribución horizontal interna para las descripciones -->
                                         <Grid ColumnDefinitions="*, Auto"
                                               VerticalOptions="Center">
+
+                                            <!-- Bloque Izquierdo Opciones de Texto: Título y Descripción Dominantes -->
                                             <VerticalStackLayout Grid.Column="0"
-                                                                 VerticalOptions="Center">
+                                                                 VerticalOptions="Center"
+                                                                 Spacing="2">
+
+                                                <!-- TÍTULO DEL EVENTO (Ahora toma el protagonismo total en la izquierda) -->
                                                 <Label Text="{Binding Titulo}"
                                                        TextColor="White"
-                                                       FontSize="18"
-                                                       FontAttributes="Bold"
-                                                       TextTransform="Uppercase"/>
+                                                       FontSize="20"
+                                                       FontFamily="HelveticaNowDisplay-ExtraBold"
+                                                       TextTransform="Uppercase"
+                                                       CharacterSpacing="-0.5"
+                                                       VerticalOptions="Center"/>
+
+                                                <!-- DESCRIPCIÓN DEL EVENTO -->
                                                 <Label Text="{Binding Descripcion}"
                                                        TextColor="#B5B5B5"
-                                                       FontSize="13"/>
+                                                       FontSize="13"
+                                                       FontFamily="OpenSansRegular"
+                                                       Margin="2,2,0,0"/>
                                             </VerticalStackLayout>
 
-                                            <Border Grid.Column="1"
-                                                    IsVisible="{Binding EsAnual}"
-                                                    BackgroundColor="White"
-                                                    VerticalOptions="Start"
-                                                    HorizontalOptions="End"
-                                                    Padding="6,3"
-                                                    Rotation="-6"
-                                                    Margin="0,-8,5,0">
-                                                <Label Text="YEARLY"
-                                                       TextColor="Black"
-                                                       FontSize="9"
-                                                       FontAttributes="Bold"/>
-                                            </Border>
+                                            <!-- Bloque Derecho Estilo HUD: Hora apilada verticalmente sobre el Sticker -->
+                                            <VerticalStackLayout Grid.Column="1"
+                                                                 HorizontalOptions="End"
+                                                                 VerticalOptions="Center"
+                                                                 Spacing="4"
+                                                                 Margin="0,5,15,0"
+                                                                 ZIndex="4">
+
+                                                <!-- HORA DEL EVENTO (Marcador dinámico superior derecho con rotación viva) -->
+                                                <Label Text="{Binding Hora}"
+                                                       TextColor="#E31D26"
+                                                       FontSize="17"
+                                                       FontFamily="HelveticaNowDisplay-ExtraBold"
+                                                       HorizontalOptions="End"
+                                                       Margin="0,0,4,0"
+                                                       Rotation="4"
+                                                       CharacterSpacing="-0.5"/>
+
+                                                <!-- Contenedor Unificado de Stickers: Evita espacios vacíos al alternar IsVisible -->
+                                                <Grid>
+                                                    <!-- Sticker Anual -->
+                                                    <Grid IsVisible="{Binding EsAnual}"
+                                                          WidthRequest="78"
+                                                          HeightRequest="32"
+                                                          Rotation="-7">
+                                                        <Polygon Points="3,5 78,3 73,35 8,31"
+                                                                Fill="Black"
+                                                                Aspect="Fill"/>
+                                                        <Polygon Points="0,2 75,0 70,32 5,28"
+                                                                Fill="#E31D26"
+                                                                Stroke="White"
+                                                                StrokeThickness="1.5"
+                                                                Aspect="Fill"/>
+                                                        <Label Text="ANUAL"
+                                                                TextColor="White"
+                                                                FontSize="12.5"
+                                                                FontAttributes="Bold"
+                                                                FontFamily="HelveticaNowDisplay-ExtraBold"
+                                                                HorizontalOptions="Center"
+                                                                VerticalOptions="Center"
+                                                                CharacterSpacing="-0.5"/>
+                                                    </Grid>
+
+                                                    <!-- Sticker Mensual -->
+                                                    <Grid IsVisible="{Binding EsMensual}"
+                                                          WidthRequest="92"
+                                                          HeightRequest="32"
+                                                          Rotation="6">
+                                                        <Polygon Points="11,3 93,7 83,35 3,29"
+                                                                Fill="Black"
+                                                                Aspect="Fill"/>
+                                                        <Polygon Points="8,0 90,4 80,32 0,26"
+                                                                Fill="#E31D26"
+                                                                Stroke="White"
+                                                                StrokeThickness="1.5"
+                                                                Aspect="Fill"/>
+                                                        <Label Text="MENSUAL"
+                                                                TextColor="White"
+                                                                FontSize="12"
+                                                                FontAttributes="Bold"
+                                                                FontFamily="HelveticaNowDisplay-ExtraBold"
+                                                                HorizontalOptions="Center"
+                                                                VerticalOptions="Center"
+                                                                CharacterSpacing="-0.5"/>
+                                                    </Grid>
+
+                                                    <!-- Sticker Semanal -->
+                                                    <Grid IsVisible="{Binding EsSemanal}"
+                                                          WidthRequest="92"
+                                                          HeightRequest="32"
+                                                          Rotation="-5">
+                                                        <Polygon Points="3,8 88,3 93,29 8,35"
+                                                                Fill="Black"
+                                                                Aspect="Fill"/>
+                                                        <Polygon Points="0,5 85,0 90,26 5,32"
+                                                                Fill="#E31D26"
+                                                                Stroke="White"
+                                                                StrokeThickness="1.5"
+                                                                Aspect="Fill"/>
+                                                        <Label Text="SEMANAL"
+                                                                TextColor="White"
+                                                                FontSize="12"
+                                                                FontAttributes="Bold"
+                                                                FontFamily="HelveticaNowDisplay-ExtraBold"
+                                                                HorizontalOptions="Center"
+                                                                VerticalOptions="Center"
+                                                                CharacterSpacing="-0.5"/>
+                                                    </Grid>
+
+                                                    <!-- Sticker Diario -->
+                                                    <Grid IsVisible="{Binding EsDiario}"
+                                                          WidthRequest="78"
+                                                          HeightRequest="32"
+                                                          Rotation="8">
+                                                        <Polygon Points="7,3 78,8 69,35 3,27"
+                                                                Fill="Black"
+                                                                Aspect="Fill"/>
+                                                        <Polygon Points="4,0 75,5 66,32 0,24"
+                                                                Fill="#E31D26"
+                                                                Stroke="White"
+                                                                StrokeThickness="1.5"
+                                                                Aspect="Fill"/>
+                                                        <Label Text="DIARIO"
+                                                                TextColor="White"
+                                                                FontSize="12.5"
+                                                                FontAttributes="Bold"
+                                                                FontFamily="HelveticaNowDisplay-ExtraBold"
+                                                                HorizontalOptions="Center"
+                                                                VerticalOptions="Center"
+                                                                CharacterSpacing="-0.5"/>
+                                                    </Grid>
+                                                </Grid>
+
+                                            </VerticalStackLayout>
                                         </Grid>
                                     </Border>
 
                                 </Grid>
                             </DataTemplate>
                         </CollectionView.ItemTemplate>
+
                     </CollectionView>
                 </RefreshView>
+
 
                 <!-- ==================== SCROLLBAR ESTILO PERSONA 5 (CALIBRACIÓN MILIMÉTRICA) ==================== -->
                 <!-- Cambiado el margen inferior a 52 para acortar el carril y alinearlo al final real del scroll -->
