@@ -1,12 +1,319 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:models="clr-namespace:MauiTime.Models"
              x:Class="MauiTime.Views.CalendarioPage"
-             Title="Calendario">
-    
-    <VerticalStackLayout Padding="20">
-        <Label Text="Vista de Calendario" 
-               FontSize="24" 
-               HorizontalOptions="Center" />
-    </VerticalStackLayout>
+             BackgroundColor="#1A1A1A"
+             Title="P5_CALENDARIO"
+             Shell.TabBarIsVisible="False">
+
+    <Grid>
+        <!-- ==================== CAPA DE FONDO ALTO CONTRASTE (P5 CALENDARIO - UNIFICACIÓN ESTILO CORREGIDO) ==================== -->
+        <Grid HorizontalOptions="Fill"
+              VerticalOptions="Fill">
+
+            <!-- BLOQUE ROJO DERECHO: Tu estructura original pero con un borde blanco que le da efecto recorte fanzine -->
+            <Border BackgroundColor="#E31D26"
+                    Stroke="White"
+                    StrokeThickness="2"
+                    HorizontalOptions="End"
+                    VerticalOptions="Fill"
+                    WidthRequest="250"
+                    Rotation="3"
+                    Margin="0,-50,-50,-50">
+                <Border.Shadow>
+                    <Shadow Brush="Black"
+                            Offset="-5,0"
+                            Radius="0"
+                            Opacity="0.5"/>
+                </Border.Shadow>
+            </Border>
+
+            <!-- POLÍGONO NEGRO SUPERIOR IZQUIERDO: Tu forma exacta que enmarca de forma brutal las pestañas -->
+            <Polygon Points="0,0 600,0 450,400 0,350"
+                     Fill="#0A0A0A"
+                     Opacity="0.95"/>
+
+            <!-- BARRA DIAGONAL CENTRAL CORREGIDA: Le bajamos la opacidad al 35% para proteger la lectura de tus números -->
+            <BoxView Color="White"
+                     HeightRequest="12"
+                     Rotation="-15"
+                     VerticalOptions="Center"
+                     HorizontalOptions="Fill"
+                     Margin="-50,0"
+                     Opacity="0.35"/>
+
+            <!-- LÍNEAS VERTICALES IZQUIERDAS MEJORADAS: Moverlas al centro-izquierdo para rellenar el vacío y dar equilibrio -->
+            <StackLayout Orientation="Horizontal"
+                         Spacing="15"
+                         Opacity="0.15"
+                         HorizontalOptions="Start"
+                         VerticalOptions="Fill"
+                         Margin="80,0,0,0">
+                <BoxView Color="White"
+                        WidthRequest="2"
+                        VerticalOptions="Fill"/>
+                <BoxView Color="White"
+                        WidthRequest="4"
+                        VerticalOptions="Fill"/>
+                <BoxView Color="White"
+                        WidthRequest="2"
+                        VerticalOptions="Fill"/>
+            </StackLayout>
+
+            <!-- CÍRCULOS DE IMPACTO CONCÉNTRICOS: Tu estructura original intacta abajo a la izquierda -->
+            <Ellipse Fill="White"
+                     WidthRequest="150"
+                     HeightRequest="150"
+                     HorizontalOptions="Start"
+                     VerticalOptions="End"
+                     Margin="-75,0,0,-75"
+                     Opacity="0.15"/>
+            <Ellipse Fill="#E31D26"
+                     WidthRequest="100"
+                     HeightRequest="100"
+                     HorizontalOptions="Start"
+                     VerticalOptions="End"
+                     Margin="-50,0,0,-50"
+                     Opacity="0.35"/>
+
+            <!-- Trama de grano de fanzine sutil al 3% para unificar la textura de la Agenda -->
+            <Grid BackgroundColor="Transparent"
+                    Opacity="0.03">
+                <BoxView Color="White"
+                        VerticalOptions="Fill"
+                        HorizontalOptions="Fill"/>
+            </Grid>
+        </Grid>
+
+
+
+        <!-- ==================== CAPA DEL CONTENIDO PRINCIPAL ==================== -->
+        <Grid RowDefinitions="Auto, Auto, Auto, *"
+              Padding="20">
+
+            <!-- 1. PESTAÑAS DE NAVEGACIÓN SUPERIORES -->
+            <Grid Grid.Row="0"
+                  ColumnDefinitions="Auto, Auto"
+                  Margin="15,0,0,15"
+                  HorizontalOptions="Start">
+                <Border x:Name="TabAgenda"
+                        Grid.Column="0"
+                        BackgroundColor="#E5E5E5"
+                        Stroke="Black"
+                        StrokeThickness="1.5"
+                        Rotation="-4"
+                        ZIndex="1"
+                        Padding="30,12">
+                    <Border.Shadow>
+                        <Shadow Brush="Black"
+                                Offset="4,4"
+                                Radius="0"
+                                Opacity="0.5"/>
+                    </Border.Shadow>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnAgendaTabTapped"/>
+                    </Border.GestureRecognizers>
+                    <Label Text="AGENDA"
+                           TextColor="#222222"
+                           FontSize="21"
+                           FontFamily="Impact"/>
+                </Border>
+                <Border x:Name="TabCalendario"
+                        Grid.Column="1"
+                        BackgroundColor="Black"
+                        Stroke="White"
+                        StrokeThickness="2"
+                        Rotation="3"
+                        ZIndex="2"
+                        Margin="-25,2,0,0"
+                        Padding="35,12">
+                    <Border.Shadow>
+                        <Shadow Brush="Black"
+                                Offset="5,5"
+                                Radius="0"
+                                Opacity="0.8"/>
+                    </Border.Shadow>
+                    <Label Text="CALENDARIO"
+                           TextColor="#E31D26"
+                           FontSize="21"
+                           FontFamily="Impact"/>
+                </Border>
+            </Grid>
+
+            <!-- 2. CABECERA HUD NATIVA (CAMBIO DE MES) -->
+            <Grid Grid.Row="1"
+                  ColumnDefinitions="Auto, *, Auto"
+                  Margin="10,0,10,15">
+                <Button Grid.Column="0"
+                        Text="&lt;"
+                        Clicked="OnPrevMonthClicked"
+                        BackgroundColor="#E31D26"
+                        TextColor="White"
+                        FontFamily="Impact"
+                        FontSize="22"
+                        WidthRequest="48"
+                        HeightRequest="45"
+                        CornerRadius="0"
+                        Rotation="-5"/>
+
+                <Border Grid.Column="1"
+                        BackgroundColor="Black"
+                        Stroke="White"
+                        StrokeThickness="2"
+                        Rotation="2"
+                        Padding="20,6"
+                        HorizontalOptions="Center"
+                        WidthRequest="260">
+                    <HorizontalStackLayout HorizontalOptions="Center"
+                                           Spacing="10"
+                                           VerticalOptions="Center">
+                        <Label x:Name="TxtMes"
+                               Text="MES"
+                               TextColor="White"
+                               FontFamily="HelveticaNowDisplay-ExtraBold"
+                               FontSize="24"
+                               TextTransform="Uppercase"/>
+                        <Label x:Name="TxtAnio"
+                               Text="0000"
+                               TextColor="#E31D26"
+                               FontFamily="Impact"
+                               FontSize="26"/>
+                    </HorizontalStackLayout>
+                </Border>
+
+                <Button Grid.Column="2"
+                        Text="&gt;"
+                        Clicked="OnNextMonthClicked"
+                        BackgroundColor="#E31D26"
+                        TextColor="White"
+                        FontFamily="Impact"
+                        FontSize="22"
+                        WidthRequest="48"
+                        HeightRequest="45"
+                        CornerRadius="0"
+                        Rotation="6"/>
+            </Grid>
+
+            <!-- 3. INDICADORES DE DÍAS DE LA SEMANA (Cinta Roja de Peligro) -->
+            <Grid Grid.Row="2"
+                  ColumnDefinitions="*,*,*,*,*,*,*"
+                  BackgroundColor="#E31D26"
+                  Margin="5,0,5,10"
+                  Padding="0,6"
+                  Rotation="-1">
+                <Label Grid.Column="0"
+                       Text="L"
+                       TextColor="White"
+                       FontFamily="HelveticaNowDisplay-ExtraBold"
+                       FontSize="14"
+                       HorizontalOptions="Center"/>
+                <Label Grid.Column="1"
+                       Text="M"
+                       TextColor="White"
+                       FontFamily="HelveticaNowDisplay-ExtraBold"
+                       FontSize="14"
+                       HorizontalOptions="Center"/>
+                <Label Grid.Column="2"
+                       Text="X"
+                       TextColor="White"
+                       FontFamily="HelveticaNowDisplay-ExtraBold"
+                       FontSize="14"
+                       HorizontalOptions="Center"/>
+                <Label Grid.Column="3"
+                       Text="J"
+                       TextColor="White"
+                       FontFamily="HelveticaNowDisplay-ExtraBold"
+                       FontSize="14"
+                       HorizontalOptions="Center"/>
+                <Label Grid.Column="4"
+                       Text="V"
+                       TextColor="White"
+                       FontFamily="HelveticaNowDisplay-ExtraBold"
+                       FontSize="14"
+                       HorizontalOptions="Center"/>
+                <Label Grid.Column="5"
+                       Text="S"
+                       TextColor="White"
+                       FontFamily="HelveticaNowDisplay-ExtraBold"
+                       FontSize="14"
+                       HorizontalOptions="Center"/>
+                <Label Grid.Column="6"
+                       Text="D"
+                       TextColor="White"
+                       FontFamily="HelveticaNowDisplay-ExtraBold"
+                       FontSize="14"
+                       HorizontalOptions="Center"/>
+            </Grid>
+
+            <!-- 4. MATRIZ DE CUADRÍCULA DE 7 COLUMNAS (SISTEMA NATIVO P5) -->
+            <CollectionView Grid.Row="3"
+                            ItemsSource="{Binding DiasDelMes}"
+                            Margin="5,0,5,0">
+                <CollectionView.ItemsLayout>
+                    <GridItemsLayout Orientation="Vertical"
+                                     Span="7"
+                                     HorizontalItemSpacing="8"
+                                     VerticalItemSpacing="10"/>
+                </CollectionView.ItemsLayout>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:DiaCalendario">
+                        <!-- Corregido el enlace de rotación a la propiedad nativa limpia -->
+                        <Grid HeightRequest="50"
+                              WidthRequest="50"
+                              Rotation="{Binding RotacionCelda}">
+
+                            <!-- Fondo si es el día de Hoy (Cuchillada Roja de Alerta) -->
+                            <Polygon Points="2,0 50,4 44,48 0,42"
+                                     Fill="#E31D26"
+                                     IsVisible="{Binding EsHoy}"
+                                     Aspect="Fill"
+                                     ZIndex="1"/>
+
+                            <!-- Caja Sólida Negra de fondo para días normales (Se oculta si es hoy) -->
+                            <Polygon Points="0,4 48,0 50,44 4,48"
+                                     Fill="Black"
+                                     Aspect="Fill"
+                                     ZIndex="1"/>
+
+
+                            <!-- Dígito numérico del calendario -->
+                            <Label Text="{Binding NumeroDia}"
+                                   FontFamily="Impact"
+                                   FontSize="22"
+                                   HorizontalOptions="Center"
+                                   VerticalOptions="Center"
+                                   ZIndex="2">
+                                <Label.Triggers>
+                                    <DataTrigger TargetType="Label"
+                                                 Binding="{Binding EsMesActual}"
+                                                 Value="True">
+                                        <Setter Property="TextColor"
+                                                Value="White"/>
+                                        <Setter Property="Opacity"
+                                                Value="1.0"/>
+                                    </DataTrigger>
+                                    <DataTrigger TargetType="Label"
+                                                 Binding="{Binding EsMesActual}"
+                                                 Value="False">
+                                        <Setter Property="TextColor"
+                                                Value="#B5B5B5"/>
+                                        <Setter Property="Opacity"
+                                                Value="0.25"/>
+                                    </DataTrigger>
+                                    <DataTrigger TargetType="Label"
+                                                 Binding="{Binding EsHoy}"
+                                                 Value="True">
+                                        <Setter Property="TextColor"
+                                                Value="White"/>
+                                    </DataTrigger>
+                                </Label.Triggers>
+                            </Label>
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Grid>
+    </Grid>
 </ContentPage>

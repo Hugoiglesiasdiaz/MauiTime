@@ -314,9 +314,18 @@ public partial class AgendaPage : ContentPage
         // Lógica para refrescar o reaccionar al tocar la pestaña activa (opcional por ahora)
     }
 
-    private void OnCalendarioTabTapped(object? sender, TappedEventArgs e)
+    private async void OnCalendarioTabTapped(object? sender, TappedEventArgs e)
+{
+    // Cambiamos el método a 'async void' para poder usar 'await' en la navegación
+    try
     {
-        // Aquí programaremos más adelante el salto fluido hacia CalendarioPage
+        // Navegación fluida hacia la vista de Calendario usando las rutas de Shell
+        await Shell.Current.GoToAsync("//CalendarioPage");
     }
+    catch (Exception ex)
+    {
+        System.Diagnostics.Debug.WriteLine($"Error al navegar al calendario: {ex.Message}");
+    }
+}
 
 }

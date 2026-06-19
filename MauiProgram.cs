@@ -2,6 +2,8 @@
 using MauiTime.Views;
 using Microsoft.Extensions.Logging;
 
+
+
 namespace MauiTime;
 
 public static class MauiProgram

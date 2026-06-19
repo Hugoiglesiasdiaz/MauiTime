@@ -197,7 +197,7 @@
                                                         Loaded="OnFechaHudLoaded"/>
                                     </Grid>
 
-                                    <!-- TARJETA DEL EVENTO (CUCHILLADA NEGRA) -->
+                                    <!-- TARJETA DEL EVENTO (RESTANTE NEGRO LIMPIO + TÍTULO DUOTONO P5) -->
                                     <Border Grid.Column="1"
                                             BackgroundColor="Black"
                                             Stroke="White"
@@ -217,19 +217,34 @@
                                         <Grid ColumnDefinitions="*, Auto"
                                               VerticalOptions="Center">
 
-                                            <!-- Bloque Izquierdo Opciones de Texto: Título y Descripción Dominantes -->
+                                            <!-- Bloque Izquierdo Opciones de Texto: Título Duotono y Descripción -->
                                             <VerticalStackLayout Grid.Column="0"
                                                                  VerticalOptions="Center"
                                                                  Spacing="2">
 
-                                                <!-- TÍTULO DEL EVENTO (Ahora toma el protagonismo total en la izquierda) -->
-                                                <Label Text="{Binding Titulo}"
-                                                       TextColor="White"
-                                                       FontSize="20"
-                                                       FontFamily="HelveticaNowDisplay-ExtraBold"
-                                                       TextTransform="Uppercase"
-                                                       CharacterSpacing="-0.5"
-                                                       VerticalOptions="Center"/>
+                                                <!-- EFECTO DUOTONO: Dos Labels solapados para crear la sombra sólida e imperfecta -->
+                                                <Grid HorizontalOptions="Start"
+                                                        VerticalOptions="Center">
+
+                                                    <!-- 1. Sombra Roja Sólida (Desplazada abajo a la derecha) -->
+                                                    <Label Text="{Binding Titulo}"
+                                                           TextColor="#E31D26"
+                                                           FontSize="20"
+                                                           FontFamily="HelveticaNowDisplay-ExtraBold"
+                                                           TextTransform="Uppercase"
+                                                           CharacterSpacing="-0.5"
+                                                           Margin="2,2,0,0"
+                                                           VerticalOptions="Center"/>
+
+                                                    <!-- 2. Texto Principal Blanco (Encima de la sombra) -->
+                                                    <Label Text="{Binding Titulo}"
+                                                           TextColor="White"
+                                                           FontSize="20"
+                                                           FontFamily="HelveticaNowDisplay-ExtraBold"
+                                                           TextTransform="Uppercase"
+                                                           CharacterSpacing="-0.5"
+                                                           VerticalOptions="Center"/>
+                                                </Grid>
 
                                                 <!-- DESCRIPCIÓN DEL EVENTO -->
                                                 <Label Text="{Binding Descripcion}"
@@ -247,7 +262,7 @@
                                                                  Margin="0,5,15,0"
                                                                  ZIndex="4">
 
-                                                <!-- HORA DEL EVENTO (Marcador dinámico superior derecho con rotación viva) -->
+                                                <!-- HORA DEL EVENTO -->
                                                 <Label Text="{Binding Hora}"
                                                        TextColor="#E31D26"
                                                        FontSize="17"
@@ -257,13 +272,13 @@
                                                        Rotation="4"
                                                        CharacterSpacing="-0.5"/>
 
-                                                <!-- Contenedor Unificado de Stickers: Evita espacios vacíos al alternar IsVisible -->
+                                                <!-- Contenedor Unificado de Stickers -->
                                                 <Grid>
                                                     <!-- Sticker Anual -->
                                                     <Grid IsVisible="{Binding EsAnual}"
-                                                          WidthRequest="78"
-                                                          HeightRequest="32"
-                                                          Rotation="-7">
+                                                            WidthRequest="78"
+                                                            HeightRequest="32"
+                                                            Rotation="-7">
                                                         <Polygon Points="3,5 78,3 73,35 8,31"
                                                                 Fill="Black"
                                                                 Aspect="Fill"/>
@@ -284,9 +299,9 @@
 
                                                     <!-- Sticker Mensual -->
                                                     <Grid IsVisible="{Binding EsMensual}"
-                                                          WidthRequest="92"
-                                                          HeightRequest="32"
-                                                          Rotation="6">
+                                                            WidthRequest="92"
+                                                            HeightRequest="32"
+                                                            Rotation="6">
                                                         <Polygon Points="11,3 93,7 83,35 3,29"
                                                                 Fill="Black"
                                                                 Aspect="Fill"/>
@@ -307,9 +322,9 @@
 
                                                     <!-- Sticker Semanal -->
                                                     <Grid IsVisible="{Binding EsSemanal}"
-                                                          WidthRequest="92"
-                                                          HeightRequest="32"
-                                                          Rotation="-5">
+                                                            WidthRequest="92"
+                                                            HeightRequest="32"
+                                                            Rotation="-5">
                                                         <Polygon Points="3,8 88,3 93,29 8,35"
                                                                 Fill="Black"
                                                                 Aspect="Fill"/>
@@ -330,9 +345,9 @@
 
                                                     <!-- Sticker Diario -->
                                                     <Grid IsVisible="{Binding EsDiario}"
-                                                          WidthRequest="78"
-                                                          HeightRequest="32"
-                                                          Rotation="8">
+                                                            WidthRequest="78"
+                                                            HeightRequest="32"
+                                                            Rotation="8">
                                                         <Polygon Points="7,3 78,8 69,35 3,27"
                                                                 Fill="Black"
                                                                 Aspect="Fill"/>

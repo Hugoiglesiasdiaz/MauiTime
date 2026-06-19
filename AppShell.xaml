@@ -4,14 +4,18 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:MauiTime.Views"
-    Shell.FlyoutBehavior="Disabled">
+    Shell.FlyoutBehavior="Disabled"
+    Shell.TabBarIsVisible="False"
+    Shell.NavBarIsVisible="False">
 
     <TabBar>
-        <Tab Title="Agenda" Icon="dotnet_bot.png">
+        <!-- AÑADIDO: Route="AgendaPage" -->
+        <Tab Title="Agenda" Icon="dotnet_bot.png" Route="AgendaPage">
             <ShellContent ContentTemplate="{DataTemplate local:AgendaPage}" />
         </Tab>
         
-        <Tab Title="Calendario" Icon="dotnet_bot.png">
+        <!-- AÑADIDO: Route="CalendarioPage" -->
+        <Tab Title="Calendario" Icon="dotnet_bot.png" Route="CalendarioPage">
             <ShellContent ContentTemplate="{DataTemplate local:CalendarioPage}" />
         </Tab>
     </TabBar>
