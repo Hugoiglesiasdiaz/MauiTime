@@ -51,14 +51,14 @@
                          VerticalOptions="Fill"
                          Margin="80,0,0,0">
                 <BoxView Color="White"
-                        WidthRequest="2"
-                        VerticalOptions="Fill"/>
+                         WidthRequest="2"
+                         VerticalOptions="Fill"/>
                 <BoxView Color="White"
-                        WidthRequest="4"
-                        VerticalOptions="Fill"/>
+                         WidthRequest="4"
+                         VerticalOptions="Fill"/>
                 <BoxView Color="White"
-                        WidthRequest="2"
-                        VerticalOptions="Fill"/>
+                         WidthRequest="2"
+                         VerticalOptions="Fill"/>
             </StackLayout>
 
             <!-- CÍRCULOS DE IMPACTO CONCÉNTRICOS: Tu estructura original intacta abajo a la izquierda -->
@@ -79,10 +79,10 @@
 
             <!-- Trama de grano de fanzine sutil al 3% para unificar la textura de la Agenda -->
             <Grid BackgroundColor="Transparent"
-                    Opacity="0.03">
+                  Opacity="0.03">
                 <BoxView Color="White"
-                        VerticalOptions="Fill"
-                        HorizontalOptions="Fill"/>
+                         VerticalOptions="Fill"
+                         HorizontalOptions="Fill"/>
             </Grid>
         </Grid>
 
@@ -141,58 +141,128 @@
                 </Border>
             </Grid>
 
-            <!-- 2. CABECERA HUD NATIVA (CAMBIO DE MES) -->
+            <!-- 2. CABECERA HUD EXTIDILO PHANTOM THIEVES (REDISEÑO TOTAL AGRESIVO) -->
             <Grid Grid.Row="1"
                   ColumnDefinitions="Auto, *, Auto"
-                  Margin="10,0,10,15">
-                <Button Grid.Column="0"
-                        Text="&lt;"
-                        Clicked="OnPrevMonthClicked"
-                        BackgroundColor="#E31D26"
-                        TextColor="White"
-                        FontFamily="Impact"
-                        FontSize="22"
-                        WidthRequest="48"
-                        HeightRequest="45"
-                        CornerRadius="0"
-                        Rotation="-5"/>
+                  Margin="10,5,10,20"
+                  VerticalOptions="Center">
 
-                <Border Grid.Column="1"
-                        BackgroundColor="Black"
-                        Stroke="White"
-                        StrokeThickness="2"
-                        Rotation="2"
-                        Padding="20,6"
-                        HorizontalOptions="Center"
-                        WidthRequest="260">
-                    <HorizontalStackLayout HorizontalOptions="Center"
-                                           Spacing="10"
-                                           VerticalOptions="Center">
-                        <Label x:Name="TxtMes"
-                               Text="MES"
-                               TextColor="White"
-                               FontFamily="HelveticaNowDisplay-ExtraBold"
-                               FontSize="24"
-                               TextTransform="Uppercase"/>
-                        <Label x:Name="TxtAnio"
-                               Text="0000"
-                               TextColor="#E31D26"
-                               FontFamily="Impact"
-                               FontSize="26"/>
-                    </HorizontalStackLayout>
-                </Border>
+                <!-- BOTÓN MES ANTERIOR: Machetazo Diagonal Masivo estilo Navaja -->
+                <Grid Grid.Column="0"
+                      WidthRequest="55"
+                      HeightRequest="50"
+                      Rotation="-12"
+                      VerticalOptions="Center">
+                    <!-- Sombra sólida negra -->
+                    <Polygon Points="8,10 55,0 42,50 0,40"
+                             Fill="Black"
+                             Aspect="Fill"/>
+                    <!-- Bloque Rojo Delantero súper afilado -->
+                    <Polygon Points="3,5 50,-5 37,45 0,35"
+                             Fill="#E31D26"
+                             Stroke="White"
+                             StrokeThickness="1.5"
+                             Aspect="Fill"/>
+                    <Label Text="&lt;"
+                           TextColor="White"
+                           FontFamily="Impact"
+                           FontSize="26"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"
+                           Margin="-4,-2,0,0"/>
+                    <Button Clicked="OnPrevMonthClicked"
+                            BackgroundColor="Transparent"
+                            CornerRadius="0"
+                            ZIndex="2"/>
+                </Grid>
 
-                <Button Grid.Column="2"
-                        Text="&gt;"
-                        Clicked="OnNextMonthClicked"
-                        BackgroundColor="#E31D26"
-                        TextColor="White"
-                        FontFamily="Impact"
-                        FontSize="22"
-                        WidthRequest="48"
-                        HeightRequest="45"
-                        CornerRadius="0"
-                        Rotation="6"/>
+                <!-- HUD CENTRAL: REPLICA DE PANTALLA DE DÍA REAL DE P5 (ESTILO COLLAGE COMPACTO) -->
+                <Grid Grid.Column="1"
+                      HorizontalOptions="Center"
+                      VerticalOptions="Center"
+                      WidthRequest="360"
+                      HeightRequest="180"
+                      Margin="0,-30,0,-10">
+
+                    <!-- CAPA 1: EL AÑO (Arriba a la Izquierda, Masivo) -->
+                    <!-- Actúa como el dígito dominante con rotación agresiva hacia la izquierda -->
+                    <FlexLayout x:Name="ContenedorLetrasAnio"
+                                Direction="Row"
+                                JustifyContent="Center"
+                                AlignItems="Center"
+                                HorizontalOptions="Start"
+                                VerticalOptions="Start"
+                                HeightRequest="70"
+                                Rotation="-15"
+                                Margin="30,5,0,0"
+                                ZIndex="2"/>
+
+                    <!-- CAPA 2: EL MES (Abajo a la Derecha, Pisando al Año) -->
+                    <!-- Inclinado hacia la derecha para romper la simetría y encastrado debajo -->
+                    <Grid HorizontalOptions="End"
+                          VerticalOptions="End"
+                          HeightRequest="80"
+                          Rotation="8"
+                          Margin="0,0,20,15"
+                          ZIndex="3">
+
+                        <!-- Fondo de pegatina unificado estilo fanzine para el bloque del mes -->
+                        <Polygon Points="-5,5 105,0 98,100 -2,95"
+                                Fill="Black"
+                                Aspect="Fill"/>
+                        <Polygon Points="-2,2 102,0 96,98 0,96"
+                                Fill="Black"
+                                Stroke="#E31D26"
+                                StrokeThickness="3"
+                                Aspect="Fill"/>
+
+                        <FlexLayout x:Name="ContenedorLetrasMes"
+                                    Direction="Row"
+                                    JustifyContent="Center"
+                                    AlignItems="Center"
+                                    Margin="20,0,25,4"/>
+                    </Grid>
+
+                    <!-- CAPA 3: DETALLE URBANO (Cinta de sujeción punk sobre el Año) -->
+                    <Polygon Points="0,0 35,-5 25,15 -5,17"
+                             Fill="Black"
+                             HorizontalOptions="Start"
+                             VerticalOptions="Start"
+                             Margin="20,0,0,0"
+                             Rotation="-40"
+                             ZIndex="4"/>
+                </Grid>
+
+
+                <!-- BOTÓN MES SIGUIENTE: Machetazo Diagonal Inverso -->
+                <Grid Grid.Column="2"
+                      WidthRequest="55"
+                      HeightRequest="50"
+                      Rotation="14"
+                      VerticalOptions="Center">
+                    <!-- Sombra sólida negra -->
+                    <Polygon Points="0,10 47,0 55,40 13,50"
+                             Fill="Black"
+                             Aspect="Fill"/>
+                    <!-- Bloque Rojo Delantero súper afilado -->
+                    <Polygon Points="0,5 47,-5 55,35 13,45"
+                             Fill="#E31D26"
+                             Stroke="White"
+                             StrokeThickness="1.5"
+                             Aspect="Fill"/>
+                    <Label Text="&gt;"
+                           TextColor="White"
+                           FontFamily="Impact"
+                           FontSize="26"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"
+                           Margin="4,-2,0,0"/>
+                    <Button Clicked="OnNextMonthClicked"
+                            BackgroundColor="Transparent"
+                            CornerRadius="0"
+                            ZIndex="2"/>
+                </Grid>
+
             </Grid>
 
             <!-- 3. INDICADORES DE DÍAS DE LA SEMANA (Cinta Roja de Peligro) -->
