@@ -122,8 +122,14 @@ namespace MauiTime.Views
             }
 
             // 3. Días del mes siguiente para rellenar el Grid de 7x6 (42 celdas)
+            int totalCeldasHastaFilaActual = listaDias.Count;
+            
+            // Si el mes no termina justo en domingo (módulo 7 != 0), calculamos cuántos días faltan para cerrar esa fila
+            int diasParaCerrarSemana = (7 - (totalCeldasHastaFilaActual % 7)) % 7;
+            int celdasObjetivoDinamico = totalCeldasHastaFilaActual + diasParaCerrarSemana;
+
             int diaSiguiente = 1;
-            while (listaDias.Count < 42)
+            while (listaDias.Count < celdasObjetivoDinamico)
             {
                 listaDias.Add(new DiaCalendario
                 {
@@ -154,7 +160,7 @@ namespace MauiTime.Views
                     StrokeShape = new Microsoft.Maui.Controls.Shapes.Rectangle(),
                     // OPTIMIZACIÓN: Más acolchado para que el recorte resalte más por sí solo
                     Padding = new Thickness(9, 5),
-                    Margin = new Thickness(3, 0)
+                    Margin = new Thickness(0.5, 0)
                 };
 
                 var labelLetra = new Label
@@ -300,8 +306,5 @@ namespace MauiTime.Views
                 ContenedorLetrasAnio.Children.Add(bloqueDigito);
             }
         }
-
-
     }
-
 }
