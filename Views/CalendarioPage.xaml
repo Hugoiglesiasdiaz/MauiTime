@@ -272,162 +272,223 @@
 
             </Grid>
 
-            <!-- ==================== 3. INDICADORES DE DÍAS DE LA SEMANA (FILA 2 - COLLAGE LIBRE PREMIUM) ==================== -->
+            <!-- ==================== 3. INDICADORES DE DÍAS DE LA SEMANA (FILA 2 - LETRAS EN LÍNEA Y SEPARADOR BAJO) ==================== -->
             <Grid Grid.Row="2"
-                  HeightRequest="70"
-                  Margin="15,5,15,5"
-                  VerticalOptions="Center">
+                  HeightRequest="65"
+                  Margin="15,5,15,5">
 
-                <!-- Franja roja de peligro continua (Base de contraste duro) -->
+                <!-- 1. LA FRANJA ROJA SEPARADORA NATIVA: Recta y clavada en la base inferior (VerticalOptions="End") -->
                 <BoxView Color="#E31D26"
-                         HeightRequest="26"
-                         VerticalOptions="Center"
-                         Rotation="-0.5"
+                         HeightRequest="14"
+                         VerticalOptions="End"
+                         Margin="0,0,0,5"
                          ZIndex="1"/>
 
-                <!-- CAPA TIPOGRÁFICA: Un contenedor elástico que permite desalineaciones y escalas caóticas -->
-                <FlexLayout ZIndex="2"
-                            Direction="Row"
-                            JustifyContent="SpaceAround"
-                            AlignItems="Center"
-                            VerticalOptions="Fill"
-                            HorizontalOptions="Fill"
-                            Margin="5,0">
+                <!-- 2. CAPA DE LETRAS ALINEADAS: Todas niveladas en el centro-alto de la fila, rozando el separador -->
+                <Grid ZIndex="2"
+                      VerticalOptions="Start"
+                      HeightRequest="45"
+                      Margin="0,2,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
 
-                    <!-- LUNES: Tarjeta Blanca Rectangular Estrecha y Alta (Letra se come el papel) -->
-                    <Border BackgroundColor="White"
-                            Stroke="Black"
-                            StrokeThickness="2.5"
-                            StrokeShape="Rectangle"
-                            Padding="12,2,12,4"
-                            HeightRequest="46"
-                            VerticalOptions="Center"
-                            ZIndex="2">
+                    <!-- LUNES -->
+                    <Grid Grid.Column="0"
+                          HorizontalOptions="Center"
+                          VerticalOptions="Center"
+                          HeightRequest="38"
+                          WidthRequest="34"
+                          Rotation="-6">
+                        <Polygon Points="3,4 39,0 33,38 -3,34"
+                                 Fill="Black"
+                                 Aspect="Fill"
+                                 ZIndex="1"/>
+                        <Polygon Points="0,4 36,0 30,34 0,30"
+                                 Fill="Black"
+                                 Stroke="White"
+                                 StrokeThickness="1"
+                                 Aspect="Fill"
+                                 ZIndex="2"/>
                         <Label Text="L"
-                                FontFamily="Impact"
-                                FontSize="26"
-                                TextColor="Black"
-                                HorizontalOptions="Center"
-                                VerticalOptions="Center"/>
-                    </Border>
-
-                    <!-- MARTES: Tarjeta Negra Cuadrada Pequeña (Asimetría radical de escala) -->
-                    <Border BackgroundColor="Black"
-                            StrokeThickness="0"
-                            StrokeShape="Rectangle"
-                            Padding="8,4"
-                            HeightRequest="32"
-                            VerticalOptions="Center"
-                            ZIndex="2"
-                            TranslationY="-6">
-                        <Label Text="M"
-                                FontFamily="Franklin Gothic"
-                                FontSize="18"
-                                FontAttributes="Bold"
-                                TextColor="White"
-                                HorizontalOptions="Center"
-                                VerticalOptions="Center"/>
-                    </Border>
-
-                    <!-- MIÉRCOLES: Letra Blanca Gigante Suelta con Sombra Sólida Negra (Sin papel trasero) -->
-                    <Grid VerticalOptions="Center"
-                            ZIndex="2"
-                            HeightRequest="45"
-                            TranslationY="4">
-                        <Label Text="X"
-                                FontFamily="Impact"
-                                FontSize="34"
-                                TextColor="Black"
-                                Margin="3,3,0,0"
-                                HorizontalOptions="Center"
-                                VerticalOptions="Center"/>
-                        <Label Text="X"
-                                FontFamily="Impact"
-                                FontSize="34"
-                                TextColor="White"
-                                HorizontalOptions="Center"
-                                VerticalOptions="Center"/>
+                               FontFamily="Impact"
+                               FontSize="19"
+                               TextColor="White"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"
+                               ZIndex="3"
+                               Margin="0,-2,2,0"/>
                     </Grid>
 
-                    <!-- JUEVES: Tarjeta Negra Alargada con Contorno Blanco Fino -->
-                    <Border BackgroundColor="Black"
-                            Stroke="White"
-                            StrokeThickness="1.5"
-                            StrokeShape="Rectangle"
-                            Padding="14,6,14,2"
-                            HeightRequest="42"
-                            VerticalOptions="Center"
-                            ZIndex="2"
-                            TranslationY="-3">
+                    <!-- MARTES -->
+                    <Grid Grid.Column="1"
+                          HorizontalOptions="Center"
+                          VerticalOptions="Center"
+                          HeightRequest="38"
+                          WidthRequest="34"
+                          Rotation="5">
+                        <Polygon Points="2,5 38,0 32,36 0,39"
+                                 Fill="Black"
+                                 Aspect="Fill"
+                                 ZIndex="1"/>
+                        <Polygon Points="0,5 36,0 30,32 1,35"
+                                 Fill="White"
+                                 Stroke="Black"
+                                 StrokeThickness="1.5"
+                                 Aspect="Fill"
+                                 ZIndex="2"/>
+                        <Label Text="M"
+                               FontFamily="Impact"
+                               FontSize="18"
+                               TextColor="Black"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"
+                               ZIndex="3"
+                               Margin="0,-2,0,0"/>
+                    </Grid>
+
+                    <!-- MIÉRCOLES -->
+                    <Grid Grid.Column="2"
+                          HorizontalOptions="Center"
+                          VerticalOptions="Center"
+                          HeightRequest="38"
+                          WidthRequest="34"
+                          Rotation="-4">
+                        <Polygon Points="0,0 38,3 34,37 3,34"
+                                 Fill="Black"
+                                 Aspect="Fill"
+                                 ZIndex="1"/>
+                        <Polygon Points="0,0 38,3 36,10 2,7"
+                                 Fill="#E31D26"
+                                 Aspect="Fill"
+                                 ZIndex="2"/>
+                        <Label Text="X"
+                               FontFamily="Impact"
+                               FontSize="18"
+                               TextColor="White"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"
+                               ZIndex="3"
+                               Margin="0,2,0,0"/>
+                    </Grid>
+
+                    <!-- JUEVES -->
+                    <Grid Grid.Column="3"
+                          HorizontalOptions="Center"
+                          VerticalOptions="Center"
+                          HeightRequest="38"
+                          WidthRequest="34"
+                          Rotation="6">
+                        <Polygon Points="3,2 37,0 31,38 -2,35"
+                                 Fill="Black"
+                                 Aspect="Fill"
+                                 ZIndex="1"/>
+                        <Polygon Points="0,2 34,0 28,34 0,31"
+                                 Fill="Black"
+                                 Stroke="White"
+                                 StrokeThickness="1"
+                                 Aspect="Fill"
+                                 ZIndex="2"/>
                         <Label Text="J"
-                                FontFamily="Franklin Gothic"
-                                FontSize="22"
-                                FontAttributes="Bold"
-                                TextColor="White"
-                                HorizontalOptions="Center"
-                                VerticalOptions="Center"/>
-                    </Border>
+                               FontFamily="Impact"
+                               FontSize="19"
+                               TextColor="White"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"
+                               ZIndex="3"
+                               Margin="0,-2,2,0"/>
+                    </Grid>
 
-                    <!-- VIERNES: Tarjeta Blanca Apelotonada Transversal -->
-                    <Border BackgroundColor="White"
-                            Stroke="Black"
-                            StrokeThickness="2"
-                            StrokeShape="Rectangle"
-                            Padding="10,4"
-                            HeightRequest="38"
-                            VerticalOptions="Center"
-                            ZIndex="2"
-                            TranslationY="5">
+                    <!-- VIERNES -->
+                    <Grid Grid.Column="4"
+                          HorizontalOptions="Center"
+                          VerticalOptions="Center"
+                          HeightRequest="38"
+                          WidthRequest="34"
+                          Rotation="-5">
+                        <Polygon Points="1,4 39,0 34,37 -2,39"
+                                 Fill="Black"
+                                 Aspect="Fill"
+                                 ZIndex="1"/>
+                        <Polygon Points="0,4 36,0 31,33 0,35"
+                                 Fill="White"
+                                 Stroke="Black"
+                                 StrokeThickness="1.5"
+                                 Aspect="Fill"
+                                 ZIndex="2"/>
                         <Label Text="V"
-                                FontFamily="Impact"
-                                FontSize="24"
-                                TextColor="Black"
-                                HorizontalOptions="Center"
-                                VerticalOptions="Center"/>
-                    </Border>
+                               FontFamily="Impact"
+                               FontSize="18"
+                               TextColor="Black"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"
+                               ZIndex="3"
+                               Margin="0,-2,0,0"/>
+                    </Grid>
 
-                    <!-- SÁBADO: Fin de Semana - Tarjeta Negra con Borde de Alerta Rojo Fuego -->
-                    <Border BackgroundColor="Black"
-                            Stroke="#E31D26"
-                            StrokeThickness="3"
-                            StrokeShape="Rectangle"
-                            Padding="12,5"
-                            HeightRequest="44"
-                            VerticalOptions="Center"
-                            ZIndex="2"
-                            TranslationY="-2">
+                    <!-- SÁBADO -->
+                    <Grid Grid.Column="5"
+                          HorizontalOptions="Center"
+                          VerticalOptions="Center"
+                          HeightRequest="38"
+                          WidthRequest="34"
+                          Rotation="5">
+                        <Polygon Points="2,2 38,0 33,37 -1,35"
+                                 Fill="Black"
+                                 Aspect="Fill"
+                                 ZIndex="1"/>
+                        <Polygon Points="0,2 36,0 31,33 0,31"
+                                 Fill="Black"
+                                 Stroke="#E31D26"
+                                 StrokeThickness="2"
+                                 Aspect="Fill"
+                                 ZIndex="2"/>
                         <Label Text="S"
-                                FontFamily="Impact"
-                                FontSize="24"
-                                TextColor="#E31D26"
-                                HorizontalOptions="Center"
-                                VerticalOptions="Center"/>
-                    </Border>
+                               FontFamily="Impact"
+                               FontSize="18"
+                               TextColor="#E31D26"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"
+                               ZIndex="3"
+                               Margin="0,-2,0,0"/>
+                    </Grid>
 
-                    <!-- DOMINGO: Peligro Crítico - Tarjeta Roja Fuego con contorno Negro Grueso y Letra Blanca Masiva -->
-                    <Border BackgroundColor="#E31D26"
-                            Stroke="Black"
-                            StrokeThickness="3"
-                            StrokeShape="Rectangle"
-                            Padding="16,3"
-                            HeightRequest="50"
-                            VerticalOptions="Center"
-                            ZIndex="3"
-                            TranslationY="6">
+                    <!-- DOMINGO -->
+                    <Grid Grid.Column="6"
+                          HorizontalOptions="Center"
+                          VerticalOptions="Center"
+                          HeightRequest="38"
+                          WidthRequest="34"
+                          Rotation="-6">
+                        <Polygon Points="2,3 39,0 33,38 -1,35"
+                                 Fill="Black"
+                                 Aspect="Fill"
+                                 ZIndex="1"/>
+                        <Polygon Points="0,3 36,0 30,34 0,31"
+                                 Fill="#E31D26"
+                                 Stroke="Black"
+                                 StrokeThickness="1.5"
+                                 Aspect="Fill"
+                                 ZIndex="2"/>
                         <Label Text="D"
-                                FontFamily="Impact"
-                                FontSize="30"
-                                TextColor="White"
-                                HorizontalOptions="Center"
-                                VerticalOptions="Center"/>
-                    </Border>
-                </FlexLayout>
+                               FontFamily="Impact"
+                               FontSize="19"
+                               TextColor="White"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"
+                               ZIndex="3"
+                               Margin="0,-2,0,0"/>
+                    </Grid>
+                </Grid>
             </Grid>
 
-
-
-
-            <!-- ==================== 4. MATRIZ DE CALENDARIO: SISTEMA DE TARJETAS BLINDADO (FILA 3) ==================== -->
+            <!-- ==================== 4. MATRIZ DE CALENDARIO: FILA 3 (SOLUCIÓN PATH GEOMÉTRICA) ==================== -->
             <CollectionView Grid.Row="3"
                             ItemsSource="{Binding DiasDelMes}"
                             Margin="15,0,15,10">
@@ -440,92 +501,123 @@
 
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="models:DiaCalendario">
-                        <!-- Celda base conectada a la rotación individual orgánica de tu modelo -->
-                        <Grid HeightRequest="65"
-                              WidthRequest="55"
-                              Rotation="{Binding RotacionCelda}"
+                        <!-- 
+            LIENZO MAESTRO (140x140): 
+            Garantiza espacio de sobra para el desborde superior del puñal sin cortes en Windows
+        -->
+                        <Grid HeightRequest="140"
+                              WidthRequest="140"
                               HorizontalOptions="Center"
-                              VerticalOptions="Center">
+                              VerticalOptions="Center"
+                              IsClippedToBounds="False">
 
-                            <!-- 1. SOMBRA TRASERA ASIMÉTRICA NEGRA: Se mantiene SIEMPRE visible para dar relieve -->
-                            <Border BackgroundColor="Black"
-                                    StrokeThickness="0"
-                                    StrokeShape="Polygon 3,0 53,4 48,60 -2,56"
-                                    Margin="4,4,-4,-4"
-                                    ZIndex="1"/>
+                            <!-- 
+                CAPA 1: TU CELDA ORIGINAL EXACTA (65x55)
+                Mantiene su tamaño, su rotación caótica y sus bordes limpios.
+            -->
+                            <Grid HeightRequest="65"
+                                  WidthRequest="55"
+                                  Rotation="{Binding RotacionCelda}"
+                                  HorizontalOptions="Center"
+                                  VerticalOptions="Center"
+                                  IsClippedToBounds="False"
+                                  ZIndex="1">
 
-                            <!-- 2. CONTENEDOR DELANTERO REAL: Blanco por defecto / Muta a Rojo si es Hoy -->
-                            <!-- Conservamos el contorno negro nativo ("Stroke") para que no pierda definición -->
-                            <Border x:Name="TarjetaBase"
-                                    BackgroundColor="White"
-                                    Stroke="Black"
-                                    StrokeThickness="2"
-                                    StrokeShape="Polygon 0,0 50,4 45,58 2,54"
-                                    ZIndex="2">
-                                <Border.Triggers>
-                                    <DataTrigger TargetType="Border"
-                                                 Binding="{Binding EsHoy}"
-                                                 Value="True">
-                                        <!-- RETOQUE: Cambia el fondo a rojo pero preserva el contorno negro marcado de fanzine -->
-                                        <Setter Property="BackgroundColor"
-                                                Value="#E31D26"/>
-                                        <Setter Property="Stroke"
-                                                Value="Black"/>
-                                        <Setter Property="StrokeThickness"
-                                                Value="2.5"/>
-                                        <!-- Un pelo más grueso para marcar el día -->
-                                    </DataTrigger>
-                                </Border.Triggers>
+                                <!-- 1. SOMBRA TRASERA ASIMÉTRICA NEGRA -->
+                                <Border BackgroundColor="Black"
+                                        StrokeThickness="0"
+                                        StrokeShape="Polygon 3,0 53,4 48,60 -2,56"
+                                        Margin="4,4,-4,-4"
+                                        ZIndex="1"/>
 
-                                <!-- Grid interno que fuerza la separación física de las capas -->
-                                <Grid RowDefinitions="18, *">
+                                <!-- 2. TARJETA DELANTERA BASE -->
+                                <Border x:Name="TarjetaBase"
+                                        BackgroundColor="White"
+                                        Stroke="Black"
+                                        StrokeThickness="2"
+                                        StrokeShape="Polygon 0,0 50,4 45,58 2,54"
+                                        ZIndex="2">
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border"
+                                                     Binding="{Binding EsHoy}"
+                                                     Value="True">
+                                            <Setter Property="BackgroundColor"
+                                                    Value="#E31D26"/>
+                                            <Setter Property="Stroke"
+                                                    Value="Black"/>
+                                            <Setter Property="StrokeThickness"
+                                                    Value="2.5"/>
+                                        </DataTrigger>
+                                    </Border.Triggers>
 
-                                    <!-- 3. PESTAÑA SUPERIOR DE RE CORTE NEGRO: Se mantiene SIEMPRE negra para dar consistencia -->
-                                    <BoxView Grid.Row="0"
-                                             Color="Black"
-                                             VerticalOptions="Fill"
-                                             HorizontalOptions="Fill"/>
+                                    <Grid RowDefinitions="18, *">
+                                        <!-- 3. MACHETAZO NEGRO SUPERIOR INTERNO -->
+                                        <BoxView Grid.Row="0"
+                                                 Color="Black"
+                                                 VerticalOptions="Fill"
+                                                 HorizontalOptions="Fill"/>
 
-                                    <!-- 4. TEXTO DEL NÚMERO: Atrapado en primer plano seguro -->
-                                    <Label Grid.Row="1"
-                                           Text="{Binding NumeroDia}"
-                                           FontFamily="Franklin Gothic"
-                                           FontSize="22"
-                                           FontAttributes="Bold"
-                                           TextColor="Black"
-                                           HorizontalOptions="Center"
-                                           VerticalOptions="Center"
-                                           Margin="0,0,0,2"
-                                           ZIndex="99">
-                                        <Label.Triggers>
-                                            <DataTrigger TargetType="Label"
-                                                         Binding="{Binding EsMesActual}"
-                                                         Value="True">
-                                                <Setter Property="Opacity"
-                                                        Value="1.0"/>
-                                            </DataTrigger>
-                                            <DataTrigger TargetType="Label"
-                                                         Binding="{Binding EsMesActual}"
-                                                         Value="False">
-                                                <Setter Property="TextColor"
-                                                        Value="#A0A0A0"/>
-                                                <Setter Property="Opacity"
-                                                        Value="0.15"/>
-                                            </DataTrigger>
-                                            <DataTrigger TargetType="Label"
-                                                         Binding="{Binding EsHoy}"
-                                                         Value="True">
-                                                <!-- Si es hoy, el número resalta en Blanco Puro sobre el fondo rojo -->
-                                                <Setter Property="TextColor"
-                                                        Value="White"/>
-                                            </DataTrigger>
-                                        </Label.Triggers>
-                                    </Label>
-                                </Grid>
-                            </Border>
+                                        <!-- 4. NÚMERO PERFECTO -->
+                                        <Label Grid.Row="1"
+                                               Text="{Binding NumeroDia}"
+                                               FontFamily="Impact"
+                                               FontSize="22"
+                                               TextColor="Black"
+                                               HorizontalOptions="Center"
+                                               VerticalOptions="Center"
+                                               Margin="0,0,0,2"
+                                               ZIndex="4">
+                                            <Label.Triggers>
+                                                <DataTrigger TargetType="Label"
+                                                             Binding="{Binding EsMesActual}"
+                                                             Value="True">
+                                                    <Setter Property="Opacity"
+                                                            Value="1.0"/>
+                                                </DataTrigger>
+                                                <DataTrigger TargetType="Label"
+                                                             Binding="{Binding EsMesActual}"
+                                                             Value="False">
+                                                    <Setter Property="TextColor"
+                                                            Value="#A0A0A0"/>
+                                                    <Setter Property="Opacity"
+                                                            Value="0.15"/>
+                                                </DataTrigger>
+                                                <DataTrigger TargetType="Label"
+                                                             Binding="{Binding EsHoy}"
+                                                             Value="True">
+                                                    <Setter Property="TextColor"
+                                                            Value="White"/>
+                                                </DataTrigger>
+                                            </Label.Triggers>
+                                        </Label>
+                                    </Grid>
+                                </Border>
+                            </Grid>
+
+                            <!-- 
+                ==================== CAPA 2: ANCLAJE QUIRÚRGICO ABSOLUTO ====================
+                Envolvemos el puñal en un AbsoluteLayout que comparte el centro del lienzo maestro.
+                Evitamos usar márgenes elásticos que Windows rompe o calcula al revés.
+            -->
+                            <AbsoluteLayout IsVisible="{Binding EsHoy}"
+                                            ZIndex="99"
+                                            HorizontalOptions="Center"
+                                            VerticalOptions="Center"
+                                            WidthRequest="140"
+                                            HeightRequest="140"
+                                            InputTransparent="True">
+
+                                <Image Source="punaltransparente.png"
+                                       Aspect="AspectFit"
+                                       AbsoluteLayout.LayoutBounds="82, -4, 70, 70"
+                                       Rotation="0"
+                                       AbsoluteLayout.LayoutFlags="None"/>
+                            </AbsoluteLayout>
+
                         </Grid>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
+
             </CollectionView>
 
         </Grid>
