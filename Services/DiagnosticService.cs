@@ -14,7 +14,6 @@ public class DiagnosticService
         _notification = notification;
     }
 
-
     public async Task RunDiagnostic()
 {
     try

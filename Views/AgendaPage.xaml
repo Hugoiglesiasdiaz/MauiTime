@@ -1,0 +1,426 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:models="clr-namespace:MauiTime.Models"
+             x:Class="MauiTime.Views.AgendaPage"
+             BackgroundColor="#1A1A1A"
+             Title="P5_AGENDA"
+             Shell.TabBarIsVisible="False">
+    <!-- TODO:Eliminar NavigationBar para que no se vea el título de la página -->
+
+    <Grid>
+        <!-- ==================== CAPA DE FONDO ALTO CONTRASTE (P5 STYLE) ==================== -->
+        <Grid HorizontalOptions="Fill"
+              VerticalOptions="Fill">
+            <!-- Polígono Rojo Superior Izquierdo Agresivo -->
+            <Polygon Points="0,0 900,0 400,700 0,500"
+                     Fill="#E31D26"
+                     Opacity="0.85"
+                     Aspect="Fill"/>
+
+            <!-- Gran Cuchillada Roja Inferior Derecha (Cruza hacia arriba) -->
+            <Polygon Points="1200,2000 2000,1100 2000,2000"
+                     Fill="#E31D26"
+                     Opacity="0.9"
+                     Aspect="Fill"/>
+
+            <!-- Línea de rasgadura negra pura que rompe la forma superior -->
+            <Line X1="0"
+                  Y1="450"
+                  X2="1300"
+                  Y2="0"
+                  Stroke="#0A0A0A"
+                  StrokeThickness="40"
+                  Aspect="Fill"/>
+
+            <!-- Franja blanca tipo destello de cómic en el fondo -->
+            <Line X1="300"
+                  Y1="2000"
+                  X2="2000"
+                  Y2="900"
+                  Stroke="White"
+                  StrokeThickness="10"
+                  Opacity="0.15"
+                  Aspect="Fill"/>
+
+            <!-- Bloque decorativo de estrellas tipo grafiti (Esquina inferior derecha) -->
+            <AbsoluteLayout HorizontalOptions="End"
+                            VerticalOptions="End"
+                            Margin="0,0,60,40"
+                            Opacity="0.4">
+                <Polygon Points="25,0 32,15 49,18 37,30 40,47 25,39 9,47 13,30 1,18 17,15"
+                         Fill="White"
+                         Scale="3.0"
+                         AbsoluteLayout.LayoutBounds="0,0,50,50"/>
+                <Polygon Points="25,0 32,15 49,18 37,30 40,47 25,39 9,47 13,30 1,18 17,15"
+                         Fill="#E31D26"
+                         Scale="1.8"
+                         Rotation="28"
+                         AbsoluteLayout.LayoutBounds="45,20,50,50"/>
+            </AbsoluteLayout>
+
+            <!-- Trama de ruido/periódico sutil -->
+            <Grid BackgroundColor="Transparent"
+                  Opacity="0.04">
+                <BoxView Color="White"
+                         VerticalOptions="Fill"
+                         HorizontalOptions="Fill"/>
+            </Grid>
+        </Grid>
+
+        <!-- ==================== CAPA DEL CONTENIDO (INTERFAZ) ==================== -->
+        <Grid RowDefinitions="Auto, Auto, *"
+              Padding="20">
+
+            <!-- TÍTULO PRINCIPAL DINÁMICO (ESTILO NOTA DE RESCATE EN C#) -->
+            <Border BackgroundColor="#E31D26"
+                    HorizontalOptions="Start"
+                    StrokeThickness="0"
+                    Rotation="-5"
+                    Margin="10,20,0,25"
+                    Padding="20,10">
+                <Border.Shadow>
+                    <Shadow Brush="Black"
+                            Offset="6,6"
+                            Radius="0"
+                            Opacity="0.8"/>
+                </Border.Shadow>
+                <!-- El archivo C# buscará este x:Name para inyectar los bloques de letras -->
+                <FlexLayout x:Name="ContenedorTitulo"
+                            Wrap="Wrap"
+                            HorizontalOptions="Center"
+                            VerticalOptions="Center"/>
+            </Border>
+
+            <!-- BOTONES DE PESTAÑA ASIMÉTRICOS (VERSION AMPLIADA Y CORREGIDA) -->
+            <Grid Grid.Row="1"
+                  ColumnDefinitions="Auto, Auto"
+                  Margin="15,0,0,25"
+                  HorizontalOptions="Start">
+
+                <!-- 1. PESTAÑA AGENDA (UNIFICADA EN TAMAÑO Y AIRE) -->
+                <Border x:Name="TabAgenda"
+                        Grid.Column="0"
+                        BackgroundColor="Black"
+                        Stroke="White"
+                        StrokeThickness="2"
+                        Rotation="-4"
+                        ZIndex="2"
+                        Padding="30,12">
+                    <Border.Shadow>
+                        <Shadow Brush="Black"
+                                Offset="5,5"
+                                Radius="0"
+                                Opacity="0.8"/>
+                    </Border.Shadow>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnAgendaTabTapped"/>
+                        <PointerGestureRecognizer PointerEntered="OnTabAgendaMouseIn"
+                                                  PointerExited="OnTabAgendaMouseOut"/>
+                    </Border.GestureRecognizers>
+
+                    <!-- Cambiamos CharacterSpacing a 0 para que expanda horizontalmente en perfecta simetría -->
+                    <Label Text="AGENDA"
+                           TextColor="#E31D26"
+                           FontSize="21"
+                           FontAttributes="Bold, Italic"
+                           FontFamily="Impact"
+                           CharacterSpacing="0"/>
+                </Border>
+
+                <!-- 2. PESTAÑA CALENDARIO (CALIBRADA EN TAMAÑO Y AIRE) -->
+                <!-- Incrementamos el Padding a 35,12 y cambiamos el margen izquierdo a -25 para ajustar el solape -->
+                <Border x:Name="TabCalendario"
+                        Grid.Column="1"
+                        BackgroundColor="#E5E5E5"
+                        Stroke="Black"
+                        StrokeThickness="1.5"
+                        Rotation="3"
+                        ZIndex="1"
+                        Margin="-25,2,0,0"
+                        Padding="35,12">
+                    <Border.Shadow>
+                        <Shadow Brush="Black"
+                                Offset="4,4"
+                                Radius="0"
+                                Opacity="0.5"/>
+                    </Border.Shadow>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnCalendarioTabTapped"/>
+                        <PointerGestureRecognizer PointerEntered="OnTabCalendarioMouseIn"
+                                                  PointerExited="OnTabCalendarioMouseOut"/>
+                    </Border.GestureRecognizers>
+
+                    <!-- Subimos FontSize a 21 y eliminamos el CharacterSpacing negativo para expandirla horizontalmente -->
+                    <Label Text="CALENDARIO"
+                           TextColor="#222222"
+                           FontSize="21"
+                           FontAttributes="Bold, Italic"
+                           FontFamily="Impact"
+                           CharacterSpacing="0"/>
+                </Border>
+            </Grid>
+
+            <!-- CONTENEDOR DE LA LISTA Y EL SCROLLBAR PERSONALIZADO -->
+            <Grid Grid.Row="2"
+                  ColumnDefinitions="*, 20">
+
+                <RefreshView Grid.Column="0"
+                             Command="{Binding CargarEventosCommand}"
+                             IsRefreshing="{Binding IsBusy}">
+                    <!-- Ocultamos la barra nativa con VerticalScrollBarVisibility="Never" -->
+                    <!-- Conectamos con el evento Scrolled del archivo C# -->
+                    <CollectionView x:Name="ListaEventos"
+                                    ItemsSource="{Binding Eventos}"
+                                    VerticalScrollBarVisibility="Never"
+                                    Scrolled="OnListaEventosScrolled">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="models:Evento">
+                                <!-- Cambiamos la columna a 125 para dar espacio al nuevo HUD extendido -->
+                                <Grid ColumnDefinitions="125, *"
+                                      Margin="0,5"
+                                      Padding="8,10">
+
+
+                                    <!-- ==================== NUEVO HUD DE FECHA ESTILO P5 ==================== -->
+                                    <Grid Grid.Column="0"
+                                          HeightRequest="85"
+                                          WidthRequest="100"
+                                          VerticalOptions="Center"
+                                          HorizontalOptions="Center"
+                                          ZIndex="2">
+
+                                        <!-- Contenedor absoluto para poder encimar las figuras geométricas estilo collage -->
+                                        <AbsoluteLayout x:Name="HudFechaP5"
+                                                        HorizontalOptions="Fill"
+                                                        VerticalOptions="Fill"
+                                                        Loaded="OnFechaHudLoaded"/>
+                                    </Grid>
+
+                                    <!-- TARJETA DEL EVENTO (RESTANTE NEGRO LIMPIO + TÍTULO DUOTONO P5) -->
+                                    <Border
+                                        x:Name="TarjetaBase"
+                                        Grid.Column="1"
+                                        BackgroundColor="Black"
+                                        Stroke="White"
+                                        StrokeThickness="2"
+                                        Margin="-15,0,0,0"
+                                        Padding="35,16,15,16"
+                                        VerticalOptions="Center"
+                                        ZIndex="1">
+                                        <Border.Shadow>
+                                            <Shadow Brush="Black"
+                                                    Offset="4,4"
+                                                    Radius="0"
+                                                    Opacity="0.5"/>
+                                        </Border.Shadow>
+
+                                        <!-- Distribución horizontal interna para las descripciones -->
+                                        <Grid ColumnDefinitions="*, Auto"
+                                              VerticalOptions="Center">
+
+                                            <!-- Bloque Izquierdo Opciones de Texto: Título Duotono y Descripción -->
+                                            <VerticalStackLayout Grid.Column="0"
+                                                                 VerticalOptions="Center"
+                                                                 Spacing="2">
+
+                                                <!-- EFECTO DUOTONO: Dos Labels solapados para crear la sombra sólida e imperfecta -->
+                                                <Grid HorizontalOptions="Start"
+                                                      VerticalOptions="Center">
+
+                                                    <!-- 1. Sombra Roja Sólida (Desplazada abajo a la derecha) -->
+                                                    <Label Text="{Binding Titulo}"
+                                                           TextColor="#E31D26"
+                                                           FontSize="20"
+                                                           FontFamily="HelveticaNowDisplay-ExtraBold"
+                                                           TextTransform="Uppercase"
+                                                           CharacterSpacing="-0.5"
+                                                           Margin="2,2,0,0"
+                                                           VerticalOptions="Center"/>
+
+                                                    <!-- 2. Texto Principal Blanco (Encima de la sombra) -->
+                                                    <Label Text="{Binding Titulo}"
+                                                           TextColor="White"
+                                                           FontSize="20"
+                                                           FontFamily="HelveticaNowDisplay-ExtraBold"
+                                                           TextTransform="Uppercase"
+                                                           CharacterSpacing="-0.5"
+                                                           VerticalOptions="Center"/>
+                                                </Grid>
+
+                                                <!-- DESCRIPCIÓN DEL EVENTO -->
+                                                <Label Text="{Binding Descripcion}"
+                                                       TextColor="#B5B5B5"
+                                                       FontSize="13"
+                                                       FontFamily="OpenSansRegular"
+                                                       Margin="2,2,0,0"/>
+                                            </VerticalStackLayout>
+
+                                            <!-- Bloque Derecho Estilo HUD: Hora apilada verticalmente sobre el Sticker -->
+                                            <VerticalStackLayout Grid.Column="1"
+                                                                 HorizontalOptions="End"
+                                                                 VerticalOptions="Center"
+                                                                 Spacing="4"
+                                                                 Margin="0,5,15,0"
+                                                                 ZIndex="4">
+
+                                                <!-- HORA DEL EVENTO -->
+                                                <Label Text="{Binding Hora}"
+                                                       TextColor="#E31D26"
+                                                       FontSize="17"
+                                                       FontFamily="HelveticaNowDisplay-ExtraBold"
+                                                       HorizontalOptions="End"
+                                                       Margin="0,0,4,0"
+                                                       Rotation="4"
+                                                       CharacterSpacing="-0.5"/>
+
+                                                <!-- Contenedor Unificado de Stickers -->
+                                                <Grid>
+                                                    <!-- Sticker Anual -->
+                                                    <Grid IsVisible="{Binding EsAnual}"
+                                                          WidthRequest="78"
+                                                          HeightRequest="32"
+                                                          Rotation="-7">
+                                                        <Polygon Points="3,5 78,3 73,35 8,31"
+                                                                 Fill="Black"
+                                                                 Aspect="Fill"/>
+                                                        <Polygon Points="0,2 75,0 70,32 5,28"
+                                                                 Fill="#E31D26"
+                                                                 Stroke="White"
+                                                                 StrokeThickness="1.5"
+                                                                 Aspect="Fill"/>
+                                                        <Label Text="ANUAL"
+                                                               TextColor="White"
+                                                               FontSize="12.5"
+                                                               FontAttributes="Bold"
+                                                               FontFamily="HelveticaNowDisplay-ExtraBold"
+                                                               HorizontalOptions="Center"
+                                                               VerticalOptions="Center"
+                                                               CharacterSpacing="-0.5"/>
+                                                    </Grid>
+
+                                                    <!-- Sticker Mensual -->
+                                                    <Grid IsVisible="{Binding EsMensual}"
+                                                          WidthRequest="92"
+                                                          HeightRequest="32"
+                                                          Rotation="6">
+                                                        <Polygon Points="11,3 93,7 83,35 3,29"
+                                                                 Fill="Black"
+                                                                 Aspect="Fill"/>
+                                                        <Polygon Points="8,0 90,4 80,32 0,26"
+                                                                 Fill="#E31D26"
+                                                                 Stroke="White"
+                                                                 StrokeThickness="1.5"
+                                                                 Aspect="Fill"/>
+                                                        <Label Text="MENSUAL"
+                                                               TextColor="White"
+                                                               FontSize="12"
+                                                               FontAttributes="Bold"
+                                                               FontFamily="HelveticaNowDisplay-ExtraBold"
+                                                               HorizontalOptions="Center"
+                                                               VerticalOptions="Center"
+                                                               CharacterSpacing="-0.5"/>
+                                                    </Grid>
+
+                                                    <!-- Sticker Semanal -->
+                                                    <Grid IsVisible="{Binding EsSemanal}"
+                                                          WidthRequest="92"
+                                                          HeightRequest="32"
+                                                          Rotation="-5">
+                                                        <Polygon Points="3,8 88,3 93,29 8,35"
+                                                                 Fill="Black"
+                                                                 Aspect="Fill"/>
+                                                        <Polygon Points="0,5 85,0 90,26 5,32"
+                                                                 Fill="#E31D26"
+                                                                 Stroke="White"
+                                                                 StrokeThickness="1.5"
+                                                                 Aspect="Fill"/>
+                                                        <Label Text="SEMANAL"
+                                                               TextColor="White"
+                                                               FontSize="12"
+                                                               FontAttributes="Bold"
+                                                               FontFamily="HelveticaNowDisplay-ExtraBold"
+                                                               HorizontalOptions="Center"
+                                                               VerticalOptions="Center"
+                                                               CharacterSpacing="-0.5"/>
+                                                    </Grid>
+
+                                                    <!-- Sticker Diario -->
+                                                    <Grid IsVisible="{Binding EsDiario}"
+                                                          WidthRequest="78"
+                                                          HeightRequest="32"
+                                                          Rotation="8">
+                                                        <Polygon Points="7,3 78,8 69,35 3,27"
+                                                                 Fill="Black"
+                                                                 Aspect="Fill"/>
+                                                        <Polygon Points="4,0 75,5 66,32 0,24"
+                                                                 Fill="#E31D26"
+                                                                 Stroke="White"
+                                                                 StrokeThickness="1.5"
+                                                                 Aspect="Fill"/>
+                                                        <Label Text="DIARIO"
+                                                               TextColor="White"
+                                                               FontSize="12.5"
+                                                               FontAttributes="Bold"
+                                                               FontFamily="HelveticaNowDisplay-ExtraBold"
+                                                               HorizontalOptions="Center"
+                                                               VerticalOptions="Center"
+                                                               CharacterSpacing="-0.5"/>
+                                                    </Grid>
+                                                </Grid>
+
+                                            </VerticalStackLayout>
+                                        </Grid>
+                                    </Border>
+
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+
+                    </CollectionView>
+                </RefreshView>
+
+
+                <!-- ==================== SCROLLBAR ESTILO PERSONA 5 (CALIBRACIÓN MILIMÉTRICA) ==================== -->
+                <!-- Cambiado el margen inferior a 52 para acortar el carril y alinearlo al final real del scroll -->
+                <Grid Grid.Column="1"
+                      WidthRequest="20"
+                      HorizontalOptions="End"
+                      Margin="0,35,0,52">
+                    <AbsoluteLayout HorizontalOptions="Fill"
+                                    VerticalOptions="Fill">
+
+                        <!-- Carril vertical blanco recto -->
+                        <BoxView WidthRequest="2"
+                                 BackgroundColor="White"
+                                 Opacity="0.3"
+                                 AbsoluteLayout.LayoutBounds="0.5, 0, 2, 1"
+                                 AbsoluteLayout.LayoutFlags="XProportional, HeightProportional"/>
+
+                        <!-- Puntero del Scroll: Rombo rojo con flags X e Y proporcionales activos -->
+                        <Border x:Name="PunteroScrollP5"
+                                BackgroundColor="#E31D26"
+                                Stroke="White"
+                                StrokeThickness="1.5"
+                                HeightRequest="24"
+                                WidthRequest="14"
+                                Rotation="15"
+                                AbsoluteLayout.LayoutBounds="0.5, 0, 14, 24"
+                                AbsoluteLayout.LayoutFlags="XProportional, YProportional">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="0"/>
+                            </Border.StrokeShape>
+                            <Border.Shadow>
+                                <Shadow Brush="Black"
+                                        Offset="3,3"
+                                        Radius="0"
+                                        Opacity="0.6"/>
+                            </Border.Shadow>
+                        </Border>
+                    </AbsoluteLayout>
+                </Grid>
+
+            </Grid>
+        </Grid>
+    </Grid>
+</ContentPage>
