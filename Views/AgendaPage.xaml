@@ -198,14 +198,16 @@
                                     </Grid>
 
                                     <!-- TARJETA DEL EVENTO (RESTANTE NEGRO LIMPIO + TÍTULO DUOTONO P5) -->
-                                    <Border Grid.Column="1"
-                                            BackgroundColor="Black"
-                                            Stroke="White"
-                                            StrokeThickness="2"
-                                            Margin="-15,0,0,0"
-                                            Padding="35,16,15,16"
-                                            VerticalOptions="Center"
-                                            ZIndex="1">
+                                    <Border
+                                        x:Name="TarjetaBase"
+                                        Grid.Column="1"
+                                        BackgroundColor="Black"
+                                        Stroke="White"
+                                        StrokeThickness="2"
+                                        Margin="-15,0,0,0"
+                                        Padding="35,16,15,16"
+                                        VerticalOptions="Center"
+                                        ZIndex="1">
                                         <Border.Shadow>
                                             <Shadow Brush="Black"
                                                     Offset="4,4"
@@ -224,7 +226,7 @@
 
                                                 <!-- EFECTO DUOTONO: Dos Labels solapados para crear la sombra sólida e imperfecta -->
                                                 <Grid HorizontalOptions="Start"
-                                                        VerticalOptions="Center">
+                                                      VerticalOptions="Center">
 
                                                     <!-- 1. Sombra Roja Sólida (Desplazada abajo a la derecha) -->
                                                     <Label Text="{Binding Titulo}"
@@ -276,94 +278,94 @@
                                                 <Grid>
                                                     <!-- Sticker Anual -->
                                                     <Grid IsVisible="{Binding EsAnual}"
-                                                            WidthRequest="78"
-                                                            HeightRequest="32"
-                                                            Rotation="-7">
+                                                          WidthRequest="78"
+                                                          HeightRequest="32"
+                                                          Rotation="-7">
                                                         <Polygon Points="3,5 78,3 73,35 8,31"
-                                                                Fill="Black"
-                                                                Aspect="Fill"/>
+                                                                 Fill="Black"
+                                                                 Aspect="Fill"/>
                                                         <Polygon Points="0,2 75,0 70,32 5,28"
-                                                                Fill="#E31D26"
-                                                                Stroke="White"
-                                                                StrokeThickness="1.5"
-                                                                Aspect="Fill"/>
+                                                                 Fill="#E31D26"
+                                                                 Stroke="White"
+                                                                 StrokeThickness="1.5"
+                                                                 Aspect="Fill"/>
                                                         <Label Text="ANUAL"
-                                                                TextColor="White"
-                                                                FontSize="12.5"
-                                                                FontAttributes="Bold"
-                                                                FontFamily="HelveticaNowDisplay-ExtraBold"
-                                                                HorizontalOptions="Center"
-                                                                VerticalOptions="Center"
-                                                                CharacterSpacing="-0.5"/>
+                                                               TextColor="White"
+                                                               FontSize="12.5"
+                                                               FontAttributes="Bold"
+                                                               FontFamily="HelveticaNowDisplay-ExtraBold"
+                                                               HorizontalOptions="Center"
+                                                               VerticalOptions="Center"
+                                                               CharacterSpacing="-0.5"/>
                                                     </Grid>
 
                                                     <!-- Sticker Mensual -->
                                                     <Grid IsVisible="{Binding EsMensual}"
-                                                            WidthRequest="92"
-                                                            HeightRequest="32"
-                                                            Rotation="6">
+                                                          WidthRequest="92"
+                                                          HeightRequest="32"
+                                                          Rotation="6">
                                                         <Polygon Points="11,3 93,7 83,35 3,29"
-                                                                Fill="Black"
-                                                                Aspect="Fill"/>
+                                                                 Fill="Black"
+                                                                 Aspect="Fill"/>
                                                         <Polygon Points="8,0 90,4 80,32 0,26"
-                                                                Fill="#E31D26"
-                                                                Stroke="White"
-                                                                StrokeThickness="1.5"
-                                                                Aspect="Fill"/>
+                                                                 Fill="#E31D26"
+                                                                 Stroke="White"
+                                                                 StrokeThickness="1.5"
+                                                                 Aspect="Fill"/>
                                                         <Label Text="MENSUAL"
-                                                                TextColor="White"
-                                                                FontSize="12"
-                                                                FontAttributes="Bold"
-                                                                FontFamily="HelveticaNowDisplay-ExtraBold"
-                                                                HorizontalOptions="Center"
-                                                                VerticalOptions="Center"
-                                                                CharacterSpacing="-0.5"/>
+                                                               TextColor="White"
+                                                               FontSize="12"
+                                                               FontAttributes="Bold"
+                                                               FontFamily="HelveticaNowDisplay-ExtraBold"
+                                                               HorizontalOptions="Center"
+                                                               VerticalOptions="Center"
+                                                               CharacterSpacing="-0.5"/>
                                                     </Grid>
 
                                                     <!-- Sticker Semanal -->
                                                     <Grid IsVisible="{Binding EsSemanal}"
-                                                            WidthRequest="92"
-                                                            HeightRequest="32"
-                                                            Rotation="-5">
+                                                          WidthRequest="92"
+                                                          HeightRequest="32"
+                                                          Rotation="-5">
                                                         <Polygon Points="3,8 88,3 93,29 8,35"
-                                                                Fill="Black"
-                                                                Aspect="Fill"/>
+                                                                 Fill="Black"
+                                                                 Aspect="Fill"/>
                                                         <Polygon Points="0,5 85,0 90,26 5,32"
-                                                                Fill="#E31D26"
-                                                                Stroke="White"
-                                                                StrokeThickness="1.5"
-                                                                Aspect="Fill"/>
+                                                                 Fill="#E31D26"
+                                                                 Stroke="White"
+                                                                 StrokeThickness="1.5"
+                                                                 Aspect="Fill"/>
                                                         <Label Text="SEMANAL"
-                                                                TextColor="White"
-                                                                FontSize="12"
-                                                                FontAttributes="Bold"
-                                                                FontFamily="HelveticaNowDisplay-ExtraBold"
-                                                                HorizontalOptions="Center"
-                                                                VerticalOptions="Center"
-                                                                CharacterSpacing="-0.5"/>
+                                                               TextColor="White"
+                                                               FontSize="12"
+                                                               FontAttributes="Bold"
+                                                               FontFamily="HelveticaNowDisplay-ExtraBold"
+                                                               HorizontalOptions="Center"
+                                                               VerticalOptions="Center"
+                                                               CharacterSpacing="-0.5"/>
                                                     </Grid>
 
                                                     <!-- Sticker Diario -->
                                                     <Grid IsVisible="{Binding EsDiario}"
-                                                            WidthRequest="78"
-                                                            HeightRequest="32"
-                                                            Rotation="8">
+                                                          WidthRequest="78"
+                                                          HeightRequest="32"
+                                                          Rotation="8">
                                                         <Polygon Points="7,3 78,8 69,35 3,27"
-                                                                Fill="Black"
-                                                                Aspect="Fill"/>
+                                                                 Fill="Black"
+                                                                 Aspect="Fill"/>
                                                         <Polygon Points="4,0 75,5 66,32 0,24"
-                                                                Fill="#E31D26"
-                                                                Stroke="White"
-                                                                StrokeThickness="1.5"
-                                                                Aspect="Fill"/>
+                                                                 Fill="#E31D26"
+                                                                 Stroke="White"
+                                                                 StrokeThickness="1.5"
+                                                                 Aspect="Fill"/>
                                                         <Label Text="DIARIO"
-                                                                TextColor="White"
-                                                                FontSize="12.5"
-                                                                FontAttributes="Bold"
-                                                                FontFamily="HelveticaNowDisplay-ExtraBold"
-                                                                HorizontalOptions="Center"
-                                                                VerticalOptions="Center"
-                                                                CharacterSpacing="-0.5"/>
+                                                               TextColor="White"
+                                                               FontSize="12.5"
+                                                               FontAttributes="Bold"
+                                                               FontFamily="HelveticaNowDisplay-ExtraBold"
+                                                               HorizontalOptions="Center"
+                                                               VerticalOptions="Center"
+                                                               CharacterSpacing="-0.5"/>
                                                     </Grid>
                                                 </Grid>
 

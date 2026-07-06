@@ -18,6 +18,14 @@
         <Tab Title="Calendario" Icon="dotnet_bot.png" Route="CalendarioPage">
             <ShellContent ContentTemplate="{DataTemplate local:CalendarioPage}" />
         </Tab>
+
+        <Tab Title="Transición" Icon="dotnet_bot.png" Route="TransicionCristalPage">
+            <ShellContent ContentTemplate="{DataTemplate local:TransicionCristalPage}" />
+        </Tab>
     </TabBar>
+
+    <!-- Rutas registradas para navegación modal -->
+    <ShellContent Route="LinternaAnimacionPage" 
+                  ContentTemplate="{DataTemplate local:LinternaAnimacionPage}" />
 
 </Shell>

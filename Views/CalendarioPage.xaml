@@ -9,7 +9,8 @@
 
     <Grid>
         <!-- ==================== CAPA DE FONDO ALTO CONTRASTE (P5 CALENDARIO - UNIFICACIÓN ESTILO CORREGIDO) ==================== -->
-        <Grid HorizontalOptions="Fill"
+        <Grid x:Name="ContenedorFondo"
+              HorizontalOptions="Fill"
               VerticalOptions="Fill">
 
             <!-- BLOQUE ROJO DERECHO: Tu estructura original pero con un borde blanco que le da efecto recorte fanzine -->
@@ -89,7 +90,8 @@
 
 
         <!-- ==================== CAPA DEL CONTENIDO PRINCIPAL ==================== -->
-        <Grid RowDefinitions="Auto, Auto, Auto, *"
+        <Grid x:Name="ContenedorContenido"
+              RowDefinitions="Auto, Auto, Auto, *"
               Padding="20">
 
             <!-- 1. PESTAÑAS DE NAVEGACIÓN SUPERIORES -->
@@ -97,6 +99,8 @@
                   ColumnDefinitions="Auto, Auto"
                   Margin="15,0,0,15"
                   HorizontalOptions="Start">
+
+                <!-- PESTAÑA AGENDA -->
                 <Border x:Name="TabAgenda"
                         Grid.Column="0"
                         BackgroundColor="#E5E5E5"
@@ -112,13 +116,19 @@
                                 Opacity="0.5"/>
                     </Border.Shadow>
                     <Border.GestureRecognizers>
+                        <!-- Clic nativo -->
                         <TapGestureRecognizer Tapped="OnAgendaTabTapped"/>
+                        <!-- 🚨 NUEVOS RECONOCEDORES DE PUNTERO MOUSE PARA WINDOWS -->
+                        <PointerGestureRecognizer PointerEntered="OnTabAgendaMouseIn"
+                                                  PointerExited="OnTabAgendaMouseOut"/>
                     </Border.GestureRecognizers>
                     <Label Text="AGENDA"
                            TextColor="#222222"
                            FontSize="21"
                            FontFamily="Impact"/>
                 </Border>
+
+                <!-- PESTAÑA CALENDARIO -->
                 <Border x:Name="TabCalendario"
                         Grid.Column="1"
                         BackgroundColor="Black"
@@ -134,12 +144,18 @@
                                 Radius="0"
                                 Opacity="0.8"/>
                     </Border.Shadow>
+                    <Border.GestureRecognizers>
+                        <!-- 🚨 NUEVOS RECONOCEDORES DE PUNTERO MOUSE PARA WINDOWS -->
+                        <PointerGestureRecognizer PointerEntered="OnTabCalendarioMouseIn"
+                                                  PointerExited="OnTabCalendarioMouseOut"/>
+                    </Border.GestureRecognizers>
                     <Label Text="CALENDARIO"
                            TextColor="#E31D26"
                            FontSize="21"
                            FontFamily="Impact"/>
                 </Border>
             </Grid>
+
 
             <!-- 2. CABECERA HUD EXTIDILO PHANTOM THIEVES (REDISEÑO TOTAL AGRESIVO) -->
             <Grid Grid.Row="1"
@@ -490,6 +506,7 @@
 
             <!-- ==================== 4. MATRIZ DE CALENDARIO: FILA 3 (SOLUCIÓN PATH GEOMÉTRICA) ==================== -->
             <CollectionView Grid.Row="3"
+                            x:Name="GridDiasCollectionView"
                             ItemsSource="{Binding DiasDelMes}"
                             Margin="15,0,15,10">
                 <CollectionView.ItemsLayout>
@@ -523,32 +540,20 @@
                                   IsClippedToBounds="False"
                                   ZIndex="1">
 
-                                <!-- 1. SOMBRA TRASERA ASIMÉTRICA NEGRA -->
+                                <!-- 1. SOMBRA TRASERA ASIMÉTRICA NEGRA: Fijada en Black de por vida -->
                                 <Border BackgroundColor="Black"
                                         StrokeThickness="0"
                                         StrokeShape="Polygon 3,0 53,4 48,60 -2,56"
                                         Margin="4,4,-4,-4"
                                         ZIndex="1"/>
 
-                                <!-- 2. TARJETA DELANTERA BASE -->
-                                <Border x:Name="TarjetaBase"
-                                        BackgroundColor="White"
+                                <!-- 2. TARJETA DELANTERA BASE: Sigue escuchando al color dinámico del modelo -->
+                                <Border BackgroundColor="{Binding ColorFondoCelda}"
                                         Stroke="Black"
                                         StrokeThickness="2"
                                         StrokeShape="Polygon 0,0 50,4 45,58 2,54"
                                         ZIndex="2">
-                                    <Border.Triggers>
-                                        <DataTrigger TargetType="Border"
-                                                     Binding="{Binding EsHoy}"
-                                                     Value="True">
-                                            <Setter Property="BackgroundColor"
-                                                    Value="#E31D26"/>
-                                            <Setter Property="Stroke"
-                                                    Value="Black"/>
-                                            <Setter Property="StrokeThickness"
-                                                    Value="2.5"/>
-                                        </DataTrigger>
-                                    </Border.Triggers>
+
 
                                     <Grid RowDefinitions="18, *">
                                         <!-- 3. MACHETAZO NEGRO SUPERIOR INTERNO -->
@@ -570,18 +575,13 @@
                                             <Label.Triggers>
                                                 <DataTrigger TargetType="Label"
                                                              Binding="{Binding EsMesActual}"
-                                                             Value="True">
-                                                    <Setter Property="Opacity"
-                                                            Value="1.0"/>
-                                                </DataTrigger>
-                                                <DataTrigger TargetType="Label"
-                                                             Binding="{Binding EsMesActual}"
                                                              Value="False">
                                                     <Setter Property="TextColor"
                                                             Value="#A0A0A0"/>
                                                     <Setter Property="Opacity"
                                                             Value="0.15"/>
                                                 </DataTrigger>
+                                                <!-- 🚨 CUANDO EL MODELO DETECTE QUE ES HOY, PASARÁ EL TEXTO A BLANCO -->
                                                 <DataTrigger TargetType="Label"
                                                              Binding="{Binding EsHoy}"
                                                              Value="True">
@@ -592,6 +592,8 @@
                                         </Label>
                                     </Grid>
                                 </Border>
+
+
                             </Grid>
 
                             <!-- 
@@ -607,12 +609,31 @@
                                             HeightRequest="140"
                                             InputTransparent="True">
 
+                                <!-- CÍRCULO DE CLAVADA: Nace invisible en tamaño cero -->
+                                <Ellipse x:Name="CirculoImpacto"
+                                         Scale="0"
+                                         WidthRequest="45"
+                                         HeightRequest="30"
+                                         Fill="White"
+                                         Stroke="Black"
+                                         StrokeThickness="3"
+                                         Rotation="-20"
+                                         AbsoluteLayout.LayoutBounds="85, 30, 45, 30"
+                                         AbsoluteLayout.LayoutFlags="None"/>
+
+                                <!-- CUCHILLO: Manteniendo tu archivo intacto con su evento Loaded -->
                                 <Image Source="punaltransparente.png"
+                                       x:Name="Cuchillo"
+                                       StyleId="Cuchillo"
                                        Aspect="AspectFit"
                                        AbsoluteLayout.LayoutBounds="82, -4, 70, 70"
                                        Rotation="0"
-                                       AbsoluteLayout.LayoutFlags="None"/>
+                                       AbsoluteLayout.LayoutFlags="None"
+                                       Loaded="OnCuchilloLoaded"/>
                             </AbsoluteLayout>
+
+
+
 
                         </Grid>
                     </DataTemplate>
@@ -622,4 +643,7 @@
 
         </Grid>
     </Grid>
+
+
+
 </ContentPage>

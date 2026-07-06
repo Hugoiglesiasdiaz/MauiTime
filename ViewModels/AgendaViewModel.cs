@@ -24,10 +24,10 @@ public class AgendaViewModel : BaseViewModel
     public AgendaViewModel(DatabaseService databaseService)
     {
         _databaseService = databaseService;
-        
+
         // Inicializamos el comando
         CargarEventosCommand = new Command(async () => await LoadEventosAsync());
-        
+
         // Carga inicial
         _ = LoadEventosAsync();
     }
@@ -36,29 +36,31 @@ public class AgendaViewModel : BaseViewModel
     {
         if (IsBusy) return;
 
-        IsBusy = true;
         try
         {
+            // Traemos la lista de la base de datos en un hilo secundario primero
             var lista = await _databaseService.ObtenerEventosAsync();
-            
-            // Si la lista no ha cambiado, evitamos borrar y rellenar todo
-            if (Eventos.Count != lista.Count)
+
+            // Una vez que tenemos los datos listos en la memoria, encendemos el hilo de la UI
+            MainThread.BeginInvokeOnMainThread(() =>
             {
+                IsBusy = true; // Se enciende solo durante el vaciado y rellenado rápido
+
                 Eventos.Clear();
                 foreach (var item in lista)
                 {
                     Eventos.Add(item);
                 }
-            }
+
+                IsBusy = false; // Se apaga de inmediato
+            });
         }
         catch (Exception ex)
         {
-            // Aquí podrías añadir un log o alerta al usuario
-            System.Diagnostics.Debug.WriteLine($"Error cargando eventos: {ex.Message}");
-        }
-        finally
-        {
+            System.Diagnostics.Debug.WriteLine($"Error: {ex.Message}");
             IsBusy = false;
         }
     }
+
+
 }

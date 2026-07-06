@@ -18,15 +18,31 @@ public partial class AgendaPage : ContentPage
         GenerarTituloP5("AGENDA DE EVENTOS");
     }
 
-    protected override async void OnAppearing()
+    protected override void OnAppearing()
     {
         base.OnAppearing();
 
-        if (_viewModel != null && !_viewModel.Eventos.Any())
+        if (_viewModel != null)
         {
-            await _viewModel.LoadEventosAsync();
+            // 🚨 EL TRUCO DEFINITIVO PARA EL REFRESHVIEW EN WINDOWS:
+            // Despachamos la carga al final de la cola de renderizado.
+            // Windows dibuja la página primero, y a los 50ms inyecta los datos de golpe,
+            // evitando que el CollectionView colapse con tamaño cero.
+            Dispatcher.Dispatch(async () =>
+            {
+                try
+                {
+                    await Task.Delay(50); // Micro-pausa de estabilización visual
+                    await _viewModel.LoadEventosAsync();
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Error en inicio Agenda: {ex.Message}");
+                }
+            });
         }
     }
+
 
     private void OnFechaHudLoaded(object? sender, EventArgs e)
     {
@@ -218,7 +234,7 @@ public partial class AgendaPage : ContentPage
         }
     }
 
-        // =========================================================================
+    // =========================================================================
     // ANIMACIONES COMPLEJAS DE ALTA FLUIDEZ (ESTILO SPRING / BOUNCE P5)
     // =========================================================================
 
@@ -234,7 +250,7 @@ public partial class AgendaPage : ContentPage
             TabAgenda.ScaleToAsync(1.12, 180, Easing.SpringOut),
             TabAgenda.RotateToAsync(-6, 180, Easing.SpringOut)
         );
-        
+
         // Calendario: Se encoge, baja en vertical (10px) y se endereza sutilmente (3 a 1 grado)
         var animCalendario = Task.WhenAll(
             TabCalendario.ScaleToAsync(0.92, 150, Easing.SinIn),
@@ -278,7 +294,7 @@ public partial class AgendaPage : ContentPage
             TabCalendario.ScaleToAsync(1.12, 180, Easing.SpringOut),
             TabCalendario.RotateToAsync(6, 180, Easing.SpringOut)
         );
-        
+
         // Agenda: Se encoge, se sumerge 10px en vertical y reduce su ángulo (-4 a -2 grados)
         var animAgenda = Task.WhenAll(
             TabAgenda.ScaleToAsync(0.92, 150, Easing.SinIn),
@@ -315,17 +331,17 @@ public partial class AgendaPage : ContentPage
     }
 
     private async void OnCalendarioTabTapped(object? sender, TappedEventArgs e)
-{
-    // Cambiamos el método a 'async void' para poder usar 'await' en la navegación
-    try
     {
-        // Navegación fluida hacia la vista de Calendario usando las rutas de Shell
-        await Shell.Current.GoToAsync("//CalendarioPage");
+        try
+        {
+            // 🚀 CAMBIO CLAVE: Viajamos primero a la página del balazo de cristal
+            await Shell.Current.GoToAsync("//TransicionCristalPage");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error al lanzar la transición: {ex.Message}");
+        }
     }
-    catch (Exception ex)
-    {
-        System.Diagnostics.Debug.WriteLine($"Error al navegar al calendario: {ex.Message}");
-    }
-}
+
 
 }
