@@ -9,10 +9,7 @@
 
 ## 🎬 Demostración en Acción
 
-<p align="center">
-  <video src="Resources/Videos/videodemo.mp4" width="750" controls autoplay loop muted></video>
-</p>
-
+https://github.com/user-attachments/assets/9097949b-bd84-4f0f-8932-890c3dd16a58
 
 ---
 
