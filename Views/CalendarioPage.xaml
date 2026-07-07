@@ -1,0 +1,649 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:models="clr-namespace:MauiTime.Models"
+             x:Class="MauiTime.Views.CalendarioPage"
+             BackgroundColor="#1A1A1A"
+             Title="P5_CALENDARIO"
+             Shell.TabBarIsVisible="False">
+
+    <Grid>
+        <!-- ==================== CAPA DE FONDO ALTO CONTRASTE (P5 CALENDARIO - UNIFICACIÓN ESTILO CORREGIDO) ==================== -->
+        <Grid x:Name="ContenedorFondo"
+              HorizontalOptions="Fill"
+              VerticalOptions="Fill">
+
+            <!-- BLOQUE ROJO DERECHO: Tu estructura original pero con un borde blanco que le da efecto recorte fanzine -->
+            <Border BackgroundColor="#E31D26"
+                    Stroke="White"
+                    StrokeThickness="2"
+                    HorizontalOptions="End"
+                    VerticalOptions="Fill"
+                    WidthRequest="250"
+                    Rotation="3"
+                    Margin="0,-50,-50,-50">
+                <Border.Shadow>
+                    <Shadow Brush="Black"
+                            Offset="-5,0"
+                            Radius="0"
+                            Opacity="0.5"/>
+                </Border.Shadow>
+            </Border>
+
+            <!-- POLÍGONO NEGRO SUPERIOR IZQUIERDO: Tu forma exacta que enmarca de forma brutal las pestañas -->
+            <Polygon Points="0,0 600,0 450,400 0,350"
+                     Fill="#0A0A0A"
+                     Opacity="0.95"/>
+
+            <!-- BARRA DIAGONAL CENTRAL CORREGIDA: Le bajamos la opacidad al 35% para proteger la lectura de tus números -->
+            <BoxView Color="White"
+                     HeightRequest="12"
+                     Rotation="-15"
+                     VerticalOptions="Center"
+                     HorizontalOptions="Fill"
+                     Margin="-50,0"
+                     Opacity="0.35"/>
+
+            <!-- LÍNEAS VERTICALES IZQUIERDAS MEJORADAS: Moverlas al centro-izquierdo para rellenar el vacío y dar equilibrio -->
+            <StackLayout Orientation="Horizontal"
+                         Spacing="15"
+                         Opacity="0.15"
+                         HorizontalOptions="Start"
+                         VerticalOptions="Fill"
+                         Margin="80,0,0,0">
+                <BoxView Color="White"
+                         WidthRequest="2"
+                         VerticalOptions="Fill"/>
+                <BoxView Color="White"
+                         WidthRequest="4"
+                         VerticalOptions="Fill"/>
+                <BoxView Color="White"
+                         WidthRequest="2"
+                         VerticalOptions="Fill"/>
+            </StackLayout>
+
+            <!-- CÍRCULOS DE IMPACTO CONCÉNTRICOS: Tu estructura original intacta abajo a la izquierda -->
+            <Ellipse Fill="White"
+                     WidthRequest="150"
+                     HeightRequest="150"
+                     HorizontalOptions="Start"
+                     VerticalOptions="End"
+                     Margin="-75,0,0,-75"
+                     Opacity="0.15"/>
+            <Ellipse Fill="#E31D26"
+                     WidthRequest="100"
+                     HeightRequest="100"
+                     HorizontalOptions="Start"
+                     VerticalOptions="End"
+                     Margin="-50,0,0,-50"
+                     Opacity="0.35"/>
+
+            <!-- Trama de grano de fanzine sutil al 3% para unificar la textura de la Agenda -->
+            <Grid BackgroundColor="Transparent"
+                  Opacity="0.03">
+                <BoxView Color="White"
+                         VerticalOptions="Fill"
+                         HorizontalOptions="Fill"/>
+            </Grid>
+        </Grid>
+
+
+
+        <!-- ==================== CAPA DEL CONTENIDO PRINCIPAL ==================== -->
+        <Grid x:Name="ContenedorContenido"
+              RowDefinitions="Auto, Auto, Auto, *"
+              Padding="20">
+
+            <!-- 1. PESTAÑAS DE NAVEGACIÓN SUPERIORES -->
+            <Grid Grid.Row="0"
+                  ColumnDefinitions="Auto, Auto"
+                  Margin="15,0,0,15"
+                  HorizontalOptions="Start">
+
+                <!-- PESTAÑA AGENDA -->
+                <Border x:Name="TabAgenda"
+                        Grid.Column="0"
+                        BackgroundColor="#E5E5E5"
+                        Stroke="Black"
+                        StrokeThickness="1.5"
+                        Rotation="-4"
+                        ZIndex="1"
+                        Padding="30,12">
+                    <Border.Shadow>
+                        <Shadow Brush="Black"
+                                Offset="4,4"
+                                Radius="0"
+                                Opacity="0.5"/>
+                    </Border.Shadow>
+                    <Border.GestureRecognizers>
+                        <!-- Clic nativo -->
+                        <TapGestureRecognizer Tapped="OnAgendaTabTapped"/>
+                        <!-- 🚨 NUEVOS RECONOCEDORES DE PUNTERO MOUSE PARA WINDOWS -->
+                        <PointerGestureRecognizer PointerEntered="OnTabAgendaMouseIn"
+                                                  PointerExited="OnTabAgendaMouseOut"/>
+                    </Border.GestureRecognizers>
+                    <Label Text="AGENDA"
+                           TextColor="#222222"
+                           FontSize="21"
+                           FontFamily="Impact"/>
+                </Border>
+
+                <!-- PESTAÑA CALENDARIO -->
+                <Border x:Name="TabCalendario"
+                        Grid.Column="1"
+                        BackgroundColor="Black"
+                        Stroke="White"
+                        StrokeThickness="2"
+                        Rotation="3"
+                        ZIndex="2"
+                        Margin="-25,2,0,0"
+                        Padding="35,12">
+                    <Border.Shadow>
+                        <Shadow Brush="Black"
+                                Offset="5,5"
+                                Radius="0"
+                                Opacity="0.8"/>
+                    </Border.Shadow>
+                    <Border.GestureRecognizers>
+                        <!-- 🚨 NUEVOS RECONOCEDORES DE PUNTERO MOUSE PARA WINDOWS -->
+                        <PointerGestureRecognizer PointerEntered="OnTabCalendarioMouseIn"
+                                                  PointerExited="OnTabCalendarioMouseOut"/>
+                    </Border.GestureRecognizers>
+                    <Label Text="CALENDARIO"
+                           TextColor="#E31D26"
+                           FontSize="21"
+                           FontFamily="Impact"/>
+                </Border>
+            </Grid>
+
+
+            <!-- 2. CABECERA HUD EXTIDILO PHANTOM THIEVES (REDISEÑO TOTAL AGRESIVO) -->
+            <Grid Grid.Row="1"
+                  ColumnDefinitions="Auto, *, Auto"
+                  Margin="10,5,10,20"
+                  VerticalOptions="Center">
+
+                <!-- BOTÓN MES ANTERIOR: Machetazo Diagonal Masivo estilo Navaja -->
+                <Grid Grid.Column="0"
+                      WidthRequest="55"
+                      HeightRequest="50"
+                      Rotation="-12"
+                      VerticalOptions="Center">
+                    <!-- Sombra sólida negra -->
+                    <Polygon Points="8,10 55,0 42,50 0,40"
+                             Fill="Black"
+                             Aspect="Fill"/>
+                    <!-- Bloque Rojo Delantero súper afilado -->
+                    <Polygon Points="3,5 50,-5 37,45 0,35"
+                             Fill="#E31D26"
+                             Stroke="White"
+                             StrokeThickness="1.5"
+                             Aspect="Fill"/>
+                    <Label Text="&lt;"
+                           TextColor="White"
+                           FontFamily="Impact"
+                           FontSize="26"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"
+                           Margin="-4,-2,0,0"/>
+                    <Button Clicked="OnPrevMonthClicked"
+                            BackgroundColor="Transparent"
+                            CornerRadius="0"
+                            ZIndex="2"/>
+                </Grid>
+
+                <!-- HUD CENTRAL: REPLICA DE PANTALLA DE DÍA REAL DE P5 (ESTILO COLLAGE COMPACTO) -->
+                <Grid Grid.Column="1"
+                      HorizontalOptions="Center"
+                      VerticalOptions="Center"
+                      WidthRequest="360"
+                      HeightRequest="180"
+                      Margin="0,-30,0,-10">
+
+                    <!-- CAPA 1: EL AÑO (Arriba a la Izquierda, Masivo) -->
+                    <!-- Actúa como el dígito dominante con rotación agresiva hacia la izquierda -->
+                    <FlexLayout x:Name="ContenedorLetrasAnio"
+                                Direction="Row"
+                                JustifyContent="Center"
+                                AlignItems="Center"
+                                HorizontalOptions="Start"
+                                VerticalOptions="Start"
+                                HeightRequest="70"
+                                Rotation="-15"
+                                Margin="30,5,0,0"
+                                ZIndex="2"/>
+
+
+                    <!-- CAPA 2: EL MES (Abajo a la Derecha - CALIBRADO PREMIUM AL PÍXEL) -->
+                    <Grid HorizontalOptions="End"
+                          VerticalOptions="End"
+                          WidthRequest="430"
+                          HeightRequest="75"
+                          Rotation="8"
+                          Margin="0,0,10,10"
+                          ZIndex="3">
+
+                        <!-- Sombra trasera asimétrica ampliada -->
+                        <Polygon Points="3,0 433,0 425,100 -2,100"
+                                 Fill="Black"
+                                 Aspect="Fill"
+                                 ZIndex="1"/>
+
+                        <!-- Polígono Delantero Negro con Borde Rojo Fuego ampliado -->
+                        <Polygon Points="0,0 430,0 422,100 6,100"
+                                 Fill="Black"
+                                 Stroke="#E31D26"
+                                 StrokeThickness="3.5"
+                                 Aspect="Fill"
+                                 ZIndex="2"/>
+
+                        <!-- RE TOQUE CRÍTICO: Cambiamos a Margin="15,0,15,4" para centrar el collage perfectamente -->
+                        <FlexLayout x:Name="ContenedorLetrasMes"
+                                    Direction="Row"
+                                    JustifyContent="Center"
+                                    AlignItems="Center"
+                                    Margin="15,0,15,4"
+                                    ZIndex="3"/>
+                    </Grid>
+
+                    <!-- CAPA 3: DETALLE URBANO (Cinta de sujeción punk sobre el Año) -->
+                    <Polygon Points="0,0 35,-5 25,15 -5,17"
+                             Fill="Black"
+                             HorizontalOptions="Start"
+                             VerticalOptions="Start"
+                             Margin="20,0,0,0"
+                             Rotation="-40"
+                             ZIndex="4"/>
+                </Grid>
+
+
+                <!-- BOTÓN MES SIGUIENTE: Machetazo Diagonal Inverso -->
+                <Grid Grid.Column="2"
+                      WidthRequest="55"
+                      HeightRequest="50"
+                      Rotation="14"
+                      VerticalOptions="Center">
+                    <!-- Sombra sólida negra -->
+                    <Polygon Points="0,10 47,0 55,40 13,50"
+                             Fill="Black"
+                             Aspect="Fill"/>
+                    <!-- Bloque Rojo Delantero súper afilado -->
+                    <Polygon Points="0,5 47,-5 55,35 13,45"
+                             Fill="#E31D26"
+                             Stroke="White"
+                             StrokeThickness="1.5"
+                             Aspect="Fill"/>
+                    <Label Text="&gt;"
+                           TextColor="White"
+                           FontFamily="Impact"
+                           FontSize="26"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"
+                           Margin="4,-2,0,0"/>
+                    <Button Clicked="OnNextMonthClicked"
+                            BackgroundColor="Transparent"
+                            CornerRadius="0"
+                            ZIndex="2"/>
+                </Grid>
+
+            </Grid>
+
+            <!-- ==================== 3. INDICADORES DE DÍAS DE LA SEMANA (FILA 2 - LETRAS EN LÍNEA Y SEPARADOR BAJO) ==================== -->
+            <Grid Grid.Row="2"
+                  HeightRequest="65"
+                  Margin="15,5,15,5">
+
+                <!-- 1. LA FRANJA ROJA SEPARADORA NATIVA: Recta y clavada en la base inferior (VerticalOptions="End") -->
+                <BoxView Color="#E31D26"
+                         HeightRequest="14"
+                         VerticalOptions="End"
+                         Margin="0,0,0,5"
+                         ZIndex="1"/>
+
+                <!-- 2. CAPA DE LETRAS ALINEADAS: Todas niveladas en el centro-alto de la fila, rozando el separador -->
+                <Grid ZIndex="2"
+                      VerticalOptions="Start"
+                      HeightRequest="45"
+                      Margin="0,2,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- LUNES -->
+                    <Grid Grid.Column="0"
+                          HorizontalOptions="Center"
+                          VerticalOptions="Center"
+                          HeightRequest="38"
+                          WidthRequest="34"
+                          Rotation="-6">
+                        <Polygon Points="3,4 39,0 33,38 -3,34"
+                                 Fill="Black"
+                                 Aspect="Fill"
+                                 ZIndex="1"/>
+                        <Polygon Points="0,4 36,0 30,34 0,30"
+                                 Fill="Black"
+                                 Stroke="White"
+                                 StrokeThickness="1"
+                                 Aspect="Fill"
+                                 ZIndex="2"/>
+                        <Label Text="L"
+                               FontFamily="Impact"
+                               FontSize="19"
+                               TextColor="White"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"
+                               ZIndex="3"
+                               Margin="0,-2,2,0"/>
+                    </Grid>
+
+                    <!-- MARTES -->
+                    <Grid Grid.Column="1"
+                          HorizontalOptions="Center"
+                          VerticalOptions="Center"
+                          HeightRequest="38"
+                          WidthRequest="34"
+                          Rotation="5">
+                        <Polygon Points="2,5 38,0 32,36 0,39"
+                                 Fill="Black"
+                                 Aspect="Fill"
+                                 ZIndex="1"/>
+                        <Polygon Points="0,5 36,0 30,32 1,35"
+                                 Fill="White"
+                                 Stroke="Black"
+                                 StrokeThickness="1.5"
+                                 Aspect="Fill"
+                                 ZIndex="2"/>
+                        <Label Text="M"
+                               FontFamily="Impact"
+                               FontSize="18"
+                               TextColor="Black"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"
+                               ZIndex="3"
+                               Margin="0,-2,0,0"/>
+                    </Grid>
+
+                    <!-- MIÉRCOLES -->
+                    <Grid Grid.Column="2"
+                          HorizontalOptions="Center"
+                          VerticalOptions="Center"
+                          HeightRequest="38"
+                          WidthRequest="34"
+                          Rotation="-4">
+                        <Polygon Points="0,0 38,3 34,37 3,34"
+                                 Fill="Black"
+                                 Aspect="Fill"
+                                 ZIndex="1"/>
+                        <Polygon Points="0,0 38,3 36,10 2,7"
+                                 Fill="#E31D26"
+                                 Aspect="Fill"
+                                 ZIndex="2"/>
+                        <Label Text="X"
+                               FontFamily="Impact"
+                               FontSize="18"
+                               TextColor="White"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"
+                               ZIndex="3"
+                               Margin="0,2,0,0"/>
+                    </Grid>
+
+                    <!-- JUEVES -->
+                    <Grid Grid.Column="3"
+                          HorizontalOptions="Center"
+                          VerticalOptions="Center"
+                          HeightRequest="38"
+                          WidthRequest="34"
+                          Rotation="6">
+                        <Polygon Points="3,2 37,0 31,38 -2,35"
+                                 Fill="Black"
+                                 Aspect="Fill"
+                                 ZIndex="1"/>
+                        <Polygon Points="0,2 34,0 28,34 0,31"
+                                 Fill="Black"
+                                 Stroke="White"
+                                 StrokeThickness="1"
+                                 Aspect="Fill"
+                                 ZIndex="2"/>
+                        <Label Text="J"
+                               FontFamily="Impact"
+                               FontSize="19"
+                               TextColor="White"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"
+                               ZIndex="3"
+                               Margin="0,-2,2,0"/>
+                    </Grid>
+
+                    <!-- VIERNES -->
+                    <Grid Grid.Column="4"
+                          HorizontalOptions="Center"
+                          VerticalOptions="Center"
+                          HeightRequest="38"
+                          WidthRequest="34"
+                          Rotation="-5">
+                        <Polygon Points="1,4 39,0 34,37 -2,39"
+                                 Fill="Black"
+                                 Aspect="Fill"
+                                 ZIndex="1"/>
+                        <Polygon Points="0,4 36,0 31,33 0,35"
+                                 Fill="White"
+                                 Stroke="Black"
+                                 StrokeThickness="1.5"
+                                 Aspect="Fill"
+                                 ZIndex="2"/>
+                        <Label Text="V"
+                               FontFamily="Impact"
+                               FontSize="18"
+                               TextColor="Black"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"
+                               ZIndex="3"
+                               Margin="0,-2,0,0"/>
+                    </Grid>
+
+                    <!-- SÁBADO -->
+                    <Grid Grid.Column="5"
+                          HorizontalOptions="Center"
+                          VerticalOptions="Center"
+                          HeightRequest="38"
+                          WidthRequest="34"
+                          Rotation="5">
+                        <Polygon Points="2,2 38,0 33,37 -1,35"
+                                 Fill="Black"
+                                 Aspect="Fill"
+                                 ZIndex="1"/>
+                        <Polygon Points="0,2 36,0 31,33 0,31"
+                                 Fill="Black"
+                                 Stroke="#E31D26"
+                                 StrokeThickness="2"
+                                 Aspect="Fill"
+                                 ZIndex="2"/>
+                        <Label Text="S"
+                               FontFamily="Impact"
+                               FontSize="18"
+                               TextColor="#E31D26"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"
+                               ZIndex="3"
+                               Margin="0,-2,0,0"/>
+                    </Grid>
+
+                    <!-- DOMINGO -->
+                    <Grid Grid.Column="6"
+                          HorizontalOptions="Center"
+                          VerticalOptions="Center"
+                          HeightRequest="38"
+                          WidthRequest="34"
+                          Rotation="-6">
+                        <Polygon Points="2,3 39,0 33,38 -1,35"
+                                 Fill="Black"
+                                 Aspect="Fill"
+                                 ZIndex="1"/>
+                        <Polygon Points="0,3 36,0 30,34 0,31"
+                                 Fill="#E31D26"
+                                 Stroke="Black"
+                                 StrokeThickness="1.5"
+                                 Aspect="Fill"
+                                 ZIndex="2"/>
+                        <Label Text="D"
+                               FontFamily="Impact"
+                               FontSize="19"
+                               TextColor="White"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"
+                               ZIndex="3"
+                               Margin="0,-2,0,0"/>
+                    </Grid>
+                </Grid>
+            </Grid>
+
+            <!-- ==================== 4. MATRIZ DE CALENDARIO: FILA 3 (SOLUCIÓN PATH GEOMÉTRICA) ==================== -->
+            <CollectionView Grid.Row="3"
+                            x:Name="GridDiasCollectionView"
+                            ItemsSource="{Binding DiasDelMes}"
+                            Margin="15,0,15,10">
+                <CollectionView.ItemsLayout>
+                    <GridItemsLayout Orientation="Vertical"
+                                     Span="7"
+                                     HorizontalItemSpacing="14"
+                                     VerticalItemSpacing="16"/>
+                </CollectionView.ItemsLayout>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:DiaCalendario">
+                        <!-- 
+            LIENZO MAESTRO (140x140): 
+            Garantiza espacio de sobra para el desborde superior del puñal sin cortes en Windows
+        -->
+                        <Grid HeightRequest="140"
+                              WidthRequest="140"
+                              HorizontalOptions="Center"
+                              VerticalOptions="Center"
+                              IsClippedToBounds="False">
+
+                            <!-- 
+                CAPA 1: TU CELDA ORIGINAL EXACTA (65x55)
+                Mantiene su tamaño, su rotación caótica y sus bordes limpios.
+            -->
+                            <Grid HeightRequest="65"
+                                  WidthRequest="55"
+                                  Rotation="{Binding RotacionCelda}"
+                                  HorizontalOptions="Center"
+                                  VerticalOptions="Center"
+                                  IsClippedToBounds="False"
+                                  ZIndex="1">
+
+                                <!-- 1. SOMBRA TRASERA ASIMÉTRICA NEGRA: Fijada en Black de por vida -->
+                                <Border BackgroundColor="Black"
+                                        StrokeThickness="0"
+                                        StrokeShape="Polygon 3,0 53,4 48,60 -2,56"
+                                        Margin="4,4,-4,-4"
+                                        ZIndex="1"/>
+
+                                <!-- 2. TARJETA DELANTERA BASE: Sigue escuchando al color dinámico del modelo -->
+                                <Border BackgroundColor="{Binding ColorFondoCelda}"
+                                        Stroke="Black"
+                                        StrokeThickness="2"
+                                        StrokeShape="Polygon 0,0 50,4 45,58 2,54"
+                                        ZIndex="2">
+
+
+                                    <Grid RowDefinitions="18, *">
+                                        <!-- 3. MACHETAZO NEGRO SUPERIOR INTERNO -->
+                                        <BoxView Grid.Row="0"
+                                                 Color="Black"
+                                                 VerticalOptions="Fill"
+                                                 HorizontalOptions="Fill"/>
+
+                                        <!-- 4. NÚMERO PERFECTO -->
+                                        <Label Grid.Row="1"
+                                               Text="{Binding NumeroDia}"
+                                               FontFamily="Impact"
+                                               FontSize="22"
+                                               TextColor="Black"
+                                               HorizontalOptions="Center"
+                                               VerticalOptions="Center"
+                                               Margin="0,0,0,2"
+                                               ZIndex="4">
+                                            <Label.Triggers>
+                                                <DataTrigger TargetType="Label"
+                                                             Binding="{Binding EsMesActual}"
+                                                             Value="False">
+                                                    <Setter Property="TextColor"
+                                                            Value="#A0A0A0"/>
+                                                    <Setter Property="Opacity"
+                                                            Value="0.15"/>
+                                                </DataTrigger>
+                                                <!-- 🚨 CUANDO EL MODELO DETECTE QUE ES HOY, PASARÁ EL TEXTO A BLANCO -->
+                                                <DataTrigger TargetType="Label"
+                                                             Binding="{Binding EsHoy}"
+                                                             Value="True">
+                                                    <Setter Property="TextColor"
+                                                            Value="White"/>
+                                                </DataTrigger>
+                                            </Label.Triggers>
+                                        </Label>
+                                    </Grid>
+                                </Border>
+
+
+                            </Grid>
+
+                            <!-- 
+                ==================== CAPA 2: ANCLAJE QUIRÚRGICO ABSOLUTO ====================
+                Envolvemos el puñal en un AbsoluteLayout que comparte el centro del lienzo maestro.
+                Evitamos usar márgenes elásticos que Windows rompe o calcula al revés.
+            -->
+                            <AbsoluteLayout IsVisible="{Binding EsHoy}"
+                                            ZIndex="99"
+                                            HorizontalOptions="Center"
+                                            VerticalOptions="Center"
+                                            WidthRequest="140"
+                                            HeightRequest="140"
+                                            InputTransparent="True">
+
+                                <!-- CÍRCULO DE CLAVADA: Nace invisible en tamaño cero -->
+                                <Ellipse x:Name="CirculoImpacto"
+                                         Scale="0"
+                                         WidthRequest="45"
+                                         HeightRequest="30"
+                                         Fill="White"
+                                         Stroke="Black"
+                                         StrokeThickness="3"
+                                         Rotation="-20"
+                                         AbsoluteLayout.LayoutBounds="85, 30, 45, 30"
+                                         AbsoluteLayout.LayoutFlags="None"/>
+
+                                <!-- CUCHILLO: Manteniendo tu archivo intacto con su evento Loaded -->
+                                <Image Source="punaltransparente.png"
+                                       x:Name="Cuchillo"
+                                       StyleId="Cuchillo"
+                                       Aspect="AspectFit"
+                                       AbsoluteLayout.LayoutBounds="82, -4, 70, 70"
+                                       Rotation="0"
+                                       AbsoluteLayout.LayoutFlags="None"
+                                       Loaded="OnCuchilloLoaded"/>
+                            </AbsoluteLayout>
+
+
+
+
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+
+            </CollectionView>
+
+        </Grid>
+    </Grid>
+
+
+
+</ContentPage>

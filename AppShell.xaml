@@ -3,12 +3,29 @@
     x:Class="MauiTime.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:local="clr-namespace:MauiTime"
-    Title="MauiTime">
+    xmlns:local="clr-namespace:MauiTime.Views"
+    Shell.FlyoutBehavior="Disabled"
+    Shell.TabBarIsVisible="False"
+    Shell.NavBarIsVisible="False">
 
-    <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
+    <TabBar>
+        <!-- AÑADIDO: Route="AgendaPage" -->
+        <Tab Title="Agenda" Icon="dotnet_bot.png" Route="AgendaPage">
+            <ShellContent ContentTemplate="{DataTemplate local:AgendaPage}" />
+        </Tab>
+        
+        <!-- AÑADIDO: Route="CalendarioPage" -->
+        <Tab Title="Calendario" Icon="dotnet_bot.png" Route="CalendarioPage">
+            <ShellContent ContentTemplate="{DataTemplate local:CalendarioPage}" />
+        </Tab>
+
+        <Tab Title="Transición" Icon="dotnet_bot.png" Route="TransicionCristalPage">
+            <ShellContent ContentTemplate="{DataTemplate local:TransicionCristalPage}" />
+        </Tab>
+    </TabBar>
+
+    <!-- Rutas registradas para navegación modal -->
+    <ShellContent Route="LinternaAnimacionPage" 
+                  ContentTemplate="{DataTemplate local:LinternaAnimacionPage}" />
 
 </Shell>

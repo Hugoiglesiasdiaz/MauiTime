@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MauiTime.Views.StartPage"
+             Style="{StaticResource P5Page}"
+             Shell.NavBarIsVisible="False">
+
+    <Grid BackgroundColor="{StaticResource P5Gray}">
+        
+        <BoxView BackgroundColor="Black" 
+                 Opacity="0.4"
+                 HorizontalOptions="Fill"
+                 VerticalOptions="Fill">
+            <BoxView.Clip>
+                <PathGeometry Figures="M 0,0 L 400,0 L 0,1000 Z" />
+            </BoxView.Clip>
+        </BoxView>
+
+        <BoxView BackgroundColor="{StaticResource P5Red}"
+                 HorizontalOptions="Fill"
+                 VerticalOptions="Fill">
+            <BoxView.Clip>
+                <PathGeometry Figures="M 150,0 L 1000,0 L 0,1000 Z" />
+            </BoxView.Clip>
+        </BoxView>
+
+        <Grid Margin="40">
+            <Label Text="TAKE YOUR TIME" 
+                   Style="{StaticResource P5BannerLabel}" 
+                   VerticalOptions="End" 
+                   HorizontalOptions="Start" />
+            
+            <VerticalStackLayout VerticalOptions="Center" 
+                                 HorizontalOptions="Center" 
+                                 Spacing="30">
+                <Grid HorizontalOptions="Center">
+                    <Label Text="MAUI TIME" Style="{StaticResource P5TitleShadow}" />
+                    <Label Text="MAUI TIME" Style="{StaticResource P5Title}" />
+                </Grid>
+
+                <VerticalStackLayout Spacing="15" HorizontalOptions="Center">
+                    <Button Text="ENTER CALENDAR" Rotation="-3" />
+                    <Button Text="VIEW DATA" Style="{StaticResource P5AccentButton}" Rotation="4" />
+                    <Button Text="SYSTEM EXIT" Rotation="-1" />
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </Grid>
+    </Grid>
+</ContentPage>
