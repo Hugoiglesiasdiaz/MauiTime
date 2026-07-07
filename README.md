@@ -1,7 +1,7 @@
 # 🎭 MauiTime — Persona 5 Stylized Calendar & Agenda
 
-[![Platform - Windows](https://shields.io)](https://microsoft.com)
-[![Framework - .NET 10](https://shields.io)](https://microsoft.com)
+![Windows](https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white)
+![.Net](https://img.shields.io/badge/.NET-5C2D91?style=for-the-badge&logo=.net&logoColor=white)
 
 **MauiTime** es una aplicación de productividad (Agenda y Calendario) desarrollada en **.NET MAUI** que rompe por completo con las interfaces planas y aburridas del software tradicional. Inspirada al 100% en la estética tipográfica, asimétrica y de alto contraste de los menús de _Persona 5 (Atlus)_, cada transición, clic e impacto de pantalla está diseñado como una obra de arte fanzine punk.
 
@@ -48,6 +48,19 @@ Para lograr que esta interfaz tan pesada a nivel gráfico rinda a **60fps/120fps
 - **Desacoplamiento por Tokens Únicos (`Guid`):** La animación del cuchillo implementa firmas de identidad efímeras. Si los eventos nativos de Windows disparan renderizados duplicados en cascada, las ejecuciones fantasmas se auto-destruyen en milisegundos evitando "ecos" visuales.
 - **Animaciones Compuestas en GPU:** El sismo general del calendario no encadena comandos asíncronos secuenciales. En su lugar, se empaqueta en una clase estructural `Animation` nativa que procesa la ida y la vuelta de forma continua en la tarjeta gráfica.
 - **Ciclo de Vida Reactivo Puro:** El color y texto del día actual se alteran a través de bindings y propiedades de la interfaz `INotifyPropertyChanged`, impidiendo que el `CollectionView` destruya y reconstruya los controles en tiempo de ejecución.
+
+---
+
+## 🗺️ Infiltration Route (Roadmap de Desarrollo)
+
+El asalto a la interfaz no ha terminado. Estas son las características planeadas que se están implementando activamente:
+
+- [x] Coreografía cinemática "Target Lock" y sacudida de GPU fluida.
+- [x] Inyección dinámica de tipografías Ransom estilo nota de rescate.
+- [x] Doble sismo unificado y elipse elástica de impacto para el día actual.
+- [ ] **Módulo de Navegación de Meses:** Transición de recortes con efectos cortantes al pulsar `<` o `>`.
+- [ ] **Persistencia Local:** Integración de base de datos SQLite para guardar eventos reales de la Agenda de forma permanente.
+- [ ] **Efectos de Sonido HUD:** Inclusión de efectos de audio de baja fidelidad en clics y transiciones críticas.
 
 ---
 
