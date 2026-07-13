@@ -69,7 +69,7 @@ El asalto a la interfaz no ha terminado. Estas son las características planeada
 1. Asegúrate de tener instalado el SDK de **.NET 10** y la carga de trabajo de **.NET MAUI**.
 2. Clona este repositorio en tu equipo:
    ```bash
-   git clone https://github.com
+   git clone https://github.com/Hugoiglesiasdiaz/MauiTime
    ```
 3. Abre la solución con **Visual Studio (Windows)**.
 4. Selecciona el framework de destino `net10.0-windows10.0.19041.0` (Arquitectura x64).

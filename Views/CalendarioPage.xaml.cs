@@ -13,6 +13,7 @@ namespace MauiTime.Views
     {
         private DateTime _mesActualReferencia = DateTime.Today;
         private bool _isAnimating = false;
+
         private ObservableCollection<DiaCalendario> _diasDelMes = new();
 
         // Campos privados para el control de los textos mediante Binding
@@ -197,13 +198,11 @@ namespace MauiTime.Views
         }
 
 
-
         private void OnPrevMonthClicked(object? sender, EventArgs e)
         {
             _mesActualReferencia = _mesActualReferencia.AddMonths(-1);
             RefrescarCalendario();
 
-            // Forzamos el redibujado de los carteles dinámicos
             ConstruirLetrasRansomMes(TextoMes);
             ConstruirLetrasRansomAnio(TextoAnio);
         }
@@ -213,7 +212,6 @@ namespace MauiTime.Views
             _mesActualReferencia = _mesActualReferencia.AddMonths(1);
             RefrescarCalendario();
 
-            // Forzamos el redibujado de los carteles dinámicos
             ConstruirLetrasRansomMes(TextoMes);
             ConstruirLetrasRansomAnio(TextoAnio);
         }
@@ -303,9 +301,28 @@ namespace MauiTime.Views
             // Forzamos el color de fondo oscuro de inmediato para conectar con la linterna
             this.BackgroundColor = Color.FromArgb("#1A1A1A");
 
-            // Hacemos el calendario visible al 100% de forma inmediata.
-            // Ya no ejecutamos el sismo aquí; se lo dejamos encargado al cuchillo en su evento 'Loaded'
+            // Hacemos el calendario visible al 100% de forma inmediata
             GridDiasCollectionView.Opacity = 1.0;
+
+            // =======================================================================
+            // 🎯 RE-CALIBRACIÓN DE ENFOQUE: GARANTIZAR EL CENTRADO REAL EN PANTALLA
+            // =======================================================================
+            // Ejecutamos el scroll un frame después de que el layout esté listo,
+            // forzando a Windows a romper cualquier bloqueo de renderizado nativo.
+            Dispatcher.Dispatch(async () =>
+            {
+                // Buscamos el objeto de la celda de hoy dentro de tu colección real de datos
+                var diaHoyModelo = DiasDelMes.FirstOrDefault(d => d.EsHoy);
+                if (diaHoyModelo != null)
+                {
+                    // Forzamos un micro-silencio de 50ms para asegurar el asiento de la UI
+                    await Task.Delay(50);
+
+                    // Hacemos el scroll instantáneo (animate: false) hacia el día de hoy.
+                    // Usamos ScrollToPosition.Center para clavar la fila de hoy en el centro visual exacto.
+                    GridDiasCollectionView.ScrollTo(diaHoyModelo, position: ScrollToPosition.Center, animate: false);
+                }
+            });
         }
 
 
@@ -315,7 +332,35 @@ namespace MauiTime.Views
         {
             if (sender is Image objetoCuchillo)
             {
-                // 1. PREPARACIÓN OCULTA EN LAS ALTURAS (Viene volando en diagonal)
+                // 🚨 EL CANDADO DEFINITIVO DE FECHA REAL:
+                // Comprobamos si el mes y año que se está renderizando coincide con el mes y año del reloj real de tu PC.
+                bool esElMesActualReal = _mesActualReferencia.Month == DateTime.Today.Month &&
+                                         _mesActualReferencia.Year == DateTime.Today.Year;
+
+                if (!esElMesActualReal)
+                {
+                    // Si el usuario está mirando Agosto, Septiembre o cualquier otro mes, 
+                    // forzamos el pintado estático en frío y abortamos la caída y el sismo.
+                    if (objetoCuchillo.BindingContext is MauiTime.Models.DiaCalendario diaActual && diaActual.EsHoy)
+                    {
+                        diaActual.ColorFondoCelda = Color.FromArgb("#E31D26");
+
+                        var contextoTemporal = objetoCuchillo.BindingContext;
+                        objetoCuchillo.BindingContext = null;
+                        objetoCuchillo.BindingContext = contextoTemporal;
+                    }
+
+                    objetoCuchillo.Opacity = 1;
+                    objetoCuchillo.TranslationY = 0;
+                    objetoCuchillo.TranslationX = 0;
+                    objetoCuchillo.Rotation = 0;
+                    objetoCuchillo.Scale = 1.0;
+                    return; // ❌ Bloqueo absoluto de animaciones secundarias
+                }
+
+                // ---------------------------------------------------------------------
+                // COREOGRAFÍA CINEMÁTICA DE BIENVENIDA (Solo corre en el mes real actual)
+                // ---------------------------------------------------------------------
                 objetoCuchillo.Opacity = 0;
                 objetoCuchillo.TranslationY = -250;
                 objetoCuchillo.TranslationX = 80;
@@ -323,40 +368,34 @@ namespace MauiTime.Views
 
                 Dispatcher.Dispatch(async () =>
                 {
-                    // Espera táctica inicial para que cargue la interfaz limpia
                     await Task.Delay(200);
 
-                    // 2. TRAYECTORIA DE CAÍDA SUAVE Y VISIBLE
+                    // Trayectoria de caída suave
                     objetoCuchillo.Opacity = 1;
                     await Task.WhenAll(
                         objetoCuchillo.TranslateToAsync(0, 0, 350, Easing.CubicIn),
                         objetoCuchillo.RotateToAsync(0, 350, Easing.CubicIn)
                     );
 
-                    // 3. ¡IMPACTO VISUAL! (Cambio de color al tocar el papel)
+                    // Impacto visual
                     if (objetoCuchillo.BindingContext is MauiTime.Models.DiaCalendario diaActual && diaActual.EsHoy)
                     {
-                        // Teñimos la tarjeta delantera de Rojo Fuego al tocar el papel
                         diaActual.ColorFondoCelda = Color.FromArgb("#E31D26");
 
-                        // Refrescamos los disparadores del XAML para pasar el texto del número a Blanco
                         var contextoTemporal = objetoCuchillo.BindingContext;
                         objetoCuchillo.BindingContext = null;
                         objetoCuchillo.BindingContext = contextoTemporal;
                     }
 
-                    // Pequeño rebote elástico individual del puñal al clavarse profundo
                     _ = objetoCuchillo.ScaleToAsync(1.4, 40, Easing.CubicOut)
                         .ContinueWith(t => MainThread.BeginInvokeOnMainThread(() => objetoCuchillo.ScaleToAsync(1.0, 100, Easing.SpringOut)));
 
-                    // 4. EL ÚNICO TERREMOTO GENERAL DE ALTA CALIDAD
-                    // Borrado el sismo duplicado. Ahora la energía del golpe sacude la cuadrícula una sola vez
+                    // Terremoto general unificado
                     if (!_isAnimating)
                     {
                         _isAnimating = true;
                         try
                         {
-                            // Un único sismo directo sobre todo el conjunto de días a la vez
                             await EjecutarTemblorSismico(GridDiasCollectionView);
                         }
                         finally
@@ -367,7 +406,6 @@ namespace MauiTime.Views
                 });
             }
         }
-
 
         // =========================================================================
         // ANIMACIONES COMPLEJAS DE ALTA FLUIDEZ (ESTILO SPRING / BOUNCE P5)
