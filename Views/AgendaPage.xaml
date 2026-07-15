@@ -194,7 +194,7 @@
                                         <AbsoluteLayout x:Name="HudFechaP5"
                                                         HorizontalOptions="Fill"
                                                         VerticalOptions="Fill"
-                                                        Loaded="OnFechaHudLoaded"/>
+                                                        BindingContextChanged="OnFechaHudBindingContextChanged"/>
                                     </Grid>
 
                                     <!-- TARJETA DEL EVENTO (RESTANTE NEGRO LIMPIO + TÍTULO DUOTONO P5) -->
@@ -371,6 +371,10 @@
 
                                             </VerticalStackLayout>
                                         </Grid>
+                                        <!-- 💣 SENSOR DE BORRADO DE LA AGENDA CONECTADO A TU SQLITE -->
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer Tapped="OnEliminarProyectoClicked"/>
+                                        </Border.GestureRecognizers>
                                     </Border>
 
                                 </Grid>
@@ -421,6 +425,23 @@
                 </Grid>
 
             </Grid>
+            <!-- ======================================================================= -->
+            <!-- ➕ BOTÓN SUPREMO: GATILLO DE REGISTRO FLOTANTE ASIMÉTRICO               -->
+            <!-- ======================================================================= -->
+            <Button Grid.Row="0"
+                    Text="[ ➕ REGISTRAR OBJETIVO ]"
+                    Clicked="OnCrearProyectoClicked"
+                    BackgroundColor="Black"
+                    TextColor="White"
+                    BorderColor="White"
+                    BorderWidth="1"
+                    FontFamily="Impact"
+                    FontSize="14"
+                    HorizontalOptions="End"
+                    VerticalOptions="Center"
+                    Margin="0,20,15,0"
+                    ZIndex="999"/>
+
         </Grid>
     </Grid>
 </ContentPage>

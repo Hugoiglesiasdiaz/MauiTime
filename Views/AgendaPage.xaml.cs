@@ -24,15 +24,13 @@ public partial class AgendaPage : ContentPage
 
         if (_viewModel != null)
         {
-            // 🚨 EL TRUCO DEFINITIVO PARA EL REFRESHVIEW EN WINDOWS:
-            // Despachamos la carga al final de la cola de renderizado.
-            // Windows dibuja la página primero, y a los 50ms inyecta los datos de golpe,
-            // evitando que el CollectionView colapse con tamaño cero.
             Dispatcher.Dispatch(async () =>
             {
                 try
                 {
                     await Task.Delay(50); // Micro-pausa de estabilización visual
+
+                    // 🚀 UNIFICACIÓN: Tu ViewModel se encargará de refrescar todo en un solo carril seguro
                     await _viewModel.LoadEventosAsync();
                 }
                 catch (Exception ex)
@@ -44,10 +42,20 @@ public partial class AgendaPage : ContentPage
     }
 
 
-    private void OnFechaHudLoaded(object? sender, EventArgs e)
-    {
-        if (sender is not AbsoluteLayout contenedor || contenedor.BindingContext is not Models.Evento evento) return;
 
+    // 1. CAMBIA EL NOMBRE Y LA LÓGICA DEL MÉTODO A BindingContextChanged
+    private void OnFechaHudBindingContextChanged(object? sender, EventArgs e)
+    {
+        if (sender is not AbsoluteLayout contenedor) return;
+
+        // 🛡️ CONTROL CRÍTICO: Desvincular si el contexto es nulo (cuando MAUI limpia la celda)
+        if (contenedor.BindingContext is not Models.Evento evento)
+        {
+            contenedor.Children.Clear();
+            return;
+        }
+
+        // Limpieza total antes de volver a dibujar para evitar acumular stickers fantasmas
         contenedor.Children.Clear();
         var random = new Random();
 
@@ -55,7 +63,7 @@ public partial class AgendaPage : ContentPage
         string mes = evento.FechaHora.ToString("MM");
 
         // =========================================================================
-        // CAPA 1: Placa del Mes (Empujada más hacia arriba a la izquierda)
+        // CAPA 1: Placa del Mes
         // =========================================================================
         var bloqueMes = new Border
         {
@@ -75,12 +83,11 @@ public partial class AgendaPage : ContentPage
                 VerticalOptions = LayoutOptions.Center
             }
         };
-        // Desplazamos a la esquina superior extrema (X: 1, Y: 2)
         AbsoluteLayout.SetLayoutBounds(bloqueMes, new Rect(1, 2, 46, 36));
         contenedor.Children.Add(bloqueMes);
 
         // =========================================================================
-        // CAPA 2: Números del Día (Empujados más hacia abajo a la derecha)
+        // CAPA 2: Números del Día
         // =========================================================================
         var stackDia = new HorizontalStackLayout
         {
@@ -118,37 +125,80 @@ public partial class AgendaPage : ContentPage
 
             stackDia.Children.Add(stickerDigito);
         }
-        // Desplazamos a la esquina inferior extrema (X: 42, Y: 36) para abrir la separación
         AbsoluteLayout.SetLayoutBounds(stackDia, new Rect(42, 36, 60, 50));
         contenedor.Children.Add(stackDia);
 
         // =========================================================================
-        // CAPA 3: La Cuchillada de Alto Impacto (GRUESA Y CON SOMBRA P5)
+        // CAPA 3: La Cuchillada de Alto Impacto
         // =========================================================================
         var tajoRojo = new BoxView
         {
-            BackgroundColor = Color.FromArgb("#E31D26"), // Rojo P5 puro encendido
-            HeightRequest = 9.0, // ¡DUPLICADO EL GROSOR! Ahora tiene la fuerza de un brochazo
-            WidthRequest = 48,   // Mantenemos el largo exacto del pasillo
-            Rotation = -30,      // Mantenemos tu ángulo inclinado perfecto
+            BackgroundColor = Color.FromArgb("#E31D26"),
+            HeightRequest = 9.0,
+            WidthRequest = 48,
+            Rotation = -30,
             HorizontalOptions = LayoutOptions.Center,
             VerticalOptions = LayoutOptions.Center
         };
 
-        // Añadimos una sombra negra dura (Drop Shadow) sin difuminar (Radius = 0)
-        // Esto duplica el contraste y hace que la línea resalte con violencia visual
         tajoRojo.Shadow = new Shadow
         {
             Brush = Colors.Black,
-            Offset = new Point(3, 3), // Desfase plano estilo manga/cómic
+            Offset = new Point(3, 3),
             Radius = 0,
             Opacity = 1
         };
 
-        // Tu posicionamiento perfecto se mantiene intacto al 100%
         AbsoluteLayout.SetLayoutBounds(tajoRojo, new Rect(18, 26, 48, 20));
         contenedor.Children.Add(tajoRojo);
+        // =========================================================================
+        // CAPA 4: STICKER DEL AÑO (SÚPER MUESTREO GRÁFICO CONTRA BORROSIDAD)
+        // =========================================================================
+        if (evento.EsAnual)
+        {
+            string anio = evento.FechaHora.ToString("yyyy");
+            double rotacionAnio = random.Next(8, 13);
+
+            var bloqueAnio = new Border
+            {
+                BackgroundColor = Color.FromArgb("#E31D26"),
+                Padding = new Thickness(12, 3), // Más padding para albergar el lienzo gigante
+                Rotation = rotacionAnio,
+                StrokeThickness = 2,
+                Stroke = Colors.White,
+
+                // ⚡ TRUCO MAUI WINDOWS: Encogemos el contenedor entero por hardware.
+                // Al procesar una fuente gigante reducida, la GPU mantiene los bordes vectoriales perfectos.
+                Scale = 0.38,
+
+                Content = new Label
+                {
+                    Text = anio,
+                    TextColor = Colors.White,
+                    FontSize = 36, // 🔥 FUENTE GIGANTE: Obliga a generar una textura de alta resolución
+                    FontAttributes = FontAttributes.Bold,
+                    FontFamily = "Arial Black", // Arial Black gestiona mejor el subpíxel que Impact en tamaños micro
+                    HorizontalOptions = LayoutOptions.Center,
+                    VerticalOptions = LayoutOptions.Center
+                }
+            };
+
+            bloqueAnio.Shadow = new Shadow
+            {
+                Brush = Colors.Black,
+                Offset = new Point(6, 6), // Sombra proporcional a la escala nativa antes de encoger
+                Radius = 0,
+                Opacity = 1
+            };
+
+            // 🎯 AJUSTE DE RECUADRO: Al usar Scale, el tamaño lógico base debe ser mayor
+            // para que al encogerse quede exactamente del tamaño del sticker original.
+            AbsoluteLayout.SetLayoutBounds(bloqueAnio, new Rect(34, -30, 140, 65));
+            contenedor.Children.Add(bloqueAnio);
+        }
+
     }
+
 
 
     private void OnListaEventosScrolled(object? sender, ItemsViewScrolledEventArgs e)
@@ -342,6 +392,60 @@ public partial class AgendaPage : ContentPage
             System.Diagnostics.Debug.WriteLine($"Error al lanzar la transición: {ex.Message}");
         }
     }
+
+    // =======================================================================
+    // ➕ ACCIÓN 1: LANZAR LA PANTALLA POPUP PARA CREAR PROYECTOS / EVENTOS
+    // =======================================================================
+    private async void OnCrearProyectoClicked(object? sender, EventArgs e)
+    {
+        // 💡 TRUCO ARQUITECTÓNICO: Si tu ViewModel ya tiene inyectada la conexión real,
+        // la extraemos directamente a través del motor de dependencias global de .NET 10.
+        var dbServiceGlobal = App.Current?.Handler?.MauiContext?.Services.GetService<Services.DatabaseService>();
+
+        if (dbServiceGlobal != null)
+        {
+            // Pasamos exactamente el mismo canal de conexión física
+            var popupFormulario = new NuevaTareaPopup(DateTime.Today, dbServiceGlobal);
+            await Navigation.PushModalAsync(popupFormulario);
+
+            Console.WriteLine("[AGENDA] Regresando del formulario modal. Solicitando refresco al ViewModel...");
+
+            // Le ordenamos a tu ViewModel que vuelva a leer el disco duro físico
+            await _viewModel.LoadEventosAsync();
+        }
+        else
+        {
+            Console.WriteLine("[AGENDA ERROR] No se pudo recuperar el DatabaseService global del contenedor.");
+        }
+    }
+
+
+    // =======================================================================
+    // 💣 ACCIÓN 2: ELIMINAR EL PROYECTO / EVENTO DE SQLITE AL TOCAR EL BLOQUE
+    // =======================================================================
+    private async void OnEliminarProyectoClicked(object? sender, EventArgs e)
+    {
+        if (sender is BindableObject control && control.BindingContext is Models.Evento eventoDestruir)
+        {
+            // Confirmación limpia con el método nativo DisplayAlert
+            bool confirmar = await DisplayAlertAsync("PHANTOM THIEVES", $"¿Deseas eliminar el objetivo: '{eventoDestruir.Titulo}'?", "BORRAR", "ABORTAR");
+
+            if (confirmar)
+            {
+                var dbService = App.Current?.Handler?.MauiContext?.Services.GetService<Services.DatabaseService>();
+                if (dbService != null)
+                {
+                    // 💡 SOLUCIÓN: Llamamos a tu método real idéntico al de tu DatabaseService.cs
+                    await dbService.BorrarEventoAsync(eventoDestruir);
+
+                    // Forzamos el refresco reactivo de la lista de tu Agenda
+                    await _viewModel.LoadEventosAsync();
+                }
+            }
+        }
+    }
+
+
 
 
 }
