@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Linq;
 using MauiTime.Models;
+using MauiTime.Services;
 
 namespace MauiTime.Views
 {
@@ -13,6 +14,9 @@ namespace MauiTime.Views
     {
         private DateTime _mesActualReferencia = DateTime.Today;
         private bool _isAnimating = false;
+        private readonly DatabaseService _dbService;
+
+
         private ObservableCollection<DiaCalendario> _diasDelMes = new();
 
         // Campos privados para el control de los textos mediante Binding
@@ -42,6 +46,8 @@ namespace MauiTime.Views
         public CalendarioPage()
         {
             InitializeComponent();
+
+            _dbService = new DatabaseService(); // Inicializamos tu servicio de base de datos real
             BindingContext = this;
 
             this.Loaded += (s, e) =>
@@ -54,82 +60,115 @@ namespace MauiTime.Views
         }
 
 
-        private void RefrescarCalendario()
+        private async void RefrescarCalendario()
         {
-            // CAMBIO: Actualizamos las propiedades reactivas en lugar de llamar a los controles rotos
             TextoMes = _mesActualReferencia.ToString("MMMM", new System.Globalization.CultureInfo("es-ES")).ToUpper();
             TextoAnio = _mesActualReferencia.ToString("yyyy");
 
-            // NUEVO: Ejecuta la lógica de recortes de letras si el layout visual ya está listo en memoria
             ConstruirLetrasRansomMes(TextoMes);
 
-            // Calculamos la matriz de días
             var listaDias = new List<DiaCalendario>();
             DateTime primerDiaMes = new DateTime(_mesActualReferencia.Year, _mesActualReferencia.Month, 1);
             int totalDiasMes = DateTime.DaysInMonth(_mesActualReferencia.Year, _mesActualReferencia.Month);
-
-            // Convertimos DayOfWeek de MAUI (Domingo=0) a formato europeo (Lunes=0, ..., Domingo=6)
             int desfaseInicio = ((int)primerDiaMes.DayOfWeek + 6) % 7;
-
-            // Generador de rotaciones asimétricas orgánicas para el estilo P5
             Random rand = new Random();
 
-            // 1. Días del mes anterior (Fondo atenuado)
+            // 1. Días del mes anterior
             DateTime mesAnterior = primerDiaMes.AddMonths(-1);
             int diasMesAnterior = DateTime.DaysInMonth(mesAnterior.Year, mesAnterior.Month);
             for (int i = desfaseInicio - 1; i >= 0; i--)
             {
-                listaDias.Add(new DiaCalendario
-                {
-                    NumeroDia = (diasMesAnterior - i).ToString(),
-                    EsMesActual = false,
-                    RotacionCelda = rand.Next(-6, 7)
-                });
+                listaDias.Add(new DiaCalendario { NumeroDia = (diasMesAnterior - i).ToString(), EsMesActual = false, RotacionCelda = rand.Next(-6, 7) });
             }
 
-            // 2. Días del mes actual (Reemplaza este bucle dentro de RefrescarCalendario)
+            // 2. Días del mes actual
             for (int dia = 1; dia <= totalDiasMes; dia++)
             {
                 var fecha = new DateTime(_mesActualReferencia.Year, _mesActualReferencia.Month, dia);
-
-                // Comparación estricta de año, mes y día para evitar desfases de zona horaria
-                bool esElDiaDeHoy = fecha.Year == DateTime.Today.Year &&
-                                    fecha.Month == DateTime.Today.Month &&
-                                    fecha.Day == DateTime.Today.Day;
-
                 listaDias.Add(new DiaCalendario
                 {
                     NumeroDia = dia.ToString(),
                     FechaCompleta = fecha,
                     EsMesActual = true,
-                    EsHoy = fecha == DateTime.Today,
+                    EsHoy = fecha.Year == DateTime.Today.Year && fecha.Month == DateTime.Today.Month && fecha.Day == DateTime.Today.Day,
                     RotacionCelda = rand.Next(-6, 7),
-                    ColorFondoCelda = Colors.White // 🚨 Aseguramos que inicien limpios en blanco
+                    ColorFondoCelda = Colors.White
                 });
             }
 
-
-            // 3. Días del mes siguiente para rellenar el Grid de 7x6 (42 celdas)
+            // 3. Días del mes siguiente
             int totalCeldasHastaFilaActual = listaDias.Count;
-
-            // Si el mes no termina justo en domingo (módulo 7 != 0), calculamos cuántos días faltan para cerrar esa fila
             int diasParaCerrarSemana = (7 - (totalCeldasHastaFilaActual % 7)) % 7;
             int celdasObjetivoDinamico = totalCeldasHastaFilaActual + diasParaCerrarSemana;
-
             int diaSiguiente = 1;
             while (listaDias.Count < celdasObjetivoDinamico)
             {
-                listaDias.Add(new DiaCalendario
-                {
-                    NumeroDia = diaSiguiente.ToString(),
-                    EsMesActual = false,
-                    RotacionCelda = rand.Next(-6, 7)
-                });
+                listaDias.Add(new DiaCalendario { NumeroDia = diaSiguiente.ToString(), EsMesActual = false, RotacionCelda = rand.Next(-6, 7) });
                 diaSiguiente++;
             }
 
+            // =======================================================================
+            // 💾 CONEXIÓN REAL CON TU DATABASESERVICE NATIVO
+            // =======================================================================
+            // =======================================================================
+            // 💾 CONEXIÓN REAL CON TU DATABASESERVICE NATIVO (CONTEO DINÁMICO)
+            // =======================================================================
+            try
+            {
+                // 1. Extraemos de golpe todos los eventos guardados en disco para este mes
+                var eventosDelMes = await _dbService.ObtenerEventosPorMes(_mesActualReferencia.Month, _mesActualReferencia.Year);
+
+                // 2. Evaluamos de forma quirúrgica cada una de las 42 celdas de la grilla
+                foreach (var dia in listaDias)
+                {
+                    if (dia.EsMesActual && dia.FechaCompleta.HasValue)
+                    {
+                        // Contamos cuántas misiones coinciden exactamente con la fecha de esta celda
+                        int totalMisionesEseDia = eventosDelMes.Count(e => e.FechaHora.Date == dia.FechaCompleta.Value.Date);
+
+                        if (totalMisionesEseDia > 0)
+                        {
+                            // 🚨 Activa la muesca y hace brotar la banderita roja en el XAML en cascada
+                            dia.TieneTareasPendientes = true;
+
+                            // 🎯 EL TRUCO DEL CONTADOR PUNK:
+                            // Si solo hay una misión, pintamos tu exclamación original '!'.
+                            // Si hay más, forzamos a que muestre el número acumulado (ej: '+2', '+3').
+                            dia.TextoBanderita = totalMisionesEseDia == 1 ? "!" : $"+{totalMisionesEseDia}";
+                        }
+                        else
+                        {
+                            // Limpieza si no hay tareas
+                            dia.TieneTareasPendientes = false;
+                            dia.TextoBanderita = "!";
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error SQLite al contar misiones: {ex.Message}");
+            }
+
+            // Volcado final atómico en la colección reactiva
             DiasDelMes = new ObservableCollection<DiaCalendario>(listaDias);
         }
+
+
+        // CONTROLADOR DE CLIC: Abre la ventana emergente al tocar una celda válida
+        private async void OnDiaSeleccionado(object sender, TappedEventArgs e)
+        {
+            if (sender is BindableObject border && border.BindingContext is DiaCalendario dia && dia.EsMesActual && dia.FechaCompleta.HasValue)
+            {
+                // Pasamos la fecha y tu servicio real al formulario
+                var popupFormulario = new NuevaTareaPopup(dia.FechaCompleta.Value, _dbService);
+                await Navigation.PushModalAsync(popupFormulario);
+
+                // Al volver de la ventana modal, refrescamos la cuadrícula automáticamente
+                RefrescarCalendario();
+            }
+        }
+
 
         // NUEVO: Método encargado de recortar e inyectar las letras de la nota de rescate
         private void ConstruirLetrasRansomMes(string mes)
@@ -197,13 +236,11 @@ namespace MauiTime.Views
         }
 
 
-
         private void OnPrevMonthClicked(object? sender, EventArgs e)
         {
             _mesActualReferencia = _mesActualReferencia.AddMonths(-1);
             RefrescarCalendario();
 
-            // Forzamos el redibujado de los carteles dinámicos
             ConstruirLetrasRansomMes(TextoMes);
             ConstruirLetrasRansomAnio(TextoAnio);
         }
@@ -213,7 +250,6 @@ namespace MauiTime.Views
             _mesActualReferencia = _mesActualReferencia.AddMonths(1);
             RefrescarCalendario();
 
-            // Forzamos el redibujado de los carteles dinámicos
             ConstruirLetrasRansomMes(TextoMes);
             ConstruirLetrasRansomAnio(TextoAnio);
         }
@@ -303,9 +339,28 @@ namespace MauiTime.Views
             // Forzamos el color de fondo oscuro de inmediato para conectar con la linterna
             this.BackgroundColor = Color.FromArgb("#1A1A1A");
 
-            // Hacemos el calendario visible al 100% de forma inmediata.
-            // Ya no ejecutamos el sismo aquí; se lo dejamos encargado al cuchillo en su evento 'Loaded'
+            // Hacemos el calendario visible al 100% de forma inmediata
             GridDiasCollectionView.Opacity = 1.0;
+
+            // =======================================================================
+            // 🎯 RE-CALIBRACIÓN DE ENFOQUE: GARANTIZAR EL CENTRADO REAL EN PANTALLA
+            // =======================================================================
+            // Ejecutamos el scroll un frame después de que el layout esté listo,
+            // forzando a Windows a romper cualquier bloqueo de renderizado nativo.
+            Dispatcher.Dispatch(async () =>
+            {
+                // Buscamos el objeto de la celda de hoy dentro de tu colección real de datos
+                var diaHoyModelo = DiasDelMes.FirstOrDefault(d => d.EsHoy);
+                if (diaHoyModelo != null)
+                {
+                    // Forzamos un micro-silencio de 50ms para asegurar el asiento de la UI
+                    await Task.Delay(50);
+
+                    // Hacemos el scroll instantáneo (animate: false) hacia el día de hoy.
+                    // Usamos ScrollToPosition.Center para clavar la fila de hoy en el centro visual exacto.
+                    GridDiasCollectionView.ScrollTo(diaHoyModelo, position: ScrollToPosition.Center, animate: false);
+                }
+            });
         }
 
 
@@ -315,7 +370,35 @@ namespace MauiTime.Views
         {
             if (sender is Image objetoCuchillo)
             {
-                // 1. PREPARACIÓN OCULTA EN LAS ALTURAS (Viene volando en diagonal)
+                // 🚨 EL CANDADO DEFINITIVO DE FECHA REAL:
+                // Comprobamos si el mes y año que se está renderizando coincide con el mes y año del reloj real de tu PC.
+                bool esElMesActualReal = _mesActualReferencia.Month == DateTime.Today.Month &&
+                                         _mesActualReferencia.Year == DateTime.Today.Year;
+
+                if (!esElMesActualReal)
+                {
+                    // Si el usuario está mirando Agosto, Septiembre o cualquier otro mes, 
+                    // forzamos el pintado estático en frío y abortamos la caída y el sismo.
+                    if (objetoCuchillo.BindingContext is MauiTime.Models.DiaCalendario diaActual && diaActual.EsHoy)
+                    {
+                        diaActual.ColorFondoCelda = Color.FromArgb("#E31D26");
+
+                        var contextoTemporal = objetoCuchillo.BindingContext;
+                        objetoCuchillo.BindingContext = null;
+                        objetoCuchillo.BindingContext = contextoTemporal;
+                    }
+
+                    objetoCuchillo.Opacity = 1;
+                    objetoCuchillo.TranslationY = 0;
+                    objetoCuchillo.TranslationX = 0;
+                    objetoCuchillo.Rotation = 0;
+                    objetoCuchillo.Scale = 1.0;
+                    return; // ❌ Bloqueo absoluto de animaciones secundarias
+                }
+
+                // ---------------------------------------------------------------------
+                // COREOGRAFÍA CINEMÁTICA DE BIENVENIDA (Solo corre en el mes real actual)
+                // ---------------------------------------------------------------------
                 objetoCuchillo.Opacity = 0;
                 objetoCuchillo.TranslationY = -250;
                 objetoCuchillo.TranslationX = 80;
@@ -323,40 +406,34 @@ namespace MauiTime.Views
 
                 Dispatcher.Dispatch(async () =>
                 {
-                    // Espera táctica inicial para que cargue la interfaz limpia
                     await Task.Delay(200);
 
-                    // 2. TRAYECTORIA DE CAÍDA SUAVE Y VISIBLE
+                    // Trayectoria de caída suave
                     objetoCuchillo.Opacity = 1;
                     await Task.WhenAll(
                         objetoCuchillo.TranslateToAsync(0, 0, 350, Easing.CubicIn),
                         objetoCuchillo.RotateToAsync(0, 350, Easing.CubicIn)
                     );
 
-                    // 3. ¡IMPACTO VISUAL! (Cambio de color al tocar el papel)
+                    // Impacto visual
                     if (objetoCuchillo.BindingContext is MauiTime.Models.DiaCalendario diaActual && diaActual.EsHoy)
                     {
-                        // Teñimos la tarjeta delantera de Rojo Fuego al tocar el papel
                         diaActual.ColorFondoCelda = Color.FromArgb("#E31D26");
 
-                        // Refrescamos los disparadores del XAML para pasar el texto del número a Blanco
                         var contextoTemporal = objetoCuchillo.BindingContext;
                         objetoCuchillo.BindingContext = null;
                         objetoCuchillo.BindingContext = contextoTemporal;
                     }
 
-                    // Pequeño rebote elástico individual del puñal al clavarse profundo
                     _ = objetoCuchillo.ScaleToAsync(1.4, 40, Easing.CubicOut)
                         .ContinueWith(t => MainThread.BeginInvokeOnMainThread(() => objetoCuchillo.ScaleToAsync(1.0, 100, Easing.SpringOut)));
 
-                    // 4. EL ÚNICO TERREMOTO GENERAL DE ALTA CALIDAD
-                    // Borrado el sismo duplicado. Ahora la energía del golpe sacude la cuadrícula una sola vez
+                    // Terremoto general unificado
                     if (!_isAnimating)
                     {
                         _isAnimating = true;
                         try
                         {
-                            // Un único sismo directo sobre todo el conjunto de días a la vez
                             await EjecutarTemblorSismico(GridDiasCollectionView);
                         }
                         finally
@@ -367,7 +444,6 @@ namespace MauiTime.Views
                 });
             }
         }
-
 
         // =========================================================================
         // ANIMACIONES COMPLEJAS DE ALTA FLUIDEZ (ESTILO SPRING / BOUNCE P5)
@@ -461,6 +537,120 @@ namespace MauiTime.Views
 
             await Task.WhenAll(animCalendario, animAgenda);
         }
+
+        private async void OnCeldaCalendarioTapped(object? sender, TappedEventArgs? e)
+        {
+            var celdaVisual = sender as BindableObject;
+            var diaData = celdaVisual?.BindingContext as MauiTime.Models.DiaCalendario;
+
+            // Si la celda no tiene fecha o no tiene misiones, ignoramos el clic
+            if (diaData == null || !diaData.FechaCompleta.HasValue || !diaData.TieneTareasPendientes)
+                return;
+
+            DateTime fechaSeleccionada = diaData.FechaCompleta.Value;
+
+            try
+            {
+                // 1. Extraemos todos los eventos guardados en SQLite para este mes
+                var todosLosEventosDelMes = await _dbService.ObtenerEventosPorMes(fechaSeleccionada.Month, fechaSeleccionada.Year);
+
+                // 2. Filtramos quirúrgicamente solo los que coinciden con el día pulsado
+                var eventosDelDia = todosLosEventosDelMes
+                    .Where(ev => ev.FechaHora.Date == fechaSeleccionada.Date)
+                    .OrderBy(ev => ev.FechaHora)
+                    .ToList();
+
+                if (!eventosDelDia.Any()) return;
+
+                // 3. Seteamos el encabezado del bocadillo con la fecha de la celda
+                LblBocadilloFecha.Text = fechaSeleccionada.ToString("MM / dd");
+
+                // 4. Limpiamos las misiones anteriores para no acumular fantasmas
+                ListaMisionesBocadillo.Children.Clear();
+                var rand = new Random();
+
+                // 5. Inyectamos las micro-tarjetas negras con la hora militar visible y blindada
+                foreach (var mision in eventosDelDia)
+                {
+                    // Creamos la cuadrícula interna de dos columnas
+                    var gridTarjeta = new Grid
+                    {
+                        ColumnDefinitions = new ColumnDefinitionCollection
+                        {
+                            new ColumnDefinition { Width = new GridLength(65) }, // 65px estrictos para que la hora no se tape
+                            new ColumnDefinition { Width = GridLength.Star }
+                        }
+                    };
+
+                    // ETIEQUETA 1: HORA MILITAR (COLUMNA 0)
+                    var lblHora = new Label
+                    {
+                        Text = mision.FechaHora.ToString("HH:mm"),
+                        TextColor = Color.FromArgb("#E31D26"), // Rojo fuego encendido
+                        FontFamily = "Arial Black",
+                        FontSize = 14,
+                        FontAttributes = FontAttributes.Bold,
+                        VerticalOptions = LayoutOptions.Center,
+                        HorizontalOptions = LayoutOptions.Start
+                    };
+
+                    // ETIQUETA 2: TÍTULO DE LA MISIÓN (COLUMNA 1)
+                    var lblTitulo = new Label
+                    {
+                        Text = mision.Titulo.ToUpper(),
+                        TextColor = Colors.White,
+                        FontFamily = "Arial Black",
+                        FontSize = 13,
+                        VerticalOptions = LayoutOptions.Center,
+                        LineBreakMode = LineBreakMode.TailTruncation
+                    };
+
+                    // Enlazamos de forma canónica las posiciones de las columnas en C#
+                    Grid.SetColumn(lblHora, 0);
+                    Grid.SetColumn(lblTitulo, 1);
+
+                    // Añadimos los hijos al Grid
+                    gridTarjeta.Children.Add(lblHora);
+                    gridTarjeta.Children.Add(lblTitulo);
+
+                    // Envolvemos todo en el Border de alto contraste
+                    var tarjetaMision = new Border
+                    {
+                        BackgroundColor = Colors.Black,
+                        Padding = new Thickness(14, 8),
+                        Rotation = rand.Next(-2, 3),
+                        StrokeThickness = 1.5,
+                        Stroke = Colors.White,
+                        Content = gridTarjeta
+                    };
+
+                    ListaMisionesBocadillo.Children.Add(tarjetaMision);
+                }
+
+
+                // 6. ANIMACIÓN DE IMPACTO: Escalamos por hardware con efecto muelle elástico
+                PopupBocadilloEventos.Scale = 0.4;
+                PopupBocadilloEventos.IsVisible = true;
+
+                // ⚡ CORRECCIÓN: Usamos ScaleTo nativo de MAUI
+                await PopupBocadilloEventos.ScaleToAsync(1.0, 160, Easing.SpringOut);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error al desplegar bocadillo: {ex.Message}");
+            }
+        }
+
+        // ⚡ CORRECCIÓN: Tipado de parámetros alineado con EventHandler nativo
+        private async void OnCerrarBocadilloClicked(object? sender, EventArgs? e)
+        {
+            // Animación de huida rápida antes de ocultar el contenedor
+            // ⚡ CORRECCIÓN: Usamos ScaleTo nativo de MAUI
+            await PopupBocadilloEventos.ScaleToAsync(0.7, 90, Easing.Linear);
+            PopupBocadilloEventos.IsVisible = false;
+        }
+
+
 
         #region ESCANEO DE ÁRBOL Y GEOMETRÍA NATIVA (.NET 10)
 
