@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MauiTime.Views.AlarmaCriticaPage"
+             BackgroundColor="#E31D26"
+             NavigationPage.HasNavigationBar="False"
+             ZIndex="99999">
+
+    <!-- LIENZO DE EMBOSCADA TOTAL (OCUPA EL 100% DEL MONITOR) -->
+    <Grid RowDefinitions="*, Auto" Padding="50" HorizontalOptions="Fill" VerticalOptions="Fill">
+        
+        <VerticalStackLayout Grid.Row="0" VerticalOptions="Center" HorizontalOptions="Center" Spacing="20">
+            <!-- SÍMBOLO GIGANTE DE PELIGRO -->
+            <Border BackgroundColor="Black" Padding="25,10" Rotation="-5" HorizontalOptions="Center">
+                <Label Text="🚨 EMBOSCADA DE TIEMPO 🚨" FontAttributes="Bold" FontSize="36" TextColor="White" FontFamily="Impact"/>
+            </Border>
+
+            <!-- TÍTULO DE LA MISIÓN EN MAYÚSCULAS GIGANTES -->
+            <Label x:Name="LblTituloMision" Text="TITULO DE LA MISION" HorizontalTextAlignment="Center" FontAttributes="Bold" FontSize="42" TextColor="Black" FontFamily="Impact" Rotation="2"/>
+            
+            <!-- DETALLES DE LAS INSTRUCCIONES -->
+            <Label x:Name="LblDescripcionMision" Text="REGLAS DE INFILTRACION..." HorizontalTextAlignment="Center" FontSize="18" TextColor="White" FontFamily="Arial Black" Rotation="-1"/>
+        </VerticalStackLayout>
+
+        <!-- BOTÓN DE APAGADO DE ALARMA CRÍTICA -->
+        <Button Grid.Row="1" 
+                Text="ENTENDIDO (RECLAMAR CORAZÓN)" 
+                Clicked="OnDesactivarAlarmaClicked"
+                BackgroundColor="Black" 
+                TextColor="White" 
+                FontFamily="Impact"
+                FontSize="22" 
+                CornerRadius="0"
+                HeightRequest="60"
+                WidthRequest="380"
+                HorizontalOptions="Center"
+                Rotation="-2">
+            <Button.Shadow>
+                <Shadow Brush="White" Offset="4,4" Radius="0" Opacity="1"/>
+            </Button.Shadow>
+        </Button>
+    </Grid>
+</ContentPage>

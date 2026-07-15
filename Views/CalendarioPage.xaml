@@ -94,11 +94,13 @@
               RowDefinitions="Auto, Auto, Auto, *"
               Padding="20">
 
-            <!-- 1. PESTAÑAS DE NAVEGACIÓN SUPERIORES -->
+            <!-- 1. PESTAÑAS DE NAVEGACIÓN SUPERIORES (BLINDADAS CONTRA ESTIRAMIENTO) -->
             <Grid Grid.Row="0"
                   ColumnDefinitions="Auto, Auto"
                   Margin="15,0,0,15"
-                  HorizontalOptions="Start">
+                  HorizontalOptions="Start"
+                  VerticalOptions="Start"
+                  HeightRequest="65">
 
                 <!-- PESTAÑA AGENDA -->
                 <Border x:Name="TabAgenda"
@@ -108,7 +110,9 @@
                         StrokeThickness="1.5"
                         Rotation="-4"
                         ZIndex="1"
-                        Padding="30,12">
+                        Padding="30,12"
+                        VerticalOptions="Start"
+                        HeightRequest="48">
                     <Border.Shadow>
                         <Shadow Brush="Black"
                                 Offset="4,4"
@@ -116,16 +120,15 @@
                                 Opacity="0.5"/>
                     </Border.Shadow>
                     <Border.GestureRecognizers>
-                        <!-- Clic nativo -->
                         <TapGestureRecognizer Tapped="OnAgendaTabTapped"/>
-                        <!-- 🚨 NUEVOS RECONOCEDORES DE PUNTERO MOUSE PARA WINDOWS -->
                         <PointerGestureRecognizer PointerEntered="OnTabAgendaMouseIn"
                                                   PointerExited="OnTabAgendaMouseOut"/>
                     </Border.GestureRecognizers>
                     <Label Text="AGENDA"
                            TextColor="#222222"
                            FontSize="21"
-                           FontFamily="Impact"/>
+                           FontFamily="Impact"
+                           VerticalOptions="Center"/>
                 </Border>
 
                 <!-- PESTAÑA CALENDARIO -->
@@ -137,7 +140,9 @@
                         Rotation="3"
                         ZIndex="2"
                         Margin="-25,2,0,0"
-                        Padding="35,12">
+                        Padding="35,12"
+                        VerticalOptions="Start"
+                        HeightRequest="48">
                     <Border.Shadow>
                         <Shadow Brush="Black"
                                 Offset="5,5"
@@ -145,16 +150,17 @@
                                 Opacity="0.8"/>
                     </Border.Shadow>
                     <Border.GestureRecognizers>
-                        <!-- 🚨 NUEVOS RECONOCEDORES DE PUNTERO MOUSE PARA WINDOWS -->
                         <PointerGestureRecognizer PointerEntered="OnTabCalendarioMouseIn"
                                                   PointerExited="OnTabCalendarioMouseOut"/>
                     </Border.GestureRecognizers>
                     <Label Text="CALENDARIO"
                            TextColor="#E31D26"
                            FontSize="21"
-                           FontFamily="Impact"/>
+                           FontFamily="Impact"
+                           VerticalOptions="Center"/>
                 </Border>
             </Grid>
+
 
 
             <!-- 2. CABECERA HUD EXTIDILO PHANTOM THIEVES (REDISEÑO TOTAL AGRESIVO) -->
@@ -529,9 +535,9 @@
                               IsClippedToBounds="False">
 
                             <!-- 
-                CAPA 1: TU CELDA ORIGINAL EXACTA (65x55)
-                Mantiene su tamaño, su rotación caótica y sus bordes limpios.
-            -->
+    CAPA 1: TU CELDA ORIGINAL EXACTA (65x55)
+    Mantiene su tamaño, su rotación caótica y sus bordes limpios.
+-->
                             <Grid HeightRequest="65"
                                   WidthRequest="55"
                                   Rotation="{Binding RotacionCelda}"
@@ -539,6 +545,11 @@
                                   VerticalOptions="Center"
                                   IsClippedToBounds="False"
                                   ZIndex="1">
+
+                                <!-- 🎯 SOLUCIÓN INYECTADA: Esto hace que toda la celda escuche el clic para abrir el bocadillo -->
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnCeldaCalendarioTapped"/>
+                                </Grid.GestureRecognizers>
 
                                 <!-- 1. SOMBRA TRASERA ASIMÉTRICA NEGRA: Fijada en Black de por vida -->
                                 <Border BackgroundColor="Black"
@@ -553,7 +564,6 @@
                                         StrokeThickness="2"
                                         StrokeShape="Polygon 0,0 50,4 45,58 2,54"
                                         ZIndex="2">
-
 
                                     <Grid RowDefinitions="18, *">
                                         <!-- 3. MACHETAZO NEGRO SUPERIOR INTERNO -->
@@ -593,8 +603,43 @@
                                     </Grid>
                                 </Border>
 
+                                <!-- ========================================================================= -->
+                                <!-- 🚨 NUEVA CAPA 5: MINI BANDERITA BLINDADA CONTRA BORROSIDAD (SUPERSAMPLING) -->
+                                <!-- ========================================================================= -->
+                                <Border BackgroundColor="#E31D26"
+                                        Stroke="Black"
+                                        StrokeThickness="2"
+                                        StrokeShape="Polygon 0,0 105,0 87,54 0,54"
+                                        HeightRequest="54"
+                                        WidthRequest="105"
+                                        Rotation="28"
+                                        HorizontalOptions="End"
+                                        VerticalOptions="Start"
+                                        IsVisible="{Binding TieneEventos}"
+                                        ZIndex="5"
+                                        Scale="0.33"
+                                        Margin="0, -18, -35, 0">
 
+                                    <!-- Sombra dura cómic adaptada a la escala nativa -->
+                                    <Border.Shadow>
+                                        <Shadow Brush="Black"
+                                                Offset="6,6"
+                                                Radius="0"
+                                                Opacity="1"/>
+                                    </Border.Shadow>
+
+                                    <!-- Texto gigante ultra definido que se condensará perfectamente nítido -->
+                                    <Label Text="{Binding TextoBanderita}"
+                                           TextColor="White"
+                                           FontSize="33"
+                                           FontAttributes="Bold"
+                                           FontFamily="Arial Black"
+                                           HorizontalOptions="Center"
+                                           VerticalOptions="Center"
+                                           Margin="0,-3,4,0"/>
+                                </Border>
                             </Grid>
+
 
                             <!-- 
                 ==================== CAPA 2: ANCLAJE QUIRÚRGICO ABSOLUTO ====================
@@ -632,18 +677,103 @@
                                        Loaded="OnCuchilloLoaded"/>
                             </AbsoluteLayout>
 
-
-
-
                         </Grid>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
 
             </CollectionView>
 
+            <!-- ========================================================================= -->
+            <!-- 🃏 CAPA SUPERIOR: BOCADILLO DE DIÁLOGO FLOTANTE (CENTRADOR ABSOLUTO)     -->
+            <!-- ========================================================================= -->
+            <!-- ⚡ CRÍTICO: Grid.RowSpan="4" rompe las cadenas de las filas y le permite 
+                 al bocadillo tomar el control del 100% de la altura del monitor -->
+            <Grid x:Name="PopupBocadilloEventos"
+                  IsVisible="False"
+                  Grid.Row="0"
+                  Grid.RowSpan="4"
+                  HorizontalOptions="Fill"
+                  VerticalOptions="Fill"
+                  BackgroundColor="Transparent"
+                  ZIndex="999">
+
+                <!-- CONTENEDOR INTERNO CON TAMAÑO CONGELADO EN EL MEDIO -->
+                <Grid HorizontalOptions="Center"
+                      VerticalOptions="Center"
+                      HeightRequest="340"
+                      WidthRequest="400"
+                      InputTransparent="False">
+
+                    <!-- Sombra negra dura desplazada -->
+                    <Border BackgroundColor="Black"
+                            StrokeThickness="0"
+                            StrokeShape="Polygon 0,15 385,0 400,310 20,340"
+                            Margin="12, 12, -12, -12"/>
+
+                    <!-- Cuerpo principal rojo asimétrico -->
+                    <Border BackgroundColor="#E31D26"
+                            Stroke="Black"
+                            StrokeThickness="3"
+                            StrokeShape="Polygon 0,20 390,5 375,320 15,305">
+
+                        <Grid RowDefinitions="Auto, *, Auto"
+                                Padding="25, 22, 25, 22">
+
+                            <!-- Header de fecha estilo nota de rescate -->
+                            <HorizontalStackLayout Grid.Row="0"
+                                    Spacing="8"
+                                    HorizontalOptions="Center"
+                                    Margin="0,0,0,12">
+                                <Border BackgroundColor="Black"
+                                        Padding="8,3"
+                                        Rotation="-4">
+                                    <Label x:Name="LblBocadilloFecha"
+                                            Text="07 / 14"
+                                            FontAttributes="Bold"
+                                            FontSize="18"
+                                            TextColor="White"
+                                            FontFamily="Impact"/>
+                                </Border>
+                                <Label Text="📢 MISIONES"
+                                        FontAttributes="Bold"
+                                        FontSize="18"
+                                        TextColor="Black"
+                                        FontFamily="Impact"
+                                        VerticalOptions="Center"
+                                        Rotation="2"/>
+                            </HorizontalStackLayout>
+
+                            <!-- Lista interna con scroll seguro -->
+                            <ScrollView Grid.Row="1"
+                                    VerticalScrollBarVisibility="Never">
+                                <VerticalStackLayout x:Name="ListaMisionesBocadillo"
+                                        Spacing="10">
+                                    <!-- Aquí se inyectan dinámicamente tus misiones (¡que ya salen con la hora perfecta!) -->
+                                </VerticalStackLayout>
+                            </ScrollView>
+
+                            <!-- Botón de escape rápido -->
+                            <Button Grid.Row="2"
+                                    Text="ENTENDIDO"
+                                    Clicked="OnCerrarBocadilloClicked"
+                                    BackgroundColor="Black"
+                                    TextColor="White"
+                                    FontFamily="Impact"
+                                    FontSize="14"
+                                    CornerRadius="0"
+                                    HeightRequest="38"
+                                    WidthRequest="140"
+                                    HorizontalOptions="Center"
+                                    Rotation="-2"
+                                    Margin="0,10,0,0"/>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Grid>
+
+
+
         </Grid>
     </Grid>
-
-
 
 </ContentPage>

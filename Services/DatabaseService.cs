@@ -1,77 +1,172 @@
 using SQLite;
 using MauiTime.Models;
+using System.IO;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Linq;
+using System;
 using static MauiTime.Models.Evento;
 
-namespace MauiTime.Services;
-
-public class DatabaseService
+namespace MauiTime.Services
 {
-    private SQLiteAsyncConnection? _dbConnection;
-
-    private async Task Init()
+    public class DatabaseService
     {
-        if (_dbConnection is not null) return;
+        private SQLiteAsyncConnection? _dbConnection;
+        private static readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
 
-        var dbPath = Path.Combine(FileSystem.AppDataDirectory, "MauiTime.db3");
-        _dbConnection = new SQLiteAsyncConnection(dbPath);
-
-        await _dbConnection.CreateTableAsync<Evento>();
-    }
-
-    public async Task<List<Evento>> ObtenerEventosAsync()
-    {
-        await Init();
-        // Agregamos el ! después de _dbConnection
-        return await _dbConnection!.Table<Evento>().ToListAsync();
-    }
-
-    public async Task SeedDataAsync()
-    {
-        await Init();
-
-        // Verificar si ya hay datos para no duplicar
-        var eventos = await _dbConnection!.Table<Evento>().ToListAsync();
-        if (eventos.Count == 0)
+        private async Task Init()
         {
-            var mockEventos = new List<Evento>
-{
-    new Evento { Titulo = "Meditación", Descripcion = "10 min de paz", FechaHora = DateTime.Now, Frecuencia = FrecuenciaEvento.Diario },
-    new Evento { Titulo = "Reunión de Equipo", Descripcion = "Avances", FechaHora = DateTime.Now.AddDays(1), Frecuencia = FrecuenciaEvento.Semanal },
-    new Evento { Titulo = "Pago Alquiler", Descripcion = "Transferencia", FechaHora = DateTime.Now.AddDays(2), Frecuencia = FrecuenciaEvento.Mensual },
-    new Evento { Titulo = "Cumpleaños Mamá", Descripcion = "Comprar regalo", FechaHora = DateTime.Now.AddDays(3), Frecuencia = FrecuenciaEvento.Anual },
-    new Evento { Titulo = "Cita Médico", Descripcion = "Chequeo", FechaHora = DateTime.Now.AddDays(5), Frecuencia = FrecuenciaEvento.Ninguna },
-    new Evento { Titulo = "Suscripción Revista", Descripcion = "Renovación", FechaHora = DateTime.Now.AddDays(7), Frecuencia = FrecuenciaEvento.Mensual },
-    new Evento { Titulo = "Clase de Idiomas", Descripcion = "Intermedio", FechaHora = DateTime.Now.AddDays(8), Frecuencia = FrecuenciaEvento.Semanal },
-    new Evento { Titulo = "Aniversario", Descripcion = "Cena", FechaHora = DateTime.Now.AddDays(10), Frecuencia = FrecuenciaEvento.Anual },
-    new Evento { Titulo = "Gym", Descripcion = "Fuerza", FechaHora = DateTime.Now.AddDays(11), Frecuencia = FrecuenciaEvento.Diario },
-    new Evento { Titulo = "Revisión Coche", Descripcion = "Taller", FechaHora = DateTime.Now.AddDays(14), Frecuencia = FrecuenciaEvento.Mensual }
-};
+            if (_dbConnection is not null) return;
 
-            await _dbConnection.InsertAllAsync(mockEventos);
+            await _semaphore.WaitAsync();
+            try
+            {
+                if (_dbConnection is null)
+                {
+                    string dbPath;
+
+                    if (DeviceInfo.Current.Platform == DevicePlatform.Android ||
+                        DeviceInfo.Current.Platform == DevicePlatform.iOS)
+                    {
+                        dbPath = Path.Combine(FileSystem.AppDataDirectory, "MauiTimeApp.db3");
+                    }
+                    else
+                    {
+                        string carpetaWindows = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "MauiTime");
+                        if (!Directory.Exists(carpetaWindows)) Directory.CreateDirectory(carpetaWindows);
+                        dbPath = Path.Combine(carpetaWindows, "MauiTimeApp.db3");
+                    }
+
+                    // 🖥️ IMPRESIÓN REAL EN TU TERMINAL DE DOTNET RUN:
+                    Console.WriteLine("\n=========================================");
+                    Console.WriteLine($"[SQLITE] CONEXIÓN CONFIGURADA EN: {dbPath}");
+                    Console.WriteLine("=========================================\n");
+
+                    _dbConnection = new SQLiteAsyncConnection(dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.Create | SQLiteOpenFlags.SharedCache);
+                    await _dbConnection.CreateTableAsync<Evento>();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[SQLITE ERROR INIT] {ex.Message}");
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
         }
-    }
 
-    public async Task<int> GuardarEventoAsync(Evento evento)
-    {
-        await Init();
-        // Agregamos el ! después de _dbConnection en ambos casos
-        if (evento.Id != 0)
-            return await _dbConnection!.UpdateAsync(evento);
-        else
-            return await _dbConnection!.InsertAsync(evento);
-    }
+        public async Task<List<Evento>> ObtenerEventosAsync()
+        {
+            await Init();
+            return await _dbConnection!.Table<Evento>().ToListAsync();
+        }
 
-    public async Task ResetDatabaseAsync()
-    {
-        await Init();
-        await _dbConnection!.DeleteAllAsync<Evento>(); // Borra todos los registros actuales
-    }
+        public async Task SeedDataAsync()
+        {
+            await Init();
 
-    public async Task<List<Evento>> ObtenerEventosPorMes(int mes, int anio)
-    {
-        await Init();
-        // Agregamos el ! después de _dbConnection
-        var eventos = await _dbConnection!.Table<Evento>().ToListAsync();
-        return eventos.Where(e => e.FechaHora.Month == mes && e.FechaHora.Year == anio).ToList();
+            await _semaphore.WaitAsync();
+            try
+            {
+                int conteoRegistros = await _dbConnection!.Table<Evento>().CountAsync();
+                
+                if (conteoRegistros > 0)
+                {
+                    Console.WriteLine($"[SQLITE] La base de datos ya tiene {conteoRegistros} elementos. Pasando de largo...");
+                    return;
+                }
+
+                Console.WriteLine("[SQLITE] Base de datos limpia detectada. Insertando Mock inicial por única vez...");
+                
+                var mockEventos = new List<Evento>
+                {
+                    new Evento { Titulo = "Meditación", Descripcion = "10 min de paz", FechaHora = DateTime.Now, Frecuencia = FrecuenciaEvento.Diario },
+                    new Evento { Titulo = "Reunión de Equipo", Descripcion = "Avances", FechaHora = DateTime.Now.AddDays(1), Frecuencia = FrecuenciaEvento.Semanal },
+                    new Evento { Titulo = "Pago Alquiler", Descripcion = "Transferencia", FechaHora = DateTime.Now.AddDays(2), Frecuencia = FrecuenciaEvento.Mensual },
+                    new Evento { Titulo = "Cumpleaños Mamá", Descripcion = "Comprar regalo", FechaHora = DateTime.Now.AddDays(3), Frecuencia = FrecuenciaEvento.Anual }
+                };
+
+                await _dbConnection.InsertAllAsync(mockEventos);
+                Console.WriteLine("[SQLITE] ¡Éxito! 4 registros iniciales inyectados.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[SQLITE ERROR SEED] {ex.Message}");
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
+        }
+
+        public async Task<int> GuardarEventoAsync(Evento evento)
+        {
+            await Init();
+
+            await _semaphore.WaitAsync();
+            try
+            {
+                int resultado;
+                if (evento.Id != 0)
+                {
+                    resultado = await _dbConnection!.UpdateAsync(evento);
+                    Console.WriteLine($"\n[SQLITE] 📝 EVENTO ACTUALIZADO EN DISCO. ID: {evento.Id}\n");
+                }
+                else
+                {
+                    resultado = await _dbConnection!.InsertAsync(evento);
+                    Console.WriteLine($"\n[SQLITE] 🚀 ¡NUEVO EVENTO GRABADO CON ÉXITO! ASIGNADO ID: {evento.Id}\n");
+                }
+                return resultado;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"\n[SQLITE ERROR AL GUARDAR] {ex.Message}\n");
+                return -1;
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
+        }
+
+        public async Task ResetDatabaseAsync()
+        {
+            await Init();
+            await _semaphore.WaitAsync();
+            try
+            {
+                await _dbConnection!.DeleteAllAsync<Evento>();
+                Console.WriteLine("[SQLITE] Toda la tabla de eventos ha sido vaciada.");
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
+        }
+
+        public async Task<List<Evento>> ObtenerEventosPorMes(int mes, int anio)
+        {
+            await Init();
+            var eventos = await _dbConnection!.Table<Evento>().ToListAsync();
+            return eventos.Where(e => e.FechaHora.Month == mes && e.FechaHora.Year == anio).ToList();
+        }
+
+        public async Task<int> BorrarEventoAsync(Evento evento)
+        {
+            await Init();
+            await _semaphore.WaitAsync();
+            try
+            {
+                int res = await _dbConnection!.DeleteAsync(evento);
+                Console.WriteLine($"\n[SQLITE] 💣 REGISTRO ELIMINADO FÍSICAMENTE. ID: {evento.Id}\n");
+                return res;
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
+        }
     }
 }

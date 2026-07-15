@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MauiTime.Views.NuevaTareaPopup"
+             Title="NUEVO EVENTO PUNK"
+             BackgroundColor="#121212">
+
+        <VerticalStackLayout Padding="30"
+                             Spacing="12"
+                             VerticalOptions="Center">
+
+                <!-- CABECERA INFORMATIVA -->
+                <Label x:Name="LabelFecha"
+                       TextColor="White"
+                       FontSize="18"
+                       FontAttributes="Bold"
+                       HorizontalOptions="Center"/>
+
+                <!-- CAMPO 1: SELECCIONAR EL DÍA DEL EVENTO (¡NUEVO!) -->
+                <!-- Añadimos el DatePicker para que el usuario pueda cambiar la fecha de la misión libremente -->
+                <Label Text="Fecha de la Misión:"
+                       TextColor="White"
+                       Margin="0,5,0,0"/>
+                <DatePicker x:Name="PickerFecha"
+                            MinimumDate="01/01/2020"
+                            MaximumDate="12/31/2030"
+                            TextColor="White"
+                            BackgroundColor="#1C1A1A"/>
+
+                <!-- CAMPO 2: TÍTULO Y DESCRIPCIÓN -->
+                <Entry x:Name="EntryTitulo"
+                       Placeholder="Nombre del evento..."
+                       TextColor="White"
+                       PlaceholderColor="Gray"/>
+                <Editor x:Name="EditorDescripcion"
+                        Placeholder="Descripción..."
+                        HeightRequest="80"
+                        TextColor="White"
+                        PlaceholderColor="Gray"/>
+
+                <!-- CAMPO 3: FRECUENCIA CON FONDO DE CONTRASTE -->
+                <!-- Envolvemos el Picker en un contenedor gris oscuro para que el texto negro de Windows sea 100% legible -->
+                <Label Text="Frecuencia del Evento:"
+                       TextColor="White"/>
+                <Grid BackgroundColor="#2A2A2A"
+                      Padding="5,0">
+                        <Picker x:Name="PickerFrecuencia"
+                                Title="Toca para seleccionar frecuencia..."
+                                TitleColor="Gray"
+                                TextColor="White">
+                                <Picker.ItemsSource>
+                                        <x:Array Type="{x:Type x:String}">
+                                                <x:String>Ninguna</x:String>
+                                                <x:String>Diario</x:String>
+                                                <x:String>Semanal</x:String>
+                                                <x:String>Mensual</x:String>
+                                                <x:String>Anual</x:String>
+                                        </x:Array>
+                                </Picker.ItemsSource>
+                        </Picker>
+                </Grid>
+
+                <!-- CAMPO 4: HORA EN FORMATO 24 HORAS REAL -->
+                <!-- Al añadir Format="HH:mm" obligamos a Windows a ocultar el selector AM/PM y usar de 00 a 23 -->
+                <Label Text="Hora del Evento (Formato 24h):"
+                       TextColor="White"/>
+                <TimePicker x:Name="PickerHora"
+                            Format="HH:mm"
+                            TextColor="White"
+                            BackgroundColor="#1C1A1A"/>
+
+                <!-- BOTONES DE ACCIÓN -->
+                <Button Text="CREAR EVENTO"
+                        Clicked="OnGuardarClicked"
+                        BackgroundColor="Red"
+                        TextColor="White"
+                        Margin="0,15,0,0"/>
+                <Button Text="ABORTAR"
+                        Clicked="OnCancelarClicked"
+                        BackgroundColor="Transparent"
+                        TextColor="Gray"/>
+
+                <!-- 🚨 CAMPO 6: SWITCH MODO EMBOSCADA REPARADO Y NITIDO -->
+                <Grid ColumnDefinitions="*, Auto"
+                      Margin="5,15,5,15"
+                      VerticalOptions="Center">
+
+                        <!-- TEXTOS BLINDADOS CON MÁXIMO CONTRASTE -->
+                        <VerticalStackLayout Grid.Column="0"
+                                        Spacing="2"
+                                        VerticalOptions="Center">
+                                <Label Text="🚨 MODO EMBOSCADA"
+                                       FontAttributes="Bold"
+                                       TextColor="White"
+                                       FontSize="14"
+                                       FontFamily="Impact"/>
+                                <Label Text="Despierta el móvil con alarma de pantalla completa"
+                                       TextColor="#DDDDDD"
+                                       FontSize="11"
+                                       FontFamily="Arial"/>
+                        </VerticalStackLayout>
+
+                        <!-- SWITCH FORZADO CON COMPORTAMIENTO NATIVO INTEGRADO -->
+                        <Switch Grid.Column="1"
+                                x:Name="SwitchAlarmaAgresiva"
+                                ThumbColor="#E31D26"
+                                OnColor="White"
+                                BackgroundColor="#333333"
+                                HorizontalOptions="End"
+                                VerticalOptions="Center"/>
+                </Grid>
+
+
+        </VerticalStackLayout>
+</ContentPage>

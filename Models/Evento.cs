@@ -31,52 +31,48 @@ public class Evento
         set => DuracionAvisoTicks = value.Ticks;
     }
 
+    public bool EsAlarmaAgresiva { get; set; }
+
+
     /// <summary>
-    /// Calcula de forma iterativa y segura el próximo aviso en el futuro real.
+    /// Avanza de forma infalible la FechaHora original al futuro real y devuelve el instante del aviso.
     /// </summary>
     public DateTime CalcularProximoAviso()
     {
-        var fecha = FechaHora;
         var ahora = DateTime.Now;
 
-        // Si la frecuencia es "Ninguna", no tiene sentido calcular bucles hacia el futuro
+        // Si no tiene frecuencia, la fecha se mantiene intacta.
         if (Frecuencia == FrecuenciaEvento.Ninguna)
         {
-            return fecha - TiempoAviso;
+            return FechaHora - TiempoAviso;
         }
 
-        // Cambiamos el 'if' por un 'while' para asegurar que la fecha avance 
-        // tantas veces como sea necesario hasta superar el momento presente actual.
-        while (fecha < ahora)
+        // Avanzar de forma iterativa y matemática la FechaHora real del objeto
+        // Usamos <= ahora para garantizar que pase obligatoriamente al futuro.
+        while (FechaHora <= ahora)
         {
-            fecha = Frecuencia switch
+            FechaHora = Frecuencia switch
             {
-                FrecuenciaEvento.Anual => fecha.AddYears(1),
-                FrecuenciaEvento.Mensual => fecha.AddMonths(1),
-                FrecuenciaEvento.Semanal => fecha.AddDays(7),
-                FrecuenciaEvento.Diario => fecha.AddDays(1),
-                _ => fecha
+                FrecuenciaEvento.Diario => FechaHora.AddDays(1),
+                FrecuenciaEvento.Semanal => FechaHora.AddDays(7),
+                FrecuenciaEvento.Mensual => FechaHora.AddMonths(1),
+                FrecuenciaEvento.Anual => FechaHora.AddYears(1),
+                _ => FechaHora
             };
         }
 
-        return fecha - TiempoAviso;
+        // Retorna el instante en el que debe sonar la alarma respecto a la nueva fecha futura
+        return FechaHora - TiempoAviso;
     }
-    // =========================================================================
-    // CONTROL DE VISIBILIDAD DE STICKERS (AGREGA ESTO EN TU EVENTO.CS)
-    // =========================================================================
 
     [Ignore]
     public bool EsAnual => Frecuencia == FrecuenciaEvento.Anual;
-
     [Ignore]
     public bool EsMensual => Frecuencia == FrecuenciaEvento.Mensual;
-
     [Ignore]
     public bool EsSemanal => Frecuencia == FrecuenciaEvento.Semanal;
-
     [Ignore]
     public bool EsDiario => Frecuencia == FrecuenciaEvento.Diario;
-
     [Ignore]
     public string Hora => FechaHora.ToString("HH:mm");
 }

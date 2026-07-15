@@ -1,35 +1,87 @@
 using System;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using Microsoft.Maui.Graphics;
+using MauiTime.ViewModels; // Inyectamos el espacio de nombres de tu BaseViewModel
 
 namespace MauiTime.Models
 {
-    public class DiaCalendario : INotifyPropertyChanged
+    // 💡 CAMBIO DE HERENCIA: Heredamos directamente de BaseViewModel para heredar SetProperty
+    public class DiaCalendario : BaseViewModel
     {
-        public string NumeroDia { get; set; } = "";
-        public DateTime? FechaCompleta { get; set; }
-        public bool EsMesActual { get; set; } = true;
-        public bool EsHoy { get; set; } = false;
-        public double RotacionCelda { get; set; } = 0;
-
-        // 🚨 PROPIEDAD DINÁMICA: Inicia en blanco y se notificará cuando pase a Rojo Fuego
+        private string _numeroDia = string.Empty;
+        private DateTime? _fechaCompleta;
+        private bool _esMesActual;
+        private bool _esHoy;
+        private double _rotacionCelda;
         private Color _colorFondoCelda = Colors.White;
+        private bool _tieneTareasPendientes = false;
+
+        // Nuevos campos privados para el control de la banderita punk
+        private bool _tieneEventos = false;
+        private string _textoBanderita = "!";
+
+        public string NumeroDia
+        {
+            get => _numeroDia;
+            set => SetProperty(ref _numeroDia, value);
+        }
+
+        public DateTime? FechaCompleta
+        {
+            get => _fechaCompleta;
+            set => SetProperty(ref _fechaCompleta, value);
+        }
+
+        public bool EsMesActual
+        {
+            get => _esMesActual;
+            set => SetProperty(ref _esMesActual, value);
+        }
+
+        public bool EsHoy
+        {
+            get => _esHoy;
+            set => SetProperty(ref _esHoy, value);
+        }
+
+        public double RotacionCelda
+        {
+            get => _rotacionCelda;
+            set => SetProperty(ref _rotacionCelda, value);
+        }
+
         public Color ColorFondoCelda
         {
             get => _colorFondoCelda;
-            set 
-            { 
-                _colorFondoCelda = value; 
-                OnPropertyChanged(); 
+            set => SetProperty(ref _colorFondoCelda, value);
+        }
+
+        public bool TieneTareasPendientes
+        {
+            get => _tieneTareasPendientes;
+            set
+            {
+                if (SetProperty(ref _tieneTareasPendientes, value))
+                {
+                    // Sincronización automática: Si tiene tareas, activamos visualmente la banderita
+                    TieneEventos = value;
+                }
             }
         }
 
-        // SOPORTE DE NOTIFICACIÓN NATIVA DE MAUI
-        public event PropertyChangedEventHandler? PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+        // =======================================================================
+        // 🚨 VINCULACIÓN DIRECTA CON TU NUEVO XAML (BANDERITA)
+        // =======================================================================
+
+        public bool TieneEventos
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            get => _tieneEventos;
+            set => SetProperty(ref _tieneEventos, value);
+        }
+
+        public string TextoBanderita
+        {
+            get => _textoBanderita;
+            set => SetProperty(ref _textoBanderita, value);
         }
     }
 }
