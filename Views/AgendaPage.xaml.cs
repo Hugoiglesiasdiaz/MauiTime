@@ -487,16 +487,35 @@ public partial class AgendaPage : ContentPage
         {
             _eventoSeleccionadoParaDestruir = eventoDestruir;
 
-            // Formateamos el texto en mayúsculas estilo colágeno radical
             string textoFormateado = $"¿DESEAS ELIMINAR EL OBJETIVO:\n'{eventoDestruir.Titulo.ToUpper()}'?";
-
-            // Sincronizamos las dos capas del efecto duotono
             TxtPreguntaBorrar.Text = textoFormateado;
-            TxtPreguntaBorrarSombra.Text = textoFormateado; // Actualiza la sombra sólida negra
+            TxtPreguntaBorrarSombra.Text = textoFormateado;
 
+            // ============================================================
+            // 💡 BLINDAJE DE MEMORIA GRÁFICA EN CALIENTE (CERO CONFLICTOS)
+            // ============================================================
+            // Detiene cualquier hilo o inercia anterior directamente sobre el Grid de fondo
+            ContenedorPopupBorrar.CancelAnimations();
+
+            // Reset estricto de seguridad para forzar a la GPU a arrancar de cero
+            ContenedorPopupBorrar.Scale = 0.01;
+            ContenedorPopupBorrar.Opacity = 0;
+
+            // Encendemos la capa translúcida
             ContenedorPopupBorrar.IsVisible = true;
-            _borradoTaskSource = new TaskCompletionSource<bool>();
 
+            // 🚀 INFLADO CINEMÁTICO REGULAR POR HARDWARE (MÉTODO ASÍNCRONO PURO)
+            // Escalamos rápidamente el cartel rojo hasta un 108% en 280ms
+            await Task.WhenAll(
+                ContenedorPopupBorrar.ScaleToAsync(1.08, 280, Easing.CubicOut),
+                ContenedorPopupBorrar.FadeToAsync(1, 220, Easing.CubicOut)
+            );
+
+            // 🎯 ASENTAMIENTO DE ALTO RENDIMIENTO CON FIRMA ASÍNCRONA ACTUALIZADA
+            // Regresa del 108% al 100% real en 80ms de manera regular sin advertencias de obsolescencia
+            await ContenedorPopupBorrar.ScaleToAsync(1.00, 80, Easing.Linear);
+
+            _borradoTaskSource = new TaskCompletionSource<bool>();
             bool confirmar = await _borradoTaskSource.Task;
 
             if (confirmar && _eventoSeleccionadoParaDestruir != null)
@@ -505,7 +524,6 @@ public partial class AgendaPage : ContentPage
                 if (dbService != null)
                 {
                     await dbService.BorrarEventoAsync(_eventoSeleccionadoParaDestruir);
-
                     if (_viewModel != null)
                     {
                         await _viewModel.LoadEventosAsync();
@@ -517,22 +535,62 @@ public partial class AgendaPage : ContentPage
         }
     }
 
-
-    private void OnConfirmarBorradoPunkClicked(object? sender, EventArgs e)
+    private async void OnConfirmarBorradoPunkClicked(object? sender, EventArgs e)
     {
-        // Ocultamos el HUD rojo de confirmación
+        // Limpieza de inercia antes del colapso inverso hacia el centro
+        ContenedorPopupBorrar.CancelAnimations();
+
+        await Task.WhenAll(
+            ContenedorPopupBorrar.ScaleToAsync(0.01, 160, Easing.CubicIn),
+            ContenedorPopupBorrar.FadeToAsync(0, 140, Easing.CubicIn)
+        );
+
         ContenedorPopupBorrar.IsVisible = false;
-        // Liberamos el hilo retornando TRUE
         _borradoTaskSource?.SetResult(true);
     }
 
-    private void OnCancelarBorradoPunkClicked(object? sender, EventArgs e)
+    private async void OnCancelarBorradoPunkClicked(object? sender, EventArgs e)
     {
-        // Ocultamos el HUD rojo de confirmación
+        // Limpieza de inercia antes del colapso inverso hacia el centro
+        ContenedorPopupBorrar.CancelAnimations();
+
+        await Task.WhenAll(
+            ContenedorPopupBorrar.ScaleToAsync(0.01, 160, Easing.CubicIn),
+            ContenedorPopupBorrar.FadeToAsync(0, 140, Easing.CubicIn)
+        );
+
         ContenedorPopupBorrar.IsVisible = false;
-        // Liberamos el hilo retornando FALSE (Abortar)
         _borradoTaskSource?.SetResult(false);
     }
+
+    private async void OnBtnInfiltracionMouseIn(object? sender, Microsoft.Maui.Controls.PointerEventArgs e)
+{
+    if (BtnInfiltracion == null) return;
+
+    // Cancelamos cualquier inercia gráfica previa en la GPU
+    BtnInfiltracion.CancelAnimations();
+
+    // 🚀 EFECTO INFLADO EMBOSCADA: Se estira al 112% y se tuerce más en diagonal (4 a 7 grados)
+    // Usamos SpringOut para que dé ese pequeño brinco o latigazo elástico al llegar al tope
+    await Task.WhenAll(
+        BtnInfiltracion.ScaleToAsync(1.12, 180, Easing.SpringOut),
+        BtnInfiltracion.RotateToAsync(7, 180, Easing.SpringOut)
+    );
+}
+
+private async void OnBtnInfiltracionMouseOut(object? sender, Microsoft.Maui.Controls.PointerEventArgs e)
+{
+    if (BtnInfiltracion == null) return;
+
+    // Cancelamos hilos de animación latentes
+    BtnInfiltracion.CancelAnimations();
+
+    // Regresa de forma fluida y limpia a sus valores exactos definidos en el XAML original (Scale 1.0, Rotation 4)
+    await Task.WhenAll(
+        BtnInfiltracion.ScaleToAsync(1.0, 140, Easing.CubicIn),
+        BtnInfiltracion.RotateToAsync(4, 140, Easing.CubicIn)
+    );
+}
 
 
 }

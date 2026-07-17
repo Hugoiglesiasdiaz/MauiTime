@@ -472,22 +472,75 @@
                 </Grid>
 
             </Grid>
+
+
             <!-- ======================================================================= -->
-            <!-- ➕ BOTÓN SUPREMO: GATILLO DE REGISTRO FLOTANTE ASIMÉTRICO               -->
+            <!-- ➕ BOTÓN SUPREMO: GATILLO DE REGISTRO FLOTANTE - CABECERA UNIFICADA (P5) -->
             <!-- ======================================================================= -->
-            <Button Grid.Row="0"
-                    Text="[ ➕ REGISTRAR OBJETIVO ]"
-                    Clicked="OnCrearProyectoClicked"
-                    BackgroundColor="Black"
-                    TextColor="White"
-                    BorderColor="White"
-                    BorderWidth="1"
-                    FontFamily="Impact"
-                    FontSize="14"
-                    HorizontalOptions="End"
-                    VerticalOptions="Center"
-                    Margin="0,20,15,0"
-                    ZIndex="999"/>
+            <!-- 💡 ADICIÓN: Añadimos x:Name para poder animarlo desde el C# -->
+            <Grid x:Name="BtnInfiltracion"
+                  Grid.Row="0"
+                  HorizontalOptions="End"
+                  VerticalOptions="Center"
+                  Margin="0,20,20,0"
+                  ZIndex="999"
+                  HeightRequest="48"
+                  Rotation="4">
+
+                <Grid.GestureRecognizers>
+                    <!-- Clic / Toque Original -->
+                    <TapGestureRecognizer Tapped="OnCrearProyectoClicked"/>
+
+                    <!-- 💡 NUEVOS DETECTORES DE RATÓN (HOVER ESTILO P5) -->
+                    <PointerGestureRecognizer PointerEntered="OnBtnInfiltracionMouseIn"
+                                              PointerExited="OnBtnInfiltracionMouseOut"/>
+                </Grid.GestureRecognizers>
+
+                <!-- CUERPO PRINCIPAL NEGRO SÓLIDO -->
+                <Border BackgroundColor="Black"
+                        Stroke="White"
+                        StrokeThickness="1.5"
+                        InputTransparent="True">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="0"/>
+                    </Border.StrokeShape>
+                </Border>
+
+                <!-- DISTRIBUIDOR INTERNO -->
+                <Grid ColumnDefinitions="Auto, *"
+                      Padding="32,0"
+                      InputTransparent="True"
+                      VerticalOptions="Center">
+
+                    <!-- ICONO: ROMBO VECTORIAL ROJO -->
+                    <Grid Grid.Column="0"
+                          WidthRequest="14"
+                          HeightRequest="14"
+                          VerticalOptions="Center"
+                          Rotation="15"
+                          Margin="0,0,10,0">
+                        <Path Data="M 7,0 L 14,7 L 7,14 L 0,7 Z"
+                                Fill="#E31D26"/>
+                        <Path Data="M 7,0 L 14,7 L 7,14 L 0,7 Z"
+                                Stroke="White"
+                                StrokeThickness="1"/>
+                        <Path Data="M 7,3 L 7,11 M 3,7 L 11,7"
+                                Stroke="White"
+                                StrokeThickness="1.5"/>
+                    </Grid>
+
+                    <!-- TEXTO SÓLIDO MAXIMIZADO CON SUAVIZADO ÓPTICO -->
+                    <Label Grid.Column="1"
+                           Text="INICIAR INFILTRACIÓN"
+                           TextColor="#F0F0F0"
+                           FontSize="20"
+                           FontAttributes="Bold"
+                           FontFamily="Impact"
+                           CharacterSpacing="0"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"/>
+                </Grid>
+            </Grid>
 
 
             <!-- ======================================================================= -->
@@ -571,16 +624,16 @@
 
                             <!-- BLOQUE DE BOTONES: BLINDAJE DE ENTRADA GRÁFICA -->
                             <Grid Grid.Row="1"
-                                    ColumnDefinitions="*, *"
-                                    ColumnSpacing="20"
-                                    Margin="0,15,0,0">
+                                  ColumnDefinitions="*, *"
+                                  ColumnSpacing="20"
+                                  Margin="0,15,0,0">
 
                                 <!-- ============================================================ -->
                                 <!-- BOTÓN ACCIÓN: BORRAR (Tarjeta Negra con Sombra de Texto Roja) -->
                                 <!-- ============================================================ -->
                                 <!-- 💡 MEJORA: El detector se pone en el Grid Padre para que NUNCA deje de funcionar -->
                                 <Grid Grid.Column="0"
-                                        HeightRequest="44">
+                                      HeightRequest="44">
                                     <Grid.GestureRecognizers>
                                         <TapGestureRecognizer Tapped="OnConfirmarBorradoPunkClicked"/>
                                     </Grid.GestureRecognizers>
@@ -597,21 +650,21 @@
 
                                     <!-- Capa de Textos Duotono -->
                                     <Grid HorizontalOptions="Center"
-                                            VerticalOptions="Center"
-                                            InputTransparent="True">
+                                          VerticalOptions="Center"
+                                          InputTransparent="True">
                                         <!-- 1. Sombra Roja Sólida (Desplazada abajo-derecha) -->
                                         <Label Text="BORRAR"
-                                                TextColor="#E31D26"
-                                                FontSize="14"
-                                                FontFamily="HelveticaNowDisplay-ExtraBold"
-                                                CharacterSpacing="-0.5"
-                                                Margin="2,1,0,0"/>
+                                               TextColor="#E31D26"
+                                               FontSize="14"
+                                               FontFamily="HelveticaNowDisplay-ExtraBold"
+                                               CharacterSpacing="-0.5"
+                                               Margin="2,1,0,0"/>
                                         <!-- 2. Texto Principal Blanco -->
                                         <Label Text="BORRAR"
-                                                TextColor="White"
-                                                FontSize="14"
-                                                FontFamily="HelveticaNowDisplay-ExtraBold"
-                                                CharacterSpacing="-0.5"/>
+                                               TextColor="White"
+                                               FontSize="14"
+                                               FontFamily="HelveticaNowDisplay-ExtraBold"
+                                               CharacterSpacing="-0.5"/>
                                     </Grid>
                                 </Grid>
 
@@ -620,7 +673,7 @@
                                 <!-- ============================================================ -->
                                 <!-- 💡 MEJORA: El detector se pone en el Grid Padre para que NUNCA deje de funcionar -->
                                 <Grid Grid.Column="1"
-                                        HeightRequest="44">
+                                      HeightRequest="44">
                                     <Grid.GestureRecognizers>
                                         <TapGestureRecognizer Tapped="OnCancelarBorradoPunkClicked"/>
                                     </Grid.GestureRecognizers>
@@ -637,22 +690,22 @@
 
                                     <!-- Capa de Textos Duotono -->
                                     <Grid HorizontalOptions="Center"
-                                            VerticalOptions="Center"
-                                            InputTransparent="True">
+                                          VerticalOptions="Center"
+                                          InputTransparent="True">
                                         <!-- 1. Sombra Negra Sólida (Desplazada abajo-derecha) -->
                                         <Label Text="ABORTAR"
-                                                TextColor="#111111"
-                                                FontSize="14"
-                                                FontFamily="HelveticaNowDisplay-ExtraBold"
-                                                CharacterSpacing="-0.5"
-                                                Margin="2,1,0,0"
-                                                Opacity="0.4"/>
+                                               TextColor="#111111"
+                                               FontSize="14"
+                                               FontFamily="HelveticaNowDisplay-ExtraBold"
+                                               CharacterSpacing="-0.5"
+                                               Margin="2,1,0,0"
+                                               Opacity="0.4"/>
                                         <!-- 2. Texto Principal Negro Puro -->
                                         <Label Text="ABORTAR"
-                                                TextColor="Black"
-                                                FontSize="14"
-                                                FontFamily="HelveticaNowDisplay-ExtraBold"
-                                                CharacterSpacing="-0.5"/>
+                                               TextColor="Black"
+                                               FontSize="14"
+                                               FontFamily="HelveticaNowDisplay-ExtraBold"
+                                               CharacterSpacing="-0.5"/>
                                     </Grid>
                                 </Grid>
 
