@@ -1,5 +1,7 @@
 namespace MauiTime.Views;
 
+using Plugin.LocalNotification;
+
 using MauiTime.ViewModels;
 using Microsoft.Maui.Controls.Shapes;
 using Microsoft.Maui.Layouts; // <--- ASEGÚRATE DE QUE ESTA LÍNEA ESTÉ AQUÍ Arriba
@@ -7,6 +9,9 @@ using Microsoft.Maui.Layouts; // <--- ASEGÚRATE DE QUE ESTA LÍNEA ESTÉ AQUÍ 
 public partial class AgendaPage : ContentPage
 {
     private readonly AgendaViewModel _viewModel;
+    // Campo de control para pausar el hilo de ejecución hasta que el usuario decida
+    private TaskCompletionSource<bool>? _borradoTaskSource;
+    private Models.Evento? _eventoSeleccionadoParaDestruir;
 
     public AgendaPage(AgendaViewModel viewModel)
     {
@@ -419,33 +424,115 @@ public partial class AgendaPage : ContentPage
         }
     }
 
+    private async void OnMitigarAlarmaTargetClicked(object? sender, EventArgs e)
+    {
+        // 1. Validar el remitente (Grid Maestro) y extraer el Evento de forma segura
+        if (sender is not Grid gridMaestro || gridMaestro.BindingContext is not Models.Evento eventoModificado)
+            return;
 
-    // =======================================================================
-    // 💣 ACCIÓN 2: ELIMINAR EL PROYECTO / EVENTO DE SQLITE AL TOCAR EL BLOQUE
-    // =======================================================================
+        // 2. Conmutación booleana bidireccional (Toggle)
+        eventoModificado.EsAlarmaAgresiva = !eventoModificado.EsAlarmaAgresiva;
+
+        // 3. Recuperar servicios nativos desde el contenedor de dependencias
+        var dbService = App.Current?.Handler?.MauiContext?.Services.GetService<Services.DatabaseService>();
+        var notificationService = App.Current?.Handler?.MauiContext?.Services.GetService<Services.NotificationService>();
+
+        if (dbService != null)
+        {
+            try
+            {
+                // 4. Persistencia asíncrona aislada en tu SQLite (HILO DE FONDO)
+                _ = Task.Run(async () =>
+                {
+                    await dbService.GuardarEventoAsync(eventoModificado);
+                });
+
+                // 5. Reprogramación segura de hardware usando tu servicio del doble carril
+                if (notificationService != null)
+                {
+                    await notificationService.ProgramarRecordatorio(eventoModificado);
+                }
+
+                // ============================================================
+                // 💡 REPARACIÓN ULTRARÁPIDA: CONMUTACIÓN DIRECTA EN ELEMENTO HIJO
+                // ============================================================
+                // Buscamos al Grid secundario que tiene el nombre "CapaRojoFuego" entre los hijos del contenedor pulsado
+                var capaRojo = gridMaestro.Children.FirstOrDefault(c => c is Grid g && g.StyleId == "CapaRojoFuego" || (c is Grid visualGrid && visualGrid.IsVisible != eventoModificado.EsAlarmaAgresiva)) as Grid;
+
+                // Si el motor de renderizado no lo encuentra por tipado indirecto, forzamos la actualización directa del árbol visual de la celda
+                foreach (var hijo in gridMaestro.Children)
+                {
+                    if (hijo is Grid capaVisual)
+                    {
+                        // Forzamos a la Capa 2 a igualar la visibilidad booleana real del objeto de forma instantánea
+                        capaVisual.IsVisible = eventoModificado.EsAlarmaAgresiva;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[MAUI-INTERACTIVO] Excepción mitigada: {ex.Message}");
+            }
+        }
+
+        // 6. Feedback háptico opcional para dispositivos móviles
+#if ANDROID || IOS
+    try { HapticFeedback.Default.Perform(HapticFeedbackType.Click); } catch { }
+#endif
+    }
+
     private async void OnEliminarProyectoClicked(object? sender, EventArgs e)
     {
         if (sender is BindableObject control && control.BindingContext is Models.Evento eventoDestruir)
         {
-            // Confirmación limpia con el método nativo DisplayAlert
-            bool confirmar = await DisplayAlertAsync("PHANTOM THIEVES", $"¿Deseas eliminar el objetivo: '{eventoDestruir.Titulo}'?", "BORRAR", "ABORTAR");
+            _eventoSeleccionadoParaDestruir = eventoDestruir;
 
-            if (confirmar)
+            // Formateamos el texto en mayúsculas estilo colágeno radical
+            string textoFormateado = $"¿DESEAS ELIMINAR EL OBJETIVO:\n'{eventoDestruir.Titulo.ToUpper()}'?";
+
+            // Sincronizamos las dos capas del efecto duotono
+            TxtPreguntaBorrar.Text = textoFormateado;
+            TxtPreguntaBorrarSombra.Text = textoFormateado; // Actualiza la sombra sólida negra
+
+            ContenedorPopupBorrar.IsVisible = true;
+            _borradoTaskSource = new TaskCompletionSource<bool>();
+
+            bool confirmar = await _borradoTaskSource.Task;
+
+            if (confirmar && _eventoSeleccionadoParaDestruir != null)
             {
                 var dbService = App.Current?.Handler?.MauiContext?.Services.GetService<Services.DatabaseService>();
                 if (dbService != null)
                 {
-                    // 💡 SOLUCIÓN: Llamamos a tu método real idéntico al de tu DatabaseService.cs
-                    await dbService.BorrarEventoAsync(eventoDestruir);
+                    await dbService.BorrarEventoAsync(_eventoSeleccionadoParaDestruir);
 
-                    // Forzamos el refresco reactivo de la lista de tu Agenda
-                    await _viewModel.LoadEventosAsync();
+                    if (_viewModel != null)
+                    {
+                        await _viewModel.LoadEventosAsync();
+                    }
                 }
             }
+
+            _eventoSeleccionadoParaDestruir = null;
         }
     }
 
 
+    private void OnConfirmarBorradoPunkClicked(object? sender, EventArgs e)
+    {
+        // Ocultamos el HUD rojo de confirmación
+        ContenedorPopupBorrar.IsVisible = false;
+        // Liberamos el hilo retornando TRUE
+        _borradoTaskSource?.SetResult(true);
+    }
+
+    private void OnCancelarBorradoPunkClicked(object? sender, EventArgs e)
+    {
+        // Ocultamos el HUD rojo de confirmación
+        ContenedorPopupBorrar.IsVisible = false;
+        // Liberamos el hilo retornando FALSE (Abortar)
+        _borradoTaskSource?.SetResult(false);
+    }
 
 
 }

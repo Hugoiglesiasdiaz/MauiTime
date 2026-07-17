@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:models="clr-namespace:MauiTime.Models"
+             xmlns:converters="clr-namespace:MauiTime.Converters"
              x:Class="MauiTime.Views.AgendaPage"
              BackgroundColor="#1A1A1A"
              Title="P5_AGENDA"
@@ -264,16 +265,62 @@
                                                                  Margin="0,5,15,0"
                                                                  ZIndex="4">
 
-                                                <!-- HORA DEL EVENTO -->
-                                                <Label Text="{Binding Hora}"
-                                                       TextColor="#E31D26"
-                                                       FontSize="17"
-                                                       FontFamily="HelveticaNowDisplay-ExtraBold"
-                                                       HorizontalOptions="End"
-                                                       Margin="0,0,4,0"
-                                                       Rotation="4"
-                                                       CharacterSpacing="-0.5"/>
+                                                <!-- CONTENEDOR DE LA HORA + EL OJO DEL TARGET INTERACTIVO -->
+                                                <HorizontalStackLayout HorizontalOptions="End"
+                                                                       Spacing="6"
+                                                                       Rotation="4"
+                                                                       Margin="0,0,4,0">
 
+                                                    <!-- ============================================================ -->
+                                                    <!-- 💡 BOTÓN INTERACTIVO: EL OJO DEL TARGET CONMUTABLE POR GPU -->
+                                                    <!-- ============================================================ -->
+                                                    <Grid WidthRequest="18"
+                                                          HeightRequest="18"
+                                                          VerticalOptions="Center"
+                                                          BackgroundColor="Transparent"
+                                                          InputTransparent="False"
+                                                          CascadeInputTransparent="False">
+
+                                                        <!-- CAPA 1: El Rombo Apagado (Siempre de color Gris Oscuro de fondo) -->
+                                                        <Path Data="M 9,0 L 18,9 L 9,18 L 0,9 Z"
+                                                              Stroke="#333333"
+                                                              StrokeThickness="1.5"
+                                                              Fill="#01000000"/>
+                                                        <Path Data="M 9,5 L 9,11 M 9,13 L 9,14"
+                                                              Stroke="#333333"
+                                                              StrokeThickness="2.5"
+                                                              Fill="#01000000"/>
+
+                                                        <!-- CAPA 2: El Rombo Encendido (Rojo Fuego) se superpone encima de la Capa 1 
+                 Su visibilidad reacciona directamente al booleano gracias a INotifyPropertyChanged -->
+                                                        <!-- CAPA 2: El Rombo Encendido (Rojo Fuego) se superpone encima de la Capa 1 -->
+                                                        <Grid x:Name="CapaRojoFuego"
+                                                              IsVisible="{Binding EsAlarmaAgresiva}">
+                                                            <Path Data="M 9,0 L 18,9 L 9,18 L 0,9 Z"
+                                                                  Stroke="#E31D26"
+                                                                  StrokeThickness="1.5"/>
+                                                            <Path Data="M 9,5 L 9,11 M 9,13 L 9,14"
+                                                                  Stroke="#E31D26"
+                                                                  StrokeThickness="2.5"/>
+                                                        </Grid>
+
+
+                                                        <!-- Capturador de Clic para Escritorio y Toque para Android -->
+                                                        <Grid.GestureRecognizers>
+                                                            <TapGestureRecognizer Tapped="OnMitigarAlarmaTargetClicked"/>
+                                                        </Grid.GestureRecognizers>
+                                                    </Grid>
+
+                                                    <!-- Texto de la Hora -->
+                                                    <Label Text="{Binding Hora}"
+                                                           TextColor="#E31D26"
+                                                           FontSize="17"
+                                                           FontFamily="HelveticaNowDisplay-ExtraBold"
+                                                           VerticalOptions="Center"
+                                                           CharacterSpacing="-0.5"/>
+                                                </HorizontalStackLayout>
+
+                                                <!-- ============================================================ -->
                                                 <!-- Contenedor Unificado de Stickers -->
                                                 <Grid>
                                                     <!-- Sticker Anual -->
@@ -441,6 +488,185 @@
                     VerticalOptions="Center"
                     Margin="0,20,15,0"
                     ZIndex="999"/>
+
+
+            <!-- ======================================================================= -->
+            <!-- 🎭 POPUP DE CONFIRMACIÓN: CUADRO SÓLIDO DE ÁNGULOS DUROS                -->
+            <!-- ======================================================================= -->
+            <Grid x:Name="ContenedorPopupBorrar"
+                  Grid.RowSpan="5"
+                  Grid.ColumnSpan="4"
+                  BackgroundColor="#A5000000"
+                  ZIndex="9999"
+                  IsVisible="False"
+                  HorizontalOptions="Fill"
+                  VerticalOptions="Fill"
+                  Margin="-50">
+
+                <!-- Lienzo Maestro Compacto -->
+                <Grid WidthRequest="540"
+                      HeightRequest="230"
+                      HorizontalOptions="Center"
+                      VerticalOptions="Center"
+                      Rotation="-2">
+                    <!-- Una única rotación limpia para todo el conjunto -->
+
+                    <!-- Sombra Sólida Dura Negra Desplazada -->
+                    <Border BackgroundColor="Black"
+                            StrokeThickness="0"
+                            Margin="12,12,0,0">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="0"/>
+                        </Border.StrokeShape>
+                    </Border>
+
+                    <!-- Cuerpo Principal en Rojo Fuego Puro (Líneas limpias sin polígonos cruzados) -->
+                    <Border BackgroundColor="#E31D26"
+                            Stroke="White"
+                            StrokeThickness="3"
+                            Margin="0,0,12,12">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="0"/>
+                        </Border.StrokeShape>
+
+                        <Grid RowDefinitions="*, Auto"
+                              Padding="25,20">
+
+                            <!-- BLOQUE CENTRAL: CAJA NEGRA RECTANGULAR SÓLIDA -->
+                            <Border Grid.Row="0"
+                                    BackgroundColor="Black"
+                                    Stroke="White"
+                                    StrokeThickness="1.5"
+                                    VerticalOptions="Center"
+                                    Padding="20,15">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="0"/>
+                                </Border.StrokeShape>
+
+                                <!-- Texto Duotono Limpio sobre Fondo Negro -->
+                                <Grid>
+                                    <Label x:Name="TxtPreguntaBorrarSombra"
+                                           Text="¿ELIMINAR OBJETIVO?"
+                                           TextColor="#E31D26"
+                                           FontSize="15"
+                                           FontFamily="HelveticaNowDisplay-ExtraBold"
+                                           HorizontalOptions="Center"
+                                           HorizontalTextAlignment="Center"
+                                           CharacterSpacing="-0.3"
+                                           Margin="2,2,0,0"
+                                           LineBreakMode="WordWrap"
+                                           VerticalOptions="Center"/>
+                                    <Label x:Name="TxtPreguntaBorrar"
+                                           Text="¿ELIMINAR OBJETIVO?"
+                                           TextColor="White"
+                                           FontSize="15"
+                                           FontFamily="HelveticaNowDisplay-ExtraBold"
+                                           HorizontalOptions="Center"
+                                           HorizontalTextAlignment="Center"
+                                           CharacterSpacing="-0.3"
+                                           LineBreakMode="WordWrap"
+                                           VerticalOptions="Center"/>
+                                </Grid>
+                            </Border>
+
+                            <!-- BLOQUE DE BOTONES: BLINDAJE DE ENTRADA GRÁFICA -->
+                            <Grid Grid.Row="1"
+                                    ColumnDefinitions="*, *"
+                                    ColumnSpacing="20"
+                                    Margin="0,15,0,0">
+
+                                <!-- ============================================================ -->
+                                <!-- BOTÓN ACCIÓN: BORRAR (Tarjeta Negra con Sombra de Texto Roja) -->
+                                <!-- ============================================================ -->
+                                <!-- 💡 MEJORA: El detector se pone en el Grid Padre para que NUNCA deje de funcionar -->
+                                <Grid Grid.Column="0"
+                                        HeightRequest="44">
+                                    <Grid.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnConfirmarBorradoPunkClicked"/>
+                                    </Grid.GestureRecognizers>
+
+                                    <!-- Fondo visual del botón -->
+                                    <Border BackgroundColor="Black"
+                                            Stroke="White"
+                                            StrokeThickness="2"
+                                            InputTransparent="True">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="0"/>
+                                        </Border.StrokeShape>
+                                    </Border>
+
+                                    <!-- Capa de Textos Duotono -->
+                                    <Grid HorizontalOptions="Center"
+                                            VerticalOptions="Center"
+                                            InputTransparent="True">
+                                        <!-- 1. Sombra Roja Sólida (Desplazada abajo-derecha) -->
+                                        <Label Text="BORRAR"
+                                                TextColor="#E31D26"
+                                                FontSize="14"
+                                                FontFamily="HelveticaNowDisplay-ExtraBold"
+                                                CharacterSpacing="-0.5"
+                                                Margin="2,1,0,0"/>
+                                        <!-- 2. Texto Principal Blanco -->
+                                        <Label Text="BORRAR"
+                                                TextColor="White"
+                                                FontSize="14"
+                                                FontFamily="HelveticaNowDisplay-ExtraBold"
+                                                CharacterSpacing="-0.5"/>
+                                    </Grid>
+                                </Grid>
+
+                                <!-- ============================================================ -->
+                                <!-- BOTÓN ABORTAR: VUELTA ATRÁS (Tarjeta Blanca con Borde Negro Duro) -->
+                                <!-- ============================================================ -->
+                                <!-- 💡 MEJORA: El detector se pone en el Grid Padre para que NUNCA deje de funcionar -->
+                                <Grid Grid.Column="1"
+                                        HeightRequest="44">
+                                    <Grid.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnCancelarBorradoPunkClicked"/>
+                                    </Grid.GestureRecognizers>
+
+                                    <!-- Fondo visual del botón con contorno negro nítido -->
+                                    <Border BackgroundColor="White"
+                                            Stroke="Black"
+                                            StrokeThickness="2"
+                                            InputTransparent="True">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="0"/>
+                                        </Border.StrokeShape>
+                                    </Border>
+
+                                    <!-- Capa de Textos Duotono -->
+                                    <Grid HorizontalOptions="Center"
+                                            VerticalOptions="Center"
+                                            InputTransparent="True">
+                                        <!-- 1. Sombra Negra Sólida (Desplazada abajo-derecha) -->
+                                        <Label Text="ABORTAR"
+                                                TextColor="#111111"
+                                                FontSize="14"
+                                                FontFamily="HelveticaNowDisplay-ExtraBold"
+                                                CharacterSpacing="-0.5"
+                                                Margin="2,1,0,0"
+                                                Opacity="0.4"/>
+                                        <!-- 2. Texto Principal Negro Puro -->
+                                        <Label Text="ABORTAR"
+                                                TextColor="Black"
+                                                FontSize="14"
+                                                FontFamily="HelveticaNowDisplay-ExtraBold"
+                                                CharacterSpacing="-0.5"/>
+                                    </Grid>
+                                </Grid>
+
+                            </Grid>
+
+
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Grid>
+
+
+            <!-- ======================================================================= -->
+
 
         </Grid>
     </Grid>

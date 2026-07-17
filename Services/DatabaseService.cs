@@ -1,10 +1,5 @@
 using SQLite;
 using MauiTime.Models;
-using System.IO;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using System.Linq;
-using System;
 using static MauiTime.Models.Evento;
 
 namespace MauiTime.Services
