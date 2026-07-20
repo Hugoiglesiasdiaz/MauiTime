@@ -95,7 +95,7 @@
 
                         <!-- Bloque General del HUD (Ancho Rígido 620 Calibrado) -->
                         <Grid WidthRequest="620"
-                              RowDefinitions="Auto, *, Auto"
+                              RowDefinitions="Auto, Auto, *, Auto"
                               Padding="15">
 
                                 <!-- ======================================================================= -->
@@ -132,7 +132,7 @@
                                 <!-- ======================================================================= -->
                                 <!-- 📝 CUERPO CENTRAL: HOJA DE LIBRETA ENVEJECIDA CON DECORACIÓN INTERNA   -->
                                 <!-- ======================================================================= -->
-                                <Border Grid.Row="1"
+                                <Border Grid.Row="2"
                                         BackgroundColor="#EADFC9"
                                         Stroke="Black"
                                         StrokeThickness="3"
@@ -192,6 +192,7 @@
 
                                                         <!-- CAMPO 1: SELECCIONAR EL DÍA -->
                                                         <VerticalStackLayout Spacing="4">
+                                                                <!-- Título superior -->
                                                                 <Border BackgroundColor="Black"
                                                                         StrokeThickness="0"
                                                                         HorizontalOptions="Start"
@@ -203,9 +204,10 @@
                                                                                TextColor="White"
                                                                                FontSize="12"
                                                                                FontFamily="HelveticaNowDisplay-ExtraBold"
-                                                                               FontAttributes="Bold"
-                                                                               CharacterSpacing="0.5"/>
+                                                                               FontAttributes="Bold"/>
                                                                 </Border>
+
+                                                                <!-- Contenedor principal del Calendario -->
                                                                 <Border BackgroundColor="#DFD3BA"
                                                                         Stroke="Black"
                                                                         StrokeThickness="2.5"
@@ -213,13 +215,137 @@
                                                                         <Border.StrokeShape>
                                                                                 <RoundRectangle CornerRadius="0"/>
                                                                         </Border.StrokeShape>
-                                                                        <DatePicker x:Name="PickerFecha"
-                                                                                    MinimumDate="01/01/2020"
-                                                                                    MaximumDate="12/31/2030"
-                                                                                    TextColor="Black"
-                                                                                    FontFamily="HelveticaNowDisplay-ExtraBold"
-                                                                                    FontSize="16"/>
+
+                                                                        <!-- Definimos 3 filas claras para evitar el solapamiento -->
+                                                                        <Grid RowDefinitions="Auto, Auto, *"
+                                                                              ColumnDefinitions="*"
+                                                                              RowSpacing="10">
+
+                                                                                <!-- Fila 0: Selector de Mes -->
+                                                                                <Border Grid.Row="0"
+                                                                                        BackgroundColor="Black"
+                                                                                        Stroke="#E31D26"
+                                                                                        StrokeThickness="2"
+                                                                                        Padding="15,12"
+                                                                                        Margin="0,0,0,8">
+                                                                                        <Border.StrokeShape>
+                                                                                                <RoundRectangle CornerRadius="16"/>
+                                                                                        </Border.StrokeShape>
+                                                                                        <Grid ColumnDefinitions="Auto,*,Auto"
+                                                                                              VerticalOptions="Center">
+                                                                                                <Button x:Name="BtnMesAnterior"
+                                                                                                        Text="◀"
+                                                                                                        FontFamily="Impact"
+                                                                                                        FontSize="24"
+                                                                                                        TextColor="White"
+                                                                                                        BackgroundColor="#E31D26"
+                                                                                                        CornerRadius="12"
+                                                                                                        WidthRequest="50"
+                                                                                                        HeightRequest="50"
+                                                                                                        Clicked="OnMesAnteriorClicked"/>
+
+                                                                                                <!-- MES MÁS GRANDE -->
+                                                                                                <Label x:Name="LabelMesAno"
+                                                                                                       Grid.Column="1"
+                                                                                                       Text="JULIO DE 2026"
+                                                                                                       TextColor="White"
+                                                                                                       FontFamily="Impact"
+                                                                                                       FontSize="22"
+                                                                                                       
+                                                                                                       HorizontalTextAlignment="Center"
+                                                                                                       VerticalTextAlignment="Center"
+                                                                                                       CharacterSpacing="1"/>
+
+                                                                                                <Button x:Name="BtnMesSiguiente"
+                                                                                                        Grid.Column="2"
+                                                                                                        Text="▶"
+                                                                                                        FontFamily="Impact"
+                                                                                                        FontSize="24"
+                                                                                                        TextColor="White"
+                                                                                                        BackgroundColor="#E31D26"
+                                                                                                        CornerRadius="12"
+                                                                                                        WidthRequest="50"
+                                                                                                        HeightRequest="50"
+                                                                                                        Clicked="OnMesSiguienteClicked"/>
+                                                                                        </Grid>
+                                                                                </Border>
+                                                                                <!-- Fila 1: Encabezados (L, M, X, J, V, S, D) con fuente Bubblegum -->
+                                                                                <Grid Grid.Row="1"
+                                                                                      ColumnDefinitions="*,*,*,*,*,*,*"
+                                                                                      ColumnSpacing="6"
+                                                                                      Margin="0,0,0,10">
+                                                                                        <Label Grid.Column="0"
+                                                                                               Text="L"
+                                                                                               TextColor="Black"
+                                                                                               FontFamily="Bubblegum"
+                                                                                               FontSize="18"
+                                                                                               HorizontalTextAlignment="Center"/>
+                                                                                        <Label Grid.Column="1"
+                                                                                               Text="M"
+                                                                                               TextColor="Black"
+                                                                                               FontFamily="Bubblegum"
+                                                                                               FontSize="18"
+                                                                                               HorizontalTextAlignment="Center"/>
+                                                                                        <Label Grid.Column="2"
+                                                                                               Text="X"
+                                                                                               TextColor="Black"
+                                                                                               FontFamily="Bubblegum"
+                                                                                               FontSize="18"
+                                                                                               HorizontalTextAlignment="Center"/>
+                                                                                        <Label Grid.Column="3"
+                                                                                               Text="J"
+                                                                                               TextColor="Black"
+                                                                                               FontFamily="Bubblegum"
+                                                                                               FontSize="18"
+                                                                                               HorizontalTextAlignment="Center"/>
+                                                                                        <Label Grid.Column="4"
+                                                                                               Text="V"
+                                                                                               TextColor="Black"
+                                                                                               FontFamily="Bubblegum"
+                                                                                               FontSize="18"
+                                                                                               HorizontalTextAlignment="Center"/>
+
+                                                                                        <Border Grid.Column="5"
+                                                                                                BackgroundColor="Black"
+                                                                                                Padding="2"
+                                                                                                HorizontalOptions="Fill">
+                                                                                                <Border.StrokeShape>
+                                                                                                        <RoundRectangle CornerRadius="6"/>
+                                                                                                </Border.StrokeShape>
+                                                                                                <Label Text="S"
+                                                                                                       TextColor="White"
+                                                                                                       FontFamily="Bubblegum"
+                                                                                                       FontSize="18"
+                                                                                                       HorizontalTextAlignment="Center"/>
+                                                                                        </Border>
+                                                                                        <Border Grid.Column="6"
+                                                                                                BackgroundColor="#E31D26"
+                                                                                                Padding="2"
+                                                                                                HorizontalOptions="Fill">
+                                                                                                <Border.StrokeShape>
+                                                                                                        <RoundRectangle CornerRadius="6"/>
+                                                                                                </Border.StrokeShape>
+                                                                                                <Label Text="D"
+                                                                                                       TextColor="White"
+                                                                                                       FontFamily="Bubblegum"
+                                                                                                       FontSize="18"
+                                                                                                       HorizontalTextAlignment="Center"/>
+                                                                                        </Border>
+                                                                                </Grid>
+
+                                                                                <!-- Fila 2: La grilla de números (se llena desde el C#) -->
+                                                                                <Grid x:Name="GridDiasCalendario"
+                                                                                      Grid.Row="2"
+                                                                                      ColumnSpacing="6"
+                                                                                      RowSpacing="6"
+                                                                                      ColumnDefinitions="*,*,*,*,*,*,*"
+                                                                                      RowDefinitions="*,*,*,*,*,*"
+                                                                                      VerticalOptions="Start"/>
+                                                                        </Grid>
                                                                 </Border>
+
+                                                                <DatePicker x:Name="PickerFecha"
+                                                                            IsVisible="False"/>
                                                         </VerticalStackLayout>
 
                                                         <!-- CAMPO 2: TÍTULO DEL EVENTO -->
@@ -411,80 +537,84 @@
                                 <!-- Cierra el Border de la libreta claro -->
 
                                 <!-- ======================================================================= -->
-                                <!-- 🎛️ BOTONES DE CONTROL DE BAJO ACCIÓN: DECISIÓN COMPACTA DUOTONO        -->
+                                <!-- 🎛️ BOTONES DE CONTROL + CONFIRMACIÓN (Fila final)                     -->
                                 <!-- ======================================================================= -->
-                                <Grid Grid.Row="2"
-                                      ColumnDefinitions="*, *"
-                                      ColumnSpacing="25"
-                                      Margin="0,25,0,0">
+                                <Grid Grid.Row="3">
+                                        <Grid RowDefinitions="Auto, Auto"
+                                              ColumnDefinitions="*"
+                                              Margin="0,25,0,0">
+                                                <Grid Grid.Row="0"
+                                                      ColumnDefinitions="*, *"
+                                                      ColumnSpacing="25">
+                                                        <!-- BOTÓN: CREAR EVENTO -->
+                                                        <Grid Grid.Column="0"
+                                                              HeightRequest="50"
+                                                              Rotation="-3.5">
+                                                                <Border BackgroundColor="Black"
+                                                                        Stroke="White"
+                                                                        StrokeThickness="2"
+                                                                        InputTransparent="True">
+                                                                        <Border.StrokeShape>
+                                                                                <RoundRectangle CornerRadius="0"/>
+                                                                        </Border.StrokeShape>
+                                                                </Border>
+                                                                <Grid HorizontalOptions="Center"
+                                                                      VerticalOptions="Center"
+                                                                      InputTransparent="True">
+                                                                        <Label Text="DESATAR MISIÓN"
+                                                                               TextColor="#E31D26"
+                                                                               FontSize="15"
+                                                                               FontFamily="HelveticaNowDisplay-ExtraBold"
+                                                                               FontAttributes="Bold, Italic"
+                                                                               Margin="2,1,0,0"/>
+                                                                        <Label Text="DESATAR MISIÓN"
+                                                                               TextColor="White"
+                                                                               FontSize="15"
+                                                                               FontFamily="HelveticaNowDisplay-ExtraBold"
+                                                                               FontAttributes="Bold, Italic"/>
+                                                                </Grid>
+                                                                <Button BackgroundColor="Transparent"
+                                                                        Clicked="OnGuardarClicked"
+                                                                        HorizontalOptions="Fill"
+                                                                        VerticalOptions="Fill"/>
+                                                        </Grid>
 
-                                        <!-- BOTÓN: CREAR EVENTO -->
-                                        <Grid Grid.Column="0"
-                                              HeightRequest="50"
-                                              Rotation="-3.5">
-                                                <Border BackgroundColor="Black"
-                                                        Stroke="White"
-                                                        StrokeThickness="2"
-                                                        InputTransparent="True">
-                                                        <Border.StrokeShape>
-                                                                <RoundRectangle CornerRadius="0"/>
-                                                        </Border.StrokeShape>
-                                                </Border>
-                                                <Grid HorizontalOptions="Center"
-                                                      VerticalOptions="Center"
-                                                      InputTransparent="True">
-                                                        <Label Text="DESATAR MISIÓN"
-                                                               TextColor="#E31D26"
-                                                               FontSize="15"
-                                                               FontFamily="HelveticaNowDisplay-ExtraBold"
-                                                               FontAttributes="Bold, Italic"
-                                                               Margin="2,1,0,0"/>
-                                                        <Label Text="DESATAR MISIÓN"
-                                                               TextColor="White"
-                                                               FontSize="15"
-                                                               FontFamily="HelveticaNowDisplay-ExtraBold"
-                                                               FontAttributes="Bold, Italic"/>
+                                                        <!-- BOTÓN: ABORTAR -->
+                                                        <Grid Grid.Column="1"
+                                                              HeightRequest="50"
+                                                              Rotation="3">
+                                                                <Border BackgroundColor="White"
+                                                                        Stroke="Black"
+                                                                        StrokeThickness="2"
+                                                                        InputTransparent="True">
+                                                                        <Border.StrokeShape>
+                                                                                <RoundRectangle CornerRadius="0"/>
+                                                                        </Border.StrokeShape>
+                                                                </Border>
+                                                                <Grid HorizontalOptions="Center"
+                                                                      VerticalOptions="Center"
+                                                                      InputTransparent="True">
+                                                                        <Label Text="ABORTAR"
+                                                                               TextColor="#111111"
+                                                                               FontSize="15"
+                                                                               FontFamily="HelveticaNowDisplay-ExtraBold"
+                                                                               FontAttributes="Bold, Italic"
+                                                                               Margin="2,1,0,0"
+                                                                               Opacity="0.4"/>
+                                                                        <Label Text="ABORTAR"
+                                                                               TextColor="Black"
+                                                                               FontSize="15"
+                                                                               FontFamily="HelveticaNowDisplay-ExtraBold"
+                                                                               FontAttributes="Bold, Italic"/>
+                                                                </Grid>
+                                                                <Button BackgroundColor="Transparent"
+                                                                        Clicked="OnCancelarClicked"
+                                                                        HorizontalOptions="Fill"
+                                                                        VerticalOptions="Fill"/>
+                                                        </Grid>
                                                 </Grid>
-                                                <Button BackgroundColor="Transparent"
-                                                        Clicked="OnGuardarClicked"
-                                                        HorizontalOptions="Fill"
-                                                        VerticalOptions="Fill"/>
-                                        </Grid>
 
-                                        <!-- BOTÓN: ABORTAR -->
-                                        <Grid Grid.Column="1"
-                                              HeightRequest="50"
-                                              Rotation="3">
-                                                <Border BackgroundColor="White"
-                                                        Stroke="Black"
-                                                        StrokeThickness="2"
-                                                        InputTransparent="True">
-                                                        <Border.StrokeShape>
-                                                                <RoundRectangle CornerRadius="0"/>
-                                                        </Border.StrokeShape>
-                                                </Border>
-                                                <Grid HorizontalOptions="Center"
-                                                      VerticalOptions="Center"
-                                                      InputTransparent="True">
-                                                        <Label Text="ABORTAR"
-                                                               TextColor="#111111"
-                                                               FontSize="15"
-                                                               FontFamily="HelveticaNowDisplay-ExtraBold"
-                                                               FontAttributes="Bold, Italic"
-                                                               Margin="2,1,0,0"
-                                                               Opacity="0.4"/>
-                                                        <Label Text="ABORTAR"
-                                                               TextColor="Black"
-                                                               FontSize="15"
-                                                               FontFamily="HelveticaNowDisplay-ExtraBold"
-                                                               FontAttributes="Bold, Italic"/>
-                                                </Grid>
-                                                <Button BackgroundColor="Transparent"
-                                                        Clicked="OnCancelarClicked"
-                                                        HorizontalOptions="Fill"
-                                                        VerticalOptions="Fill"/>
                                         </Grid>
-
                                 </Grid>
                                 <!-- Cierra el Grid de botones inferiores -->
 
