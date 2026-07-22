@@ -30,8 +30,23 @@ namespace MauiTime.Views
             FocoLinterna.Scale = 1.0;
             FocoLinterna.TranslationX = 0;
             FocoLinterna.TranslationY = 0;
-            FocoLinterna.BackgroundColor = Colors.White;
             TextoLinterna.Text = "SEARCHING...";
+
+            // 🎨 EL ANTÍDOTO: Forzamos la restauración del gradiente blanco de búsqueda original
+            // Borra el residuo rojo de la última animación antes de que empiece el movimiento
+            FocoLinterna.Background = new RadialGradientBrush
+            {
+                Center = new Point(0.5, 0.5),
+                Radius = 0.5,
+                GradientStops = new GradientStopCollection
+                {
+                    new GradientStop { Color = Color.FromArgb("#FFFFFF"), Offset = 0.0f },   // Centro brillante limpio
+                    new GradientStop { Color = Color.FromArgb("#D1E4E8"), Offset = 0.4f },   // Haz intermedio nítido
+                    new GradientStop { Color = Color.FromArgb("#405560"), Offset = 0.75f },  // Dispersión azul de cómic
+                    new GradientStop { Color = Colors.Transparent, Offset = 1.0f }          // Desvanecimiento a negro
+                }
+            };
+
 
             // CONTROL DE DIMENSIONES SEGURO PARA WINDOWS
             int intentos = 0;
@@ -62,12 +77,26 @@ namespace MauiTime.Views
                 await Task.Delay(80); // Pausa mínima milimétrica antes del golpe de efecto
 
                 // FASE 2: DETONACIÓN TARGET LOCK + INCURSIÓN LÍNEAS ANIME
-                FocoLinterna.BackgroundColor = Color.FromArgb("#E31D26");
+                // 🎨 REEMPLAZADO: Cambiamos color plano por gradiente radial de peligro difuminado a negro
+                FocoLinterna.Background = new RadialGradientBrush
+                {
+                    Center = new Point(0.5, 0.5),
+                    Radius = 0.5,
+                    GradientStops = new GradientStopCollection
+                    {
+                        new GradientStop { Color = Color.FromArgb("#FFFFFF"), Offset = 0.0f },   // Centro nuclear brillante
+                        new GradientStop { Color = Color.FromArgb("#E31D26"), Offset = 0.5f },   // Rojo Fuego Persona 5
+                        new GradientStop { Color = Color.FromArgb("#500A0D"), Offset = 0.82f },  // Sombra de sangre nocturna
+                        new GradientStop { Color = Colors.Transparent, Offset = 1.0f }          // Difuminado perfecto a negro
+                    }
+                };
+
                 TextoLinterna.Text = "TARGET LOCK";
                 ContenedorLineasAccion.Opacity = 1.0;
 
                 // 🚨 EL TRUCO DEFINITIVO: Creamos un token para detener el bucle cuando saltemos de página
                 bool seguirVibrando = true;
+
 
                 // FASE 3: DISPARAR BUCLE DE SHAKE INFINITO EN PARALELO (Sin "await")
                 // Al usar un método "async void" sin await, el bucle se queda corriendo de fondo de forma perpetua
