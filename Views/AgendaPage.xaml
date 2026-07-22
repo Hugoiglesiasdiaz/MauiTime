@@ -534,7 +534,6 @@
                            Text="INICIAR INFILTRACIÓN"
                            TextColor="#F0F0F0"
                            FontSize="20"
-                           FontAttributes="Bold"
                            FontFamily="Impact"
                            CharacterSpacing="0"
                            HorizontalOptions="Center"

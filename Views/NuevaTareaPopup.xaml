@@ -123,7 +123,7 @@
                                                 <Label x:Name="LabelFecha"
                                                        TextColor="White"
                                                        FontSize="19"
-                                                       FontAttributes="Bold, Italic"
+                                                       FontAttributes="Italic"
                                                        FontFamily="Impact"
                                                        CharacterSpacing="0.5"/>
                                         </Border>
@@ -251,7 +251,6 @@
                                                                                                        TextColor="White"
                                                                                                        FontFamily="Impact"
                                                                                                        FontSize="22"
-                                                                                                       
                                                                                                        HorizontalTextAlignment="Center"
                                                                                                        VerticalTextAlignment="Center"
                                                                                                        CharacterSpacing="1"/>
@@ -409,48 +408,162 @@
                                                                          Opacity="0.8"/>
                                                         </VerticalStackLayout>
 
-                                                        <!-- CAMPO 4: FRECUENCIA DEL EVENTO -->
+                                                        <!-- CAMPO 4: FRECUENCIA DEL EVENTO (ESTRUCTURA 100% PLANA Y ALINEADA) -->
                                                         <VerticalStackLayout Spacing="4">
-                                                                <Border BackgroundColor="#222222"
-                                                                        StrokeThickness="0"
-                                                                        HorizontalOptions="Start"
-                                                                        Padding="15,5">
-                                                                        <Border.StrokeShape>
-                                                                                <RoundRectangle CornerRadius="0"/>
-                                                                        </Border.StrokeShape>
-                                                                        <Label Text="FRECUENCIA DEL EVENTO"
-                                                                               TextColor="White"
-                                                                               FontSize="11.5"
-                                                                               FontFamily="HelveticaNowDisplay-ExtraBold"
-                                                                               FontAttributes="Bold"/>
-                                                                </Border>
-                                                                <Picker x:Name="PickerFrecuencia"
-                                                                        Title="Toca para seleccionar..."
-                                                                        TitleColor="#766C56"
-                                                                        TextColor="Black"
-                                                                        FontFamily="HelveticaNowDisplay-ExtraBold"
-                                                                        FontAttributes="Bold"
-                                                                        FontSize="15"
-                                                                        BackgroundColor="Transparent"
-                                                                        Margin="5,2,0,0">
-                                                                        <Picker.ItemsSource>
-                                                                                <x:Array Type="{x:Type x:String}">
-                                                                                        <x:String>Ninguna</x:String>
-                                                                                        <x:String>Diario</x:String>
-                                                                                        <x:String>Semanal</x:String>
-                                                                                        <x:String>Mensual</x:String>
-                                                                                        <x:String>Anual</x:String>
-                                                                                </x:Array>
-                                                                        </Picker.ItemsSource>
-                                                                </Picker>
-                                                                <BoxView HeightRequest="2"
-                                                                         BackgroundColor="Black"
-                                                                         Opacity="0.8"/>
+                                                                <!-- Título sin Sombra Dura Desfasada y 100% Horizontal -->
+                                                                <!-- 🎨 ANTÍDOTO DEFINTIVO: Cambiamos Rotation a 0 en ambas capas del título -->
+                                                                <Grid HorizontalOptions="Start">
+                                                                        <Border BackgroundColor="Black"
+                                                                                StrokeThickness="0"
+                                                                                TranslationX="0"
+                                                                                TranslationY="0"
+                                                                                Rotation="0"
+                                                                                Padding="15,4">
+                                                                                <Border.StrokeShape>
+                                                                                        <RoundRectangle CornerRadius="0"/>
+                                                                                </Border.StrokeShape>
+                                                                                <Label Text="FRECUENCIA DEL EVENTO"
+                                                                                                FontSize="11.5"
+                                                                                                FontFamily="HelveticaNowDisplay-ExtraBold"/>
+                                                                        </Border>
+                                                                        <Border BackgroundColor="Black"
+                                                                                StrokeThickness="0"
+                                                                                Rotation="0"
+                                                                                Padding="15,4">
+                                                                                <Border.StrokeShape>
+                                                                                        <RoundRectangle CornerRadius="0"/>
+                                                                                </Border.StrokeShape>
+                                                                                <Label Text="FRECUENCIA DEL EVENTO"
+                                                                                                TextColor="White"
+                                                                                                FontSize="11.5"
+                                                                                                FontFamily="HelveticaNowDisplay-ExtraBold"
+                                                                                                FontAttributes="Bold"/>
+                                                                        </Border>
+                                                                </Grid>
+
+                                                                <!-- CONTENEDOR MAESTRO DEL DROPDOWN -->
+                                                                <VerticalStackLayout WidthRequest="230"
+                                                                                     HorizontalOptions="Start"
+                                                                                     Margin="5,8,0,8">
+
+                                                                        <!-- CABECERA DEL DROPDOWN (HORIZONTAL PLANA AS MAESTRA) -->
+                                                                        <Border BackgroundColor="Black"
+                                                                                StrokeThickness="0"
+                                                                                HeightRequest="40">
+                                                                                <Border.StrokeShape>
+                                                                                        <RoundRectangle CornerRadius="0"/>
+                                                                                </Border.StrokeShape>
+
+                                                                                <Grid ColumnDefinitions="*, Auto"
+                                                                                                Padding="15,0,12,0">
+                                                                                        <Label x:Name="LabelFrecuenciaCustom"
+                                                                                                        Grid.Column="0"
+                                                                                                        Text="NINGUNA"
+                                                                                                        TextColor="White"
+                                                                                                        FontFamily="Impact"
+                                                                                                        FontSize="18"
+                                                                                                        CharacterSpacing="1"
+                                                                                                        VerticalOptions="Center"/>
+                                                                                        <Label x:Name="IndicadorAngulo"
+                                                                                                        Grid.Column="1"
+                                                                                                        Text="◢"
+                                                                                                        TextColor="#E31D26"
+                                                                                                        FontSize="14"
+                                                                                                        VerticalOptions="Center"
+                                                                                                        Margin="0,4,0,0"/>
+                                                                                </Grid>
+                                                                                <Border.GestureRecognizers>
+                                                                                        <TapGestureRecognizer Tapped="OnFrecuenciaHeaderTapped"/>
+                                                                                </Border.GestureRecognizers>
+                                                                        </Border>
+
+                                                                        <!-- PERSIANA DESPLEGABLE RECTANGULAR -->
+                                                                        <Border x:Name="ContenedorOpcionesDrop"
+                                                                                Margin="0,2,0,0"
+                                                                                BackgroundColor="#000000"
+                                                                                Stroke="#000000"
+                                                                                StrokeThickness="1">
+                                                                                <Border.StrokeShape>
+                                                                                        <RoundRectangle CornerRadius="0"/>
+                                                                                </Border.StrokeShape>
+
+                                                                                <VerticalStackLayout Spacing="6"
+                                                                                                Padding="0,15,0,20">
+                                                                                        <Label Text="NINGUNA"
+                                                                                                        FontFamily="Impact"
+                                                                                                        FontSize="16"
+                                                                                                        TextColor="White"
+                                                                                                        CharacterSpacing="0.8"
+                                                                                                        Padding="20,5"
+                                                                                                        HorizontalOptions="Fill">
+                                                                                                <Label.GestureRecognizers>
+                                                                                                        <TapGestureRecognizer Tapped="OnOpcionSeleccionadaTapped"/>
+                                                                                                </Label.GestureRecognizers>
+                                                                                        </Label>
+                                                                                        <Grid Margin="0,4"
+                                                                                                        HeightRequest="36">
+                                                                                                <BoxView BackgroundColor="#E31D26"/>
+                                                                                                <Label Text="DIARIO"
+                                                                                                                FontFamily="Impact"
+                                                                                                                FontSize="16"
+                                                                                                                TextColor="White"
+                                                                                                                FontAttributes="Bold"
+                                                                                                                CharacterSpacing="1"
+                                                                                                                Padding="25,0"
+                                                                                                                VerticalTextAlignment="Center"
+                                                                                                                HorizontalOptions="Fill">
+                                                                                                        <Label.GestureRecognizers>
+                                                                                                                <TapGestureRecognizer Tapped="OnOpcionSeleccionadaTapped"/>
+                                                                                                        </Label.GestureRecognizers>
+                                                                                                </Label>
+                                                                                        </Grid>
+                                                                                        <Label Text="SEMANAL"
+                                                                                                        FontFamily="Impact"
+                                                                                                        FontSize="16"
+                                                                                                        TextColor="White"
+                                                                                                        CharacterSpacing="0.8"
+                                                                                                        Padding="20,5"
+                                                                                                        HorizontalOptions="Fill">
+                                                                                                <Label.GestureRecognizers>
+                                                                                                        <TapGestureRecognizer Tapped="OnOpcionSeleccionadaTapped"/>
+                                                                                                </Label.GestureRecognizers>
+                                                                                        </Label>
+                                                                                        <Grid Margin="0,4"
+                                                                                                        HeightRequest="36">
+                                                                                                <BoxView BackgroundColor="#E31D26"/>
+                                                                                                <Label Text="MENSUAL"
+                                                                                                                FontFamily="Impact"
+                                                                                                                FontSize="16"
+                                                                                                                TextColor="White"
+                                                                                                                FontAttributes="Bold"
+                                                                                                                CharacterSpacing="1"
+                                                                                                                Padding="25,0"
+                                                                                                                VerticalTextAlignment="Center"
+                                                                                                                HorizontalOptions="Fill">
+                                                                                                        <Label.GestureRecognizers>
+                                                                                                                <TapGestureRecognizer Tapped="OnOpcionSeleccionadaTapped"/>
+                                                                                                        </Label.GestureRecognizers>
+                                                                                                </Label>
+                                                                                        </Grid>
+                                                                                        <Label Text="ANUAL"
+                                                                                                        FontFamily="Impact"
+                                                                                                        FontSize="16"
+                                                                                                        TextColor="White"
+                                                                                                        CharacterSpacing="0.8"
+                                                                                                        Padding="20,5"
+                                                                                                        HorizontalOptions="Fill">
+                                                                                                <Label.GestureRecognizers>
+                                                                                                        <TapGestureRecognizer Tapped="OnOpcionSeleccionadaTapped"/>
+                                                                                                </Label.GestureRecognizers>
+                                                                                        </Label>
+                                                                                </VerticalStackLayout>
+                                                                        </Border>
+                                                                </VerticalStackLayout>
                                                         </VerticalStackLayout>
 
-                                                        <!-- CAMPO 5: HORA DEL EVENTO -->
+                                                        <!-- CAMPO 5: HORA DEL EVENTO RECONSTRUIDO CON CORTE FÍSICO DE CAPAS -->
                                                         <VerticalStackLayout Spacing="4">
-                                                                <Border BackgroundColor="#222222"
+                                                                <Border BackgroundColor="Black"
                                                                         StrokeThickness="0"
                                                                         HorizontalOptions="Start"
                                                                         Padding="15,5">
@@ -463,19 +576,96 @@
                                                                                FontFamily="HelveticaNowDisplay-ExtraBold"
                                                                                FontAttributes="Bold"/>
                                                                 </Border>
-                                                                <TimePicker x:Name="PickerHora"
-                                                                            Format="HH:mm"
-                                                                            TextColor="Black"
-                                                                            FontFamily="HelveticaNowDisplay-ExtraBold"
-                                                                            FontAttributes="Bold"
-                                                                            FontSize="16"
-                                                                            BackgroundColor="Transparent"
-                                                                            HorizontalOptions="Start"
-                                                                            Margin="5,2,0,0"/>
+
+                                                                <!-- Contenedor blindado con IsClippedToBounds para que nada se desborde -->
+                                                                <Grid HeightRequest="120"
+                                                                      WidthRequest="240"
+                                                                      HorizontalOptions="Start"
+                                                                      Margin="5,10,0,10"
+                                                                      IsClippedToBounds="True">
+
+                                                                        <!-- VISOR CENTRAL ROJO FIJO DE 40PX -->
+                                                                        <BoxView BackgroundColor="#E31D26"
+                                                                                 HeightRequest="40"
+                                                                                 VerticalOptions="Center"/>
+
+                                                                        <!-- Cuadrícula con 3 filas simétricas de 40px -->
+                                                                        <Grid RowDefinitions="40, 40, 40"
+                                                                              ColumnDefinitions="*, Auto, *">
+
+                                                                                <!-- LISTA DE HORAS (Ocupa las 3 filas del contenedor) -->
+                                                                                <CollectionView x:Name="ListaHoras"
+                                                                                                Grid.Column="0"
+                                                                                                Grid.RowSpan="3"
+                                                                                                HeightRequest="120"
+                                                                                                SelectionMode="None"
+                                                                                                VerticalScrollBarVisibility="Never"
+                                                                                                Scrolled="OnRuedaScrolled">
+                                                                                        <CollectionView.ItemsLayout>
+                                                                                                <LinearItemsLayout Orientation="Vertical"
+                                                                                                                   SnapPointsType="MandatorySingle"
+                                                                                                                   SnapPointsAlignment="Center"/>
+                                                                                        </CollectionView.ItemsLayout>
+                                                                                        <CollectionView.ItemTemplate>
+                                                                                                <DataTemplate>
+                                                                                                        <!-- Forzado absoluto a 40px por número sin holguras -->
+                                                                                                        <Label Text="{Binding .}"
+                                                                                                               FontFamily="Impact"
+                                                                                                               FontSize="28"
+                                                                                                               TextColor="Black"
+                                                                                                               HorizontalTextAlignment="Center"
+                                                                                                               VerticalTextAlignment="Center"
+                                                                                                               HeightRequest="40"/>
+                                                                                                </DataTemplate>
+                                                                                        </CollectionView.ItemTemplate>
+                                                                                </CollectionView>
+
+                                                                                <!-- DOS PUNTOS PUNK (Fijados exclusivamente en la fila central) -->
+                                                                                <Label Grid.Column="1"
+                                                                                       Grid.Row="1"
+                                                                                       Text=":"
+                                                                                       FontFamily="Impact"
+                                                                                       FontSize="30"
+                                                                                       TextColor="Black"
+                                                                                       HorizontalTextAlignment="Center"
+                                                                                       VerticalTextAlignment="Center"
+                                                                                       Margin="5,0,5,5"/>
+
+                                                                                <!-- LISTA DE MINUTOS (Ocupa las 3 filas del contenedor) -->
+                                                                                <CollectionView x:Name="ListaMinutos"
+                                                                                                Grid.Column="2"
+                                                                                                Grid.RowSpan="3"
+                                                                                                HeightRequest="120"
+                                                                                                SelectionMode="None"
+                                                                                                VerticalScrollBarVisibility="Never"
+                                                                                                Scrolled="OnRuedaScrolled">
+                                                                                        <CollectionView.ItemsLayout>
+                                                                                                <LinearItemsLayout Orientation="Vertical"
+                                                                                                                   SnapPointsType="MandatorySingle"
+                                                                                                                   SnapPointsAlignment="Center"/>
+                                                                                        </CollectionView.ItemsLayout>
+                                                                                        <CollectionView.ItemTemplate>
+                                                                                                <DataTemplate>
+                                                                                                        <!-- Forzado absoluto a 40px por número sin holguras -->
+                                                                                                        <Label Text="{Binding .}"
+                                                                                                               FontFamily="Impact"
+                                                                                                               FontSize="28"
+                                                                                                               TextColor="Black"
+                                                                                                               HorizontalTextAlignment="Center"
+                                                                                                               VerticalTextAlignment="Center"
+                                                                                                               HeightRequest="40"/>
+                                                                                                </DataTemplate>
+                                                                                        </CollectionView.ItemTemplate>
+                                                                                </CollectionView>
+                                                                        </Grid>
+                                                                </Grid>
+
                                                                 <BoxView HeightRequest="2"
                                                                          BackgroundColor="Black"
                                                                          Opacity="0.8"/>
                                                         </VerticalStackLayout>
+
+
                                                         <!-- 🚨 CAMPO 6: SWITCH MODO EMBOSCADA ENMARCADO -->
                                                         <Border BackgroundColor="#0D0D0D"
                                                                 Stroke="#E31D26"
@@ -547,7 +737,8 @@
                                                       ColumnDefinitions="*, *"
                                                       ColumnSpacing="25">
                                                         <!-- BOTÓN: CREAR EVENTO -->
-                                                        <Grid Grid.Column="0"
+                                                        <Grid x:Name="BtnCrearEventoGrid"
+                                                              Grid.Column="0"
                                                               HeightRequest="50"
                                                               Rotation="-3.5">
                                                                 <Border BackgroundColor="Black"
@@ -577,20 +768,31 @@
                                                                         Clicked="OnGuardarClicked"
                                                                         HorizontalOptions="Fill"
                                                                         VerticalOptions="Fill"/>
+
+                                                                <!-- Detector de Hover por hardware para WinUI3 y Android -->
+                                                                <Grid.GestureRecognizers>
+                                                                        <PointerGestureRecognizer PointerEntered="OnBtnCrearMouseIn"
+                                                                                                  PointerExited="OnBtnCrearMouseOut"/>
+                                                                </Grid.GestureRecognizers>
                                                         </Grid>
 
-                                                        <!-- BOTÓN: ABORTAR -->
-                                                        <Grid Grid.Column="1"
+                                                        <!-- BOTÓN: ABORTAR (ESTRUCTURA DE BORDE ÚNICO EN SIMETRÍA CRUDA) -->
+                                                        <Grid x:Name="BtnAbortarGrid"
+                                                              Grid.Column="1"
                                                               HeightRequest="50"
                                                               Rotation="3">
+
+                                                                <!-- 🎨 UNICO CONTENEDOR: Caja blanca con un solo borde negro grueso exterior -->
                                                                 <Border BackgroundColor="White"
                                                                         Stroke="Black"
-                                                                        StrokeThickness="2"
+                                                                        StrokeThickness="2.5"
                                                                         InputTransparent="True">
                                                                         <Border.StrokeShape>
                                                                                 <RoundRectangle CornerRadius="0"/>
                                                                         </Border.StrokeShape>
                                                                 </Border>
+
+                                                                <!-- CUERPO DE TEXTOS DUOTONO ORIGINALES -->
                                                                 <Grid HorizontalOptions="Center"
                                                                       VerticalOptions="Center"
                                                                       InputTransparent="True">
@@ -607,11 +809,19 @@
                                                                                FontFamily="HelveticaNowDisplay-ExtraBold"
                                                                                FontAttributes="Bold, Italic"/>
                                                                 </Grid>
+
                                                                 <Button BackgroundColor="Transparent"
                                                                         Clicked="OnCancelarClicked"
                                                                         HorizontalOptions="Fill"
                                                                         VerticalOptions="Fill"/>
+
+                                                                <!-- Detector de Hover por hardware para WinUI3 y Android -->
+                                                                <Grid.GestureRecognizers>
+                                                                        <PointerGestureRecognizer PointerEntered="OnBtnAbortarMouseIn"
+                                                                                                  PointerExited="OnBtnAbortarMouseOut"/>
+                                                                </Grid.GestureRecognizers>
                                                         </Grid>
+
                                                 </Grid>
 
                                         </Grid>

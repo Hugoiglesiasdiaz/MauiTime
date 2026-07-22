@@ -1,9 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Maui.Controls;
 using MauiTime.Models;
 using MauiTime.Services;
-using static MauiTime.Models.Evento; // Mapeo de tus Enums auténticos
+using static MauiTime.Models.Evento;
 
 namespace MauiTime.Views
 {
@@ -13,6 +16,18 @@ namespace MauiTime.Views
         private DateTime _fechaSeleccionada;
         private DateTime _mesVisualizado;
 
+        // Búferes de desplazamiento fluidos para las horas
+        private double _scrollXHoras = 0;
+        private double _scrollXMinutos = 0;
+
+        private CancellationTokenSource? _ctsHoras;
+        private CancellationTokenSource? _ctsMinutos;
+
+        // ⚔️ SISTEMA DE DESPLEGABLE INTERNO: Opciones y control de estado
+        private readonly List<string> _opcionesFrecuencia = new() { "NINGUNA", "DIARIO", "SEMANAL", "MENSUAL", "ANUAL" };
+        private int _indiceFrecuenciaActual = 0;
+        private bool _desplegableAbierto = false;
+
         public NuevaTareaPopup(DateTime fechaInicial, DatabaseService dbService)
         {
             InitializeComponent();
@@ -21,17 +36,150 @@ namespace MauiTime.Views
             _fechaSeleccionada = DateTime.Now.Date;
             _mesVisualizado = new DateTime(_fechaSeleccionada.Year, _fechaSeleccionada.Month, 1);
 
-            // 1. Inicializamos el selector de fecha en el día actual del sistema
             PickerFecha.Date = _fechaSeleccionada;
-
-            // 2. Seteamos por defecto la hora actual del sistema en formato limpio
-            PickerHora.Time = DateTime.Now.TimeOfDay;
-
-            PickerFrecuencia.SelectedIndex = 0; // "Ninguna" por defecto
             LabelFecha.Text = $"NUEVO OBJETIVO: {fechaInicial:dd / MM / yyyy}";
 
+            // Inicializamos el texto del campo select y ocultamos el menú de opciones
+            LabelFrecuenciaCustom.Text = _opcionesFrecuencia[_indiceFrecuenciaActual];
+            ContenedorOpcionesDrop.IsVisible = false;
+
+            CargarRuedasPersonalizadas();
             ActualizarCabeceraMes();
             ConstruirCuadriculaCalendario();
+        }
+
+        private async void OnFrecuenciaHeaderTapped(object? sender, TappedEventArgs e)
+        {
+            _desplegableAbierto = !_desplegableAbierto;
+
+            if (_desplegableAbierto)
+            {
+                // Mostramos el panel y hacemos que brote expandiendo su escala vertical
+                ContenedorOpcionesDrop.IsVisible = true;
+                ContenedorOpcionesDrop.Opacity = 0;
+                ContenedorOpcionesDrop.ScaleY = 0;
+                ContenedorOpcionesDrop.AnchorY = 0; // El eje de expansión es la parte superior
+
+                await Task.WhenAll(
+                    ContenedorOpcionesDrop.FadeToAsync(1, 120, Easing.CubicOut),
+                    ContenedorOpcionesDrop.ScaleYToAsync(1, 180, Easing.SpringOut),
+                    IndicadorAngulo.RotateToAsync(180, 120, Easing.CubicOut)
+                );
+            }
+            else
+            {
+                // Contracción fluida de la persiana
+                await Task.WhenAll(
+                    ContenedorOpcionesDrop.FadeToAsync(0, 100, Easing.CubicIn),
+                    ContenedorOpcionesDrop.ScaleYToAsync(0, 100, Easing.CubicIn),
+                    IndicadorAngulo.RotateToAsync(0, 100, Easing.CubicIn)
+                );
+                ContenedorOpcionesDrop.IsVisible = false;
+            }
+        }
+
+        private async void OnOpcionSeleccionadaTapped(object? sender, TappedEventArgs e)
+        {
+            if (sender is Label etiquetaOpcion)
+            {
+                string textoElegido = etiquetaOpcion.Text;
+                _indiceFrecuenciaActual = _opcionesFrecuencia.IndexOf(textoElegido);
+                LabelFrecuenciaCustom.Text = textoElegido;
+
+                // Forzamos el cierre del desplegable tras la selección
+                _desplegableAbierto = false;
+                await Task.WhenAll(
+                    ContenedorOpcionesDrop.FadeToAsync(0, 90, Easing.CubicIn),
+                    ContenedorOpcionesDrop.ScaleYToAsync(0, 90, Easing.CubicIn),
+                    IndicadorAngulo.RotateToAsync(0, 90, Easing.CubicIn)
+                );
+                ContenedorOpcionesDrop.IsVisible = false;
+            }
+        }
+
+        private void CargarRuedasPersonalizadas()
+        {
+            var horas = new List<string>();
+            for (int ciclo = 0; ciclo < 50; ciclo++)
+            {
+                for (int i = 0; i < 24; i++) horas.Add(i.ToString("D2"));
+            }
+
+            var minutos = new List<string>();
+            for (int ciclo = 0; ciclo < 50; ciclo++)
+            {
+                for (int i = 0; i < 60; i++) minutos.Add(i.ToString("D2"));
+            }
+
+            ListaHoras.ItemsSource = horas;
+            ListaMinutos.ItemsSource = minutos;
+
+            var horaActual = DateTime.Now;
+
+            Dispatcher.Dispatch(() =>
+            {
+                int puntoMedioHoras = (25 * 24) + horaActual.Hour;
+                int puntoMedioMinutos = (25 * 60) + horaActual.Minute;
+
+                ListaHoras.ScrollTo(puntoMedioHoras, position: ScrollToPosition.Center, animate: false);
+                ListaMinutos.ScrollTo(puntoMedioMinutos, position: ScrollToPosition.Center, animate: false);
+            });
+        }
+
+        public TimeSpan ObtenerHoraSeleccionada()
+        {
+            try
+            {
+                int indiceHora = (int)Math.Round(_scrollXHoras / 40.0);
+                int indiceMinuto = (int)Math.Round(_scrollXMinutos / 40.0);
+
+                int hora = (indiceHora % 24 + 24) % 24;
+                int minuto = (indiceMinuto % 60 + 60) % 60;
+
+                return new TimeSpan(hora, minuto, 0);
+            }
+            catch
+            {
+                return DateTime.Now.TimeOfDay;
+            }
+        }
+
+        private void OnRuedaScrolled(object? sender, ItemsViewScrolledEventArgs e)
+        {
+            if (sender == ListaHoras)
+            {
+                _scrollXHoras = e.VerticalOffset;
+                _ctsHoras?.Cancel();
+                _ctsHoras = new CancellationTokenSource();
+                var token = _ctsHoras.Token;
+
+                Task.Delay(90, token).ContinueWith(t =>
+                {
+                    if (t.IsCanceled) return;
+                    Dispatcher.Dispatch(() =>
+                    {
+                        int indiceObjetivo = (int)Math.Round(_scrollXHoras / 40.0);
+                        ListaHoras.ScrollTo(indiceObjetivo, position: ScrollToPosition.Center, animate: true);
+                    });
+                }, token);
+            }
+            else if (sender == ListaMinutos)
+            {
+                _scrollXMinutos = e.VerticalOffset;
+                _ctsMinutos?.Cancel();
+                _ctsMinutos = new CancellationTokenSource();
+                var token = _ctsMinutos.Token;
+
+                Task.Delay(90, token).ContinueWith(t =>
+                {
+                    if (t.IsCanceled) return;
+                    Dispatcher.Dispatch(() =>
+                    {
+                        int indiceObjetivo = (int)Math.Round(_scrollXMinutos / 40.0);
+                        ListaMinutos.ScrollTo(indiceObjetivo, position: ScrollToPosition.Center, animate: true);
+                    });
+                }, token);
+            }
         }
 
         private void ActualizarCabeceraMes()
@@ -40,7 +188,6 @@ namespace MauiTime.Views
             string mesTexto = _mesVisualizado.ToString("MMMM", culturaEsp).ToUpperInvariant();
             LabelMesAno.Text = $"{mesTexto} DE {_mesVisualizado.Year}";
         }
-
         private void ConstruirCuadriculaCalendario()
         {
             GridDiasCalendario.Children.Clear();
@@ -121,7 +268,7 @@ namespace MauiTime.Views
             ConstruirCuadriculaCalendario();
         }
 
-        private async void OnDiaCalendarioClicked(object? sender, EventArgs e)
+        private void OnDiaCalendarioClicked(object? sender, EventArgs e)
         {
             if (sender is Microsoft.Maui.Controls.Button boton && boton.BindingContext is DateTime fecha)
             {
@@ -139,26 +286,22 @@ namespace MauiTime.Views
                 await this.ScaleToAsync(0.95, 120, Microsoft.Maui.Easing.SpringOut);
                 await this.ScaleToAsync(1.0, 180, Microsoft.Maui.Easing.BounceOut);
             }
-            catch { /* Animaciones no críticas, fail-safe */ }
+            catch { /* Animaciones fail-safe */ }
 
             await Navigation.PopModalAsync(true);
         }
 
-        // 💡 SOLUCIÓN: Cambiamos 'object sender' a 'object? sender' para limpiar el warning CS8622
         private async void OnGuardarClicked(object? sender, EventArgs e)
         {
-            // Validación ágil de campo obligatorio
             if (string.IsNullOrWhiteSpace(EntryTitulo.Text))
             {
                 await DisplayAlertAsync("ALERTA", "El evento requiere un título obligatorio.", "ENTENDIDO");
                 return;
             }
 
-            // 🛡️ CORRECCIÓN: Quitados los ?? null ya que Date y Time en MAUI nunca son nulos
-            TimeSpan horaSeleccionada = PickerHora.Time.GetValueOrDefault();
-            DateTime fechaDatePicker = PickerFecha.Date.GetValueOrDefault();
+            TimeSpan horaSeleccionada = ObtenerHoraSeleccionada();
+            DateTime fechaDatePicker = PickerFecha.Date.GetValueOrDefault(DateTime.Now.Date);
 
-            // Construimos la fecha pura elegida por el usuario en el formulario
             DateTime fechaHoraFinal = new DateTime(
                 fechaDatePicker.Year,
                 fechaDatePicker.Month,
@@ -168,42 +311,32 @@ namespace MauiTime.Views
                 0
             );
 
-            string seleccionTexto = PickerFrecuencia.SelectedItem?.ToString() ?? "Ninguna";
+            // EXTRAEMOS LA SELECCIÓN DIRECTA DEL ÍNDICE DEL DROPDOWN INTERNO
+            string seleccionTexto = _opcionesFrecuencia[_indiceFrecuenciaActual];
             FrecuenciaEvento frecuenciaEnum = seleccionTexto switch
             {
-                "Diario" => FrecuenciaEvento.Diario,
-                "Semanal" => FrecuenciaEvento.Semanal,
-                "Mensual" => FrecuenciaEvento.Mensual,
-                "Anual" => FrecuenciaEvento.Anual,
+                "DIARIO" => FrecuenciaEvento.Diario,
+                "SEMANAL" => FrecuenciaEvento.Semanal,
+                "MENSUAL" => FrecuenciaEvento.Mensual,
+                "ANUAL" => FrecuenciaEvento.Anual,
                 _ => FrecuenciaEvento.Ninguna
             };
 
-            // Creamos el objeto con los datos limpios en frío y estética mayúsculas
             var nuevoEvento = new Evento
             {
                 Titulo = EntryTitulo.Text.Trim().ToUpper(),
                 Descripcion = EditorDescripcion.Text?.Trim() ?? "SIN DETALLES ADICIONALES.",
                 FechaHora = fechaHoraFinal,
                 Frecuencia = frecuenciaEnum,
-                DuracionAvisoTicks = TimeSpan.Zero.Ticks, // Suena a la hora exacta elegida
-
-                // 🎯 INYECTA ESTA NUEVA LÍNEA: Conecta el objeto con el interruptor del formulario
+                DuracionAvisoTicks = TimeSpan.Zero.Ticks,
                 EsAlarmaAgresiva = SwitchAlarmaAgresiva.IsToggled
             };
 
-
-            // 1. Calculas la fecha correcta en memoria pasándola al futuro de ser necesario
             nuevoEvento.CalcularProximoAviso();
-
-            // 2. ⚡ CRÍTICO: Lo grabas físicamente en la base de datos de SQLite
             await _dbService.GuardarEventoAsync(nuevoEvento);
 
-            // =========================================================================
-            // 🎯 NUEVO REQUISITO: INYECCIÓN DE ALERTA EN ANDROID Y WINDOWS
-            // =========================================================================
             try
             {
-                // Instanciamos el servicio y agendamos la notificación de forma asíncrona
                 var notifier = new MauiTime.Services.NotificationService();
                 await notifier.ProgramarRecordatorio(nuevoEvento);
             }
@@ -212,18 +345,69 @@ namespace MauiTime.Views
                 System.Diagnostics.Debug.WriteLine($"[NOTIFICACIÓN POPUP ERROR] {ex.Message}");
             }
 
-            // Cerramos la vista modal limpiamente
             await Navigation.PopModalAsync();
         }
 
-
-
-        // 💡 SOLUCIÓN: Cambiamos 'object sender' a 'object? sender'
         private async void OnCancelarClicked(object? sender, EventArgs e)
         {
             await Navigation.PopModalAsync();
         }
 
+        private void OnBtnCrearMouseIn(object? sender, Microsoft.Maui.Controls.PointerEventArgs e)
+        {
+            if (BtnCrearEventoGrid == null) return;
+            try
+            {
+                BtnCrearEventoGrid.CancelAnimations();
+                _ = Task.WhenAll(
+                    BtnCrearEventoGrid.ScaleToAsync(1.12, 180, Easing.SpringOut),
+                    BtnCrearEventoGrid.RotateToAsync(-7, 180, Easing.SpringOut)
+                );
+            }
+            catch { }
+        }
+
+        private void OnBtnCrearMouseOut(object? sender, Microsoft.Maui.Controls.PointerEventArgs e)
+        {
+            if (BtnCrearEventoGrid == null) return;
+            try
+            {
+                BtnCrearEventoGrid.CancelAnimations();
+                _ = Task.WhenAll(
+                    BtnCrearEventoGrid.ScaleToAsync(1.0, 140, Easing.CubicIn),
+                    BtnCrearEventoGrid.RotateToAsync(-3.5, 140, Easing.CubicIn)
+                );
+            }
+            catch { }
+        }
+
+        private void OnBtnAbortarMouseIn(object? sender, Microsoft.Maui.Controls.PointerEventArgs e)
+        {
+            if (BtnAbortarGrid == null) return;
+            try
+            {
+                BtnAbortarGrid.CancelAnimations();
+                _ = Task.WhenAll(
+                    BtnAbortarGrid.ScaleToAsync(1.12, 180, Easing.SpringOut),
+                    BtnAbortarGrid.RotateToAsync(6, 180, Easing.SpringOut)
+                );
+            }
+            catch { }
+        }
+
+        private void OnBtnAbortarMouseOut(object? sender, Microsoft.Maui.Controls.PointerEventArgs e)
+        {
+            if (BtnAbortarGrid == null) return;
+            try
+            {
+                BtnAbortarGrid.CancelAnimations();
+                _ = Task.WhenAll(
+                    BtnAbortarGrid.ScaleToAsync(1.0, 140, Easing.CubicIn),
+                    BtnAbortarGrid.RotateToAsync(3, 140, Easing.CubicIn)
+                );
+            }
+            catch { }
+        }
 
     }
 }
