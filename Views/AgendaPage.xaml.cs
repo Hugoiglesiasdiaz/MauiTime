@@ -592,5 +592,62 @@ public partial class AgendaPage : ContentPage
         );
     }
 
+    // =======================================================================
+    // 🎸 ANIMACIONES HOVER ASÍNCRONAS PARA EL BOTÓN "BORRAR"
+    // =======================================================================
+    private async void OnBtnBorrarMouseIn(object? sender, Microsoft.Maui.Controls.PointerEventArgs e)
+    {
+        if (BtnBorrarGrid == null) return;
+
+        BtnBorrarGrid.CancelAnimations();
+
+        // Latigazo elástico: se infla un 12% y se inclina a -6 grados (hacia la izquierda)
+        await Task.WhenAll(
+            BtnBorrarGrid.ScaleToAsync(1.12, 180, Easing.SpringOut),
+            BtnBorrarGrid.RotateToAsync(-6, 180, Easing.SpringOut)
+        );
+    }
+
+    private async void OnBtnBorrarMouseOut(object? sender, Microsoft.Maui.Controls.PointerEventArgs e)
+    {
+        if (BtnBorrarGrid == null) return;
+
+        BtnBorrarGrid.CancelAnimations();
+
+        // Retorno limpio al tamaño y rotación originales (Escala 1, Rotación 0)
+        await Task.WhenAll(
+            BtnBorrarGrid.ScaleToAsync(1.0, 140, Easing.CubicIn),
+            BtnBorrarGrid.RotateToAsync(0, 140, Easing.CubicIn)
+        );
+    }
+
+    // =======================================================================
+    // 🎸 ANIMACIONES HOVER ASÍNCRONAS PARA EL BOTÓN "ABORTAR"
+    // =======================================================================
+    private async void OnBtnAbortarMouseIn(object? sender, Microsoft.Maui.Controls.PointerEventArgs e)
+    {
+        if (BtnAbortarGrid == null) return;
+
+        BtnAbortarGrid.CancelAnimations();
+
+        // Latigazo elástico: se infla un 12% y se inclina a 6 grados (hacia la derecha)
+        await Task.WhenAll(
+            BtnAbortarGrid.ScaleToAsync(1.12, 180, Easing.SpringOut),
+            BtnAbortarGrid.RotateToAsync(6, 180, Easing.SpringOut)
+        );
+    }
+
+    private async void OnBtnAbortarMouseOut(object? sender, Microsoft.Maui.Controls.PointerEventArgs e)
+    {
+        if (BtnAbortarGrid == null) return;
+
+        BtnAbortarGrid.CancelAnimations();
+
+        // Retorno limpio al tamaño y rotación originales
+        await Task.WhenAll(
+            BtnAbortarGrid.ScaleToAsync(1.0, 140, Easing.CubicIn),
+            BtnAbortarGrid.RotateToAsync(0, 140, Easing.CubicIn)
+        );
+    }
 
 }

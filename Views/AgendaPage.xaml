@@ -520,13 +520,13 @@
                           Rotation="15"
                           Margin="0,0,10,0">
                         <Path Data="M 7,0 L 14,7 L 7,14 L 0,7 Z"
-                                Fill="#E31D26"/>
+                              Fill="#E31D26"/>
                         <Path Data="M 7,0 L 14,7 L 7,14 L 0,7 Z"
-                                Stroke="White"
-                                StrokeThickness="1"/>
+                              Stroke="White"
+                              StrokeThickness="1"/>
                         <Path Data="M 7,3 L 7,11 M 3,7 L 11,7"
-                                Stroke="White"
-                                StrokeThickness="1.5"/>
+                              Stroke="White"
+                              StrokeThickness="1.5"/>
                     </Grid>
 
                     <!-- TEXTO SÓLIDO MAXIMIZADO CON SUAVIZADO ÓPTICO -->
@@ -630,11 +630,15 @@
                                 <!-- ============================================================ -->
                                 <!-- BOTÓN ACCIÓN: BORRAR (Tarjeta Negra con Sombra de Texto Roja) -->
                                 <!-- ============================================================ -->
-                                <!-- 💡 MEJORA: El detector se pone en el Grid Padre para que NUNCA deje de funcionar -->
-                                <Grid Grid.Column="0"
+                                <!-- 🚀 ASIGNADO: x:Name="BtnBorrarGrid" para que se anime por C# -->
+                                <Grid x:Name="BtnBorrarGrid"
+                                      Grid.Column="0"
                                       HeightRequest="44">
                                     <Grid.GestureRecognizers>
                                         <TapGestureRecognizer Tapped="OnConfirmarBorradoPunkClicked"/>
+                                        <!-- 💻 CAPTURA DEL PUNTERO DEL RATÓN -->
+                                        <PointerGestureRecognizer PointerEntered="OnBtnBorrarMouseIn"
+                                                                  PointerExited="OnBtnBorrarMouseOut"/>
                                     </Grid.GestureRecognizers>
 
                                     <!-- Fondo visual del botón -->
@@ -670,11 +674,15 @@
                                 <!-- ============================================================ -->
                                 <!-- BOTÓN ABORTAR: VUELTA ATRÁS (Tarjeta Blanca con Borde Negro Duro) -->
                                 <!-- ============================================================ -->
-                                <!-- 💡 MEJORA: El detector se pone en el Grid Padre para que NUNCA deje de funcionar -->
-                                <Grid Grid.Column="1"
+                                <!-- 🚀 ASIGNADO: x:Name="BtnAbortarGrid" para que se anime por C# -->
+                                <Grid x:Name="BtnAbortarGrid"
+                                      Grid.Column="1"
                                       HeightRequest="44">
                                     <Grid.GestureRecognizers>
                                         <TapGestureRecognizer Tapped="OnCancelarBorradoPunkClicked"/>
+                                        <!-- 💻 CAPTURA DEL PUNTERO DEL RATÓN -->
+                                        <PointerGestureRecognizer PointerEntered="OnBtnAbortarMouseIn"
+                                                                  PointerExited="OnBtnAbortarMouseOut"/>
                                     </Grid.GestureRecognizers>
 
                                     <!-- Fondo visual del botón con contorno negro nítido -->
@@ -709,6 +717,7 @@
                                 </Grid>
 
                             </Grid>
+
 
 
                         </Grid>

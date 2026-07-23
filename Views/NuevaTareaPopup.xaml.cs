@@ -43,6 +43,7 @@ namespace MauiTime.Views
             LabelFrecuenciaCustom.Text = _opcionesFrecuencia[_indiceFrecuenciaActual];
             ContenedorOpcionesDrop.IsVisible = false;
 
+            // Cargamos y posicionamos en frío (los eventos están desconectados)
             CargarRuedasPersonalizadas();
             ActualizarCabeceraMes();
             ConstruirCuadriculaCalendario();
@@ -386,8 +387,6 @@ namespace MauiTime.Views
             }
         }
 
-
-
         private async void OnCancelarClicked(object? sender, EventArgs e)
         {
             if (ContenedorPrincipal != null)
@@ -459,7 +458,6 @@ namespace MauiTime.Views
             catch { }
         }
 
-
         protected override async void OnAppearing()
         {
             base.OnAppearing();
@@ -478,8 +476,12 @@ namespace MauiTime.Views
                     ContenedorPrincipal.TranslateToAsync(0, 0, 450, Easing.SpringOut)
                 );
             }
+
+            // 🚀 EL DETALLE MAESTRO: Conectamos los escuchadores del scroll por código 
+            // únicamente cuando la hoja ha terminado de subir y rebotar de forma elástica.
+            ListaHoras.Scrolled += OnRuedaScrolled;
+            ListaMinutos.Scrolled += OnRuedaScrolled;
         }
 
     }
-
 }

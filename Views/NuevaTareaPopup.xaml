@@ -601,12 +601,11 @@
                                                                                                 Grid.RowSpan="3"
                                                                                                 HeightRequest="120"
                                                                                                 SelectionMode="None"
-                                                                                                VerticalScrollBarVisibility="Never"
-                                                                                                Scrolled="OnRuedaScrolled">
+                                                                                                VerticalScrollBarVisibility="Never">
                                                                                         <CollectionView.ItemsLayout>
+                                                                                                <!-- Eliminados los SnapPoints nativos para evitar conflictos de bucle -->
                                                                                                 <LinearItemsLayout Orientation="Vertical"
-                                                                                                                   SnapPointsType="MandatorySingle"
-                                                                                                                   SnapPointsAlignment="Center"/>
+                                                                                                                ItemSpacing="0"/>
                                                                                         </CollectionView.ItemsLayout>
                                                                                         <CollectionView.ItemTemplate>
                                                                                                 <DataTemplate>
@@ -639,12 +638,11 @@
                                                                                                 Grid.RowSpan="3"
                                                                                                 HeightRequest="120"
                                                                                                 SelectionMode="None"
-                                                                                                VerticalScrollBarVisibility="Never"
-                                                                                                Scrolled="OnRuedaScrolled">
+                                                                                                VerticalScrollBarVisibility="Never">
                                                                                         <CollectionView.ItemsLayout>
+                                                                                                <!-- Eliminados los SnapPoints nativos para evitar conflictos de bucle -->
                                                                                                 <LinearItemsLayout Orientation="Vertical"
-                                                                                                                   SnapPointsType="MandatorySingle"
-                                                                                                                   SnapPointsAlignment="Center"/>
+                                                                                                                ItemSpacing="0"/>
                                                                                         </CollectionView.ItemsLayout>
                                                                                         <CollectionView.ItemTemplate>
                                                                                                 <DataTemplate>
@@ -659,6 +657,7 @@
                                                                                                 </DataTemplate>
                                                                                         </CollectionView.ItemTemplate>
                                                                                 </CollectionView>
+
                                                                         </Grid>
                                                                 </Grid>
 
