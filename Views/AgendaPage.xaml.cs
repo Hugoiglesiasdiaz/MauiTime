@@ -564,33 +564,33 @@ public partial class AgendaPage : ContentPage
     }
 
     private async void OnBtnInfiltracionMouseIn(object? sender, Microsoft.Maui.Controls.PointerEventArgs e)
-{
-    if (BtnInfiltracion == null) return;
+    {
+        if (BtnInfiltracion == null) return;
 
-    // Cancelamos cualquier inercia gráfica previa en la GPU
-    BtnInfiltracion.CancelAnimations();
+        // Cancelamos cualquier inercia gráfica previa en la GPU
+        BtnInfiltracion.CancelAnimations();
 
-    // 🚀 EFECTO INFLADO EMBOSCADA: Se estira al 112% y se tuerce más en diagonal (4 a 7 grados)
-    // Usamos SpringOut para que dé ese pequeño brinco o latigazo elástico al llegar al tope
-    await Task.WhenAll(
-        BtnInfiltracion.ScaleToAsync(1.12, 180, Easing.SpringOut),
-        BtnInfiltracion.RotateToAsync(7, 180, Easing.SpringOut)
-    );
-}
+        // 🚀 EFECTO INFLADO EMBOSCADA: Se estira al 112% y se tuerce más en diagonal (4 a 7 grados)
+        // Usamos SpringOut para que dé ese pequeño brinco o latigazo elástico al llegar al tope
+        await Task.WhenAll(
+            BtnInfiltracion.ScaleToAsync(1.12, 180, Easing.SpringOut),
+            BtnInfiltracion.RotateToAsync(7, 180, Easing.SpringOut)
+        );
+    }
 
-private async void OnBtnInfiltracionMouseOut(object? sender, Microsoft.Maui.Controls.PointerEventArgs e)
-{
-    if (BtnInfiltracion == null) return;
+    private async void OnBtnInfiltracionMouseOut(object? sender, Microsoft.Maui.Controls.PointerEventArgs e)
+    {
+        if (BtnInfiltracion == null) return;
 
-    // Cancelamos hilos de animación latentes
-    BtnInfiltracion.CancelAnimations();
+        // Cancelamos hilos de animación latentes
+        BtnInfiltracion.CancelAnimations();
 
-    // Regresa de forma fluida y limpia a sus valores exactos definidos en el XAML original (Scale 1.0, Rotation 4)
-    await Task.WhenAll(
-        BtnInfiltracion.ScaleToAsync(1.0, 140, Easing.CubicIn),
-        BtnInfiltracion.RotateToAsync(4, 140, Easing.CubicIn)
-    );
-}
+        // Regresa de forma fluida y limpia a sus valores exactos definidos en el XAML original (Scale 1.0, Rotation 4)
+        await Task.WhenAll(
+            BtnInfiltracion.ScaleToAsync(1.0, 140, Easing.CubicIn),
+            BtnInfiltracion.RotateToAsync(4, 140, Easing.CubicIn)
+        );
+    }
 
 
 }

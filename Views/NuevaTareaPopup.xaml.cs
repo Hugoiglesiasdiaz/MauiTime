@@ -345,13 +345,63 @@ namespace MauiTime.Views
                 System.Diagnostics.Debug.WriteLine($"[NOTIFICACIÓN POPUP ERROR] {ex.Message}");
             }
 
-            await Navigation.PopModalAsync();
+            // --- 🎬 SECUENCIA DE ANIMACIÓN: IMPACTO DE TU NUEVO SELLO (selloEvento) ---
+            if (selloEvento != null && ContenedorPrincipal != null)
+            {
+                // Forzamos al nuevo escudo a tomar la prioridad visual máxima de la pantalla
+                selloEvento.ZIndex = 999;
+
+                // 1. El escudo de MAUITIME cae gigante golpeando y rotando elásticamente
+                await Task.WhenAll(
+                    selloEvento.FadeToAsync(1, 150, Easing.CubicOut),
+                    selloEvento.ScaleToAsync(1.0, 220, Easing.SpringOut),
+                    selloEvento.RotateToAsync(-12, 220, Easing.SpringOut)
+                );
+
+                // 2. Pausa dramática: Mantenemos el documento quieto con el escudo plasmado
+                await Task.Delay(450);
+
+                // 3. Deslizamiento continuo hacia abajo del documento entero
+                await Task.WhenAll(
+                    ContenedorPrincipal.FadeToAsync(0, 250, Easing.CubicIn),
+                    ContenedorPrincipal.TranslateToAsync(0, 500, 250, Easing.CubicIn)
+                );
+            }
+            else
+            {
+                // Fallback de seguridad por si los componentes visuales no estuvieran listos
+                if (ContenedorPrincipal != null)
+                {
+                    await ContenedorPrincipal.TranslateToAsync(0, 400, 150, Easing.CubicIn);
+                }
+            }
+
+            // Cerramos el modal cancelando la transición por defecto del sistema operativo
+            await Navigation.PopModalAsync(false);
+
+            // --- RESTAURACIÓN FLUIDA DE LA OPACIDAD DE LA AGENDA PAGE ---
+            if (this.Window?.Page is NavigationPage navPage && navPage.CurrentPage is Page agendaPage)
+            {
+                await agendaPage.FadeToAsync(1.0, 200, Easing.CubicOut);
+            }
         }
+
+
 
         private async void OnCancelarClicked(object? sender, EventArgs e)
         {
-            await Navigation.PopModalAsync();
+            if (ContenedorPrincipal != null)
+            {
+                // Animación de salida hacia abajo y desvanecimiento
+                await Task.WhenAll(
+                    ContenedorPrincipal.FadeToAsync(0, 250, Easing.CubicIn),
+                    ContenedorPrincipal.TranslateToAsync(0, 300, 250, Easing.CubicIn)
+                );
+            }
+
+            await Navigation.PopModalAsync(false); // 'false' para deshabilitar la transición nativa y usar la nuestra
         }
+
 
         private void OnBtnCrearMouseIn(object? sender, Microsoft.Maui.Controls.PointerEventArgs e)
         {
@@ -409,5 +459,27 @@ namespace MauiTime.Views
             catch { }
         }
 
+
+        protected override async void OnAppearing()
+        {
+            base.OnAppearing();
+
+            // Esperamos un instante mínimo para asegurar que el motor gráfico de MAUI está listo
+            await Task.Delay(50);
+
+            if (ContenedorPrincipal != null)
+            {
+                // Cancelamos cualquier animación previa por seguridad
+                ContenedorPrincipal.CancelAnimations();
+
+                // Subida fluida con efecto elástico y desvanecimiento simultáneo
+                await Task.WhenAll(
+                    ContenedorPrincipal.FadeToAsync(1, 400, Easing.CubicOut),
+                    ContenedorPrincipal.TranslateToAsync(0, 0, 450, Easing.SpringOut)
+                );
+            }
+        }
+
     }
+
 }

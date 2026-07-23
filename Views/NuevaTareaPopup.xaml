@@ -6,7 +6,9 @@
              BackgroundColor="#0D0D0D">
 
         <!-- Canvas Maestro de Capas Gráficas -->
-        <Grid>
+        <Grid x:Name="ContenedorPrincipal"
+              Opacity="0"
+              TranslationY="400">
                 <!-- ======================================================================= -->
                 <!-- 🎸 DECORACIÓN DEL FONDO GENERAL RECALIBRADA                             -->
                 <!-- ======================================================================= -->
@@ -423,8 +425,8 @@
                                                                                         <RoundRectangle CornerRadius="0"/>
                                                                                 </Border.StrokeShape>
                                                                                 <Label Text="FRECUENCIA DEL EVENTO"
-                                                                                                FontSize="11.5"
-                                                                                                FontFamily="HelveticaNowDisplay-ExtraBold"/>
+                                                                                       FontSize="11.5"
+                                                                                       FontFamily="HelveticaNowDisplay-ExtraBold"/>
                                                                         </Border>
                                                                         <Border BackgroundColor="Black"
                                                                                 StrokeThickness="0"
@@ -434,10 +436,10 @@
                                                                                         <RoundRectangle CornerRadius="0"/>
                                                                                 </Border.StrokeShape>
                                                                                 <Label Text="FRECUENCIA DEL EVENTO"
-                                                                                                TextColor="White"
-                                                                                                FontSize="11.5"
-                                                                                                FontFamily="HelveticaNowDisplay-ExtraBold"
-                                                                                                FontAttributes="Bold"/>
+                                                                                       TextColor="White"
+                                                                                       FontSize="11.5"
+                                                                                       FontFamily="HelveticaNowDisplay-ExtraBold"
+                                                                                       FontAttributes="Bold"/>
                                                                         </Border>
                                                                 </Grid>
 
@@ -455,22 +457,22 @@
                                                                                 </Border.StrokeShape>
 
                                                                                 <Grid ColumnDefinitions="*, Auto"
-                                                                                                Padding="15,0,12,0">
+                                                                                      Padding="15,0,12,0">
                                                                                         <Label x:Name="LabelFrecuenciaCustom"
-                                                                                                        Grid.Column="0"
-                                                                                                        Text="NINGUNA"
-                                                                                                        TextColor="White"
-                                                                                                        FontFamily="Impact"
-                                                                                                        FontSize="18"
-                                                                                                        CharacterSpacing="1"
-                                                                                                        VerticalOptions="Center"/>
+                                                                                               Grid.Column="0"
+                                                                                               Text="NINGUNA"
+                                                                                               TextColor="White"
+                                                                                               FontFamily="Impact"
+                                                                                               FontSize="18"
+                                                                                               CharacterSpacing="1"
+                                                                                               VerticalOptions="Center"/>
                                                                                         <Label x:Name="IndicadorAngulo"
-                                                                                                        Grid.Column="1"
-                                                                                                        Text="◢"
-                                                                                                        TextColor="#E31D26"
-                                                                                                        FontSize="14"
-                                                                                                        VerticalOptions="Center"
-                                                                                                        Margin="0,4,0,0"/>
+                                                                                               Grid.Column="1"
+                                                                                               Text="◢"
+                                                                                               TextColor="#E31D26"
+                                                                                               FontSize="14"
+                                                                                               VerticalOptions="Center"
+                                                                                               Margin="0,4,0,0"/>
                                                                                 </Grid>
                                                                                 <Border.GestureRecognizers>
                                                                                         <TapGestureRecognizer Tapped="OnFrecuenciaHeaderTapped"/>
@@ -488,70 +490,70 @@
                                                                                 </Border.StrokeShape>
 
                                                                                 <VerticalStackLayout Spacing="6"
-                                                                                                Padding="0,15,0,20">
+                                                                                                     Padding="0,15,0,20">
                                                                                         <Label Text="NINGUNA"
-                                                                                                        FontFamily="Impact"
-                                                                                                        FontSize="16"
-                                                                                                        TextColor="White"
-                                                                                                        CharacterSpacing="0.8"
-                                                                                                        Padding="20,5"
-                                                                                                        HorizontalOptions="Fill">
+                                                                                               FontFamily="Impact"
+                                                                                               FontSize="16"
+                                                                                               TextColor="White"
+                                                                                               CharacterSpacing="0.8"
+                                                                                               Padding="20,5"
+                                                                                               HorizontalOptions="Fill">
                                                                                                 <Label.GestureRecognizers>
                                                                                                         <TapGestureRecognizer Tapped="OnOpcionSeleccionadaTapped"/>
                                                                                                 </Label.GestureRecognizers>
                                                                                         </Label>
                                                                                         <Grid Margin="0,4"
-                                                                                                        HeightRequest="36">
+                                                                                              HeightRequest="36">
                                                                                                 <BoxView BackgroundColor="#E31D26"/>
                                                                                                 <Label Text="DIARIO"
-                                                                                                                FontFamily="Impact"
-                                                                                                                FontSize="16"
-                                                                                                                TextColor="White"
-                                                                                                                FontAttributes="Bold"
-                                                                                                                CharacterSpacing="1"
-                                                                                                                Padding="25,0"
-                                                                                                                VerticalTextAlignment="Center"
-                                                                                                                HorizontalOptions="Fill">
+                                                                                                       FontFamily="Impact"
+                                                                                                       FontSize="16"
+                                                                                                       TextColor="White"
+                                                                                                       FontAttributes="Bold"
+                                                                                                       CharacterSpacing="1"
+                                                                                                       Padding="25,0"
+                                                                                                       VerticalTextAlignment="Center"
+                                                                                                       HorizontalOptions="Fill">
                                                                                                         <Label.GestureRecognizers>
                                                                                                                 <TapGestureRecognizer Tapped="OnOpcionSeleccionadaTapped"/>
                                                                                                         </Label.GestureRecognizers>
                                                                                                 </Label>
                                                                                         </Grid>
                                                                                         <Label Text="SEMANAL"
-                                                                                                        FontFamily="Impact"
-                                                                                                        FontSize="16"
-                                                                                                        TextColor="White"
-                                                                                                        CharacterSpacing="0.8"
-                                                                                                        Padding="20,5"
-                                                                                                        HorizontalOptions="Fill">
+                                                                                               FontFamily="Impact"
+                                                                                               FontSize="16"
+                                                                                               TextColor="White"
+                                                                                               CharacterSpacing="0.8"
+                                                                                               Padding="20,5"
+                                                                                               HorizontalOptions="Fill">
                                                                                                 <Label.GestureRecognizers>
                                                                                                         <TapGestureRecognizer Tapped="OnOpcionSeleccionadaTapped"/>
                                                                                                 </Label.GestureRecognizers>
                                                                                         </Label>
                                                                                         <Grid Margin="0,4"
-                                                                                                        HeightRequest="36">
+                                                                                              HeightRequest="36">
                                                                                                 <BoxView BackgroundColor="#E31D26"/>
                                                                                                 <Label Text="MENSUAL"
-                                                                                                                FontFamily="Impact"
-                                                                                                                FontSize="16"
-                                                                                                                TextColor="White"
-                                                                                                                FontAttributes="Bold"
-                                                                                                                CharacterSpacing="1"
-                                                                                                                Padding="25,0"
-                                                                                                                VerticalTextAlignment="Center"
-                                                                                                                HorizontalOptions="Fill">
+                                                                                                       FontFamily="Impact"
+                                                                                                       FontSize="16"
+                                                                                                       TextColor="White"
+                                                                                                       FontAttributes="Bold"
+                                                                                                       CharacterSpacing="1"
+                                                                                                       Padding="25,0"
+                                                                                                       VerticalTextAlignment="Center"
+                                                                                                       HorizontalOptions="Fill">
                                                                                                         <Label.GestureRecognizers>
                                                                                                                 <TapGestureRecognizer Tapped="OnOpcionSeleccionadaTapped"/>
                                                                                                         </Label.GestureRecognizers>
                                                                                                 </Label>
                                                                                         </Grid>
                                                                                         <Label Text="ANUAL"
-                                                                                                        FontFamily="Impact"
-                                                                                                        FontSize="16"
-                                                                                                        TextColor="White"
-                                                                                                        CharacterSpacing="0.8"
-                                                                                                        Padding="20,5"
-                                                                                                        HorizontalOptions="Fill">
+                                                                                               FontFamily="Impact"
+                                                                                               FontSize="16"
+                                                                                               TextColor="White"
+                                                                                               CharacterSpacing="0.8"
+                                                                                               Padding="20,5"
+                                                                                               HorizontalOptions="Fill">
                                                                                                 <Label.GestureRecognizers>
                                                                                                         <TapGestureRecognizer Tapped="OnOpcionSeleccionadaTapped"/>
                                                                                                 </Label.GestureRecognizers>
@@ -827,10 +829,22 @@
                                         </Grid>
                                 </Grid>
                                 <!-- Cierra el Grid de botones inferiores -->
-
                         </Grid>
                         <!-- Cierra el Grid maestro del formulario (Ancho 620) -->
                 </ScrollView>
+                <!-- 📥 CAPA FLOTANTE CON TU NUEVO SELLO VECTORIAL ORIGINAL -->
+                <Image x:Name="selloEvento"
+                       Source="selloevento.png"
+                       Opacity="0"
+                       Scale="3"
+                       Rotation="25"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"
+                       HeightRequest="230"
+                       WidthRequest="230"
+                       Margin="260,0,0,100"
+                       InputTransparent="True"/>
+
         </Grid>
         <!-- Cierra el Grid estructural base de la ContentPage -->
 </ContentPage>
