@@ -44,8 +44,35 @@ public partial class AlarmaCriticaPage : ContentPage
 #endif
     }
 
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+
+        // 🔄 INTERCAMBIO DE AUDIO: Pausamos el fondo y encendemos el combate
+        if (App.BackgroundPlayer != null && App.BackgroundPlayer.IsPlaying)
+        {
+            App.BackgroundPlayer.Stop(); // Se pausa para retomar en el mismo segundo al volver
+        }
+
+        if (App.AlarmaPlayer != null && !App.AlarmaPlayer.IsPlaying)
+        {
+            App.AlarmaPlayer.Play(); // Hace estallar la música de la alarma
+        }
+    }
+
+
     private async void OnDesactivarAlarmaClicked(object? sender, EventArgs? e)
     {
+        // 🔄 REVERSO DE AUDIO: Silenciamos el combate y despertamos la rutina diaria
+        if (App.AlarmaPlayer != null && App.AlarmaPlayer.IsPlaying)
+        {
+            App.AlarmaPlayer.Stop(); // Esta se apaga por completo hasta la siguiente alerta
+        }
+
+        if (App.BackgroundPlayer != null)
+        {
+            App.BackgroundPlayer.Play(); // Reanuda la banda sonora permanente de tu app
+        }
         // 🎯 AL APAGAR LA ALARMA: Devolvemos las propiedades normales del escritorio
 #if WINDOWS
         var nativeWindow = App.Current?.Windows?[0]?.Handler?.PlatformView as Microsoft.UI.Xaml.Window;
@@ -72,4 +99,33 @@ public partial class AlarmaCriticaPage : ContentPage
 
         await Navigation.PopModalAsync();
     }
+    // =======================================================================
+    // 🎸 COREOGRAFÍA HOVER ELÁSTICA PARA EL BOTÓN DE LA ALARMA CRÍTICA
+    // =======================================================================
+    private async void OnBtnReclamarMouseIn(object? sender, Microsoft.Maui.Controls.PointerEventArgs e)
+    {
+        if (BtnReclamarGrid == null) return;
+
+        BtnReclamarGrid.CancelAnimations();
+
+        // Latigazo elástico: se infla un 10% y se inclina a -5 grados contracorriente
+        await Task.WhenAll(
+            BtnReclamarGrid.ScaleToAsync(1.10, 160, Easing.SpringOut),
+            BtnReclamarGrid.RotateToAsync(-5, 160, Easing.SpringOut)
+        );
+    }
+
+    private async void OnBtnReclamarMouseOut(object? sender, Microsoft.Maui.Controls.PointerEventArgs e)
+    {
+        if (BtnReclamarGrid == null) return;
+
+        BtnReclamarGrid.CancelAnimations();
+
+        // Retorno seco, limpio y fluido a sus valores exactos de inclinación (-2 grados)
+        await Task.WhenAll(
+            BtnReclamarGrid.ScaleToAsync(1.0, 130, Easing.CubicIn),
+            BtnReclamarGrid.RotateToAsync(-2, 130, Easing.CubicIn)
+        );
+    }
+
 }

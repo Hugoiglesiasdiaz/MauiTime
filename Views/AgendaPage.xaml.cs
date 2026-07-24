@@ -1,5 +1,7 @@
 namespace MauiTime.Views;
 
+using Plugin.LocalNotification;
+
 using MauiTime.ViewModels;
 using Microsoft.Maui.Controls.Shapes;
 using Microsoft.Maui.Layouts; // <--- ASEGÚRATE DE QUE ESTA LÍNEA ESTÉ AQUÍ Arriba
@@ -7,6 +9,9 @@ using Microsoft.Maui.Layouts; // <--- ASEGÚRATE DE QUE ESTA LÍNEA ESTÉ AQUÍ 
 public partial class AgendaPage : ContentPage
 {
     private readonly AgendaViewModel _viewModel;
+    // Campo de control para pausar el hilo de ejecución hasta que el usuario decida
+    private TaskCompletionSource<bool>? _borradoTaskSource;
+    private Models.Evento? _eventoSeleccionadoParaDestruir;
 
     public AgendaPage(AgendaViewModel viewModel)
     {
@@ -419,33 +424,230 @@ public partial class AgendaPage : ContentPage
         }
     }
 
+    private async void OnMitigarAlarmaTargetClicked(object? sender, EventArgs e)
+    {
+        // 1. Validar el remitente (Grid Maestro) y extraer el Evento de forma segura
+        if (sender is not Grid gridMaestro || gridMaestro.BindingContext is not Models.Evento eventoModificado)
+            return;
 
-    // =======================================================================
-    // 💣 ACCIÓN 2: ELIMINAR EL PROYECTO / EVENTO DE SQLITE AL TOCAR EL BLOQUE
-    // =======================================================================
+        // 2. Conmutación booleana bidireccional (Toggle)
+        eventoModificado.EsAlarmaAgresiva = !eventoModificado.EsAlarmaAgresiva;
+
+        // 3. Recuperar servicios nativos desde el contenedor de dependencias
+        var dbService = App.Current?.Handler?.MauiContext?.Services.GetService<Services.DatabaseService>();
+        var notificationService = App.Current?.Handler?.MauiContext?.Services.GetService<Services.NotificationService>();
+
+        if (dbService != null)
+        {
+            try
+            {
+                // 4. Persistencia asíncrona aislada en tu SQLite (HILO DE FONDO)
+                _ = Task.Run(async () =>
+                {
+                    await dbService.GuardarEventoAsync(eventoModificado);
+                });
+
+                // 5. Reprogramación segura de hardware usando tu servicio del doble carril
+                if (notificationService != null)
+                {
+                    await notificationService.ProgramarRecordatorio(eventoModificado);
+                }
+
+                // ============================================================
+                // 💡 REPARACIÓN ULTRARÁPIDA: CONMUTACIÓN DIRECTA EN ELEMENTO HIJO
+                // ============================================================
+                // Buscamos al Grid secundario que tiene el nombre "CapaRojoFuego" entre los hijos del contenedor pulsado
+                var capaRojo = gridMaestro.Children.FirstOrDefault(c => c is Grid g && g.StyleId == "CapaRojoFuego" || (c is Grid visualGrid && visualGrid.IsVisible != eventoModificado.EsAlarmaAgresiva)) as Grid;
+
+                // Si el motor de renderizado no lo encuentra por tipado indirecto, forzamos la actualización directa del árbol visual de la celda
+                foreach (var hijo in gridMaestro.Children)
+                {
+                    if (hijo is Grid capaVisual)
+                    {
+                        // Forzamos a la Capa 2 a igualar la visibilidad booleana real del objeto de forma instantánea
+                        capaVisual.IsVisible = eventoModificado.EsAlarmaAgresiva;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[MAUI-INTERACTIVO] Excepción mitigada: {ex.Message}");
+            }
+        }
+
+        // 6. Feedback háptico opcional para dispositivos móviles
+#if ANDROID || IOS
+    try { HapticFeedback.Default.Perform(HapticFeedbackType.Click); } catch { }
+#endif
+    }
+
     private async void OnEliminarProyectoClicked(object? sender, EventArgs e)
     {
         if (sender is BindableObject control && control.BindingContext is Models.Evento eventoDestruir)
         {
-            // Confirmación limpia con el método nativo DisplayAlert
-            bool confirmar = await DisplayAlertAsync("PHANTOM THIEVES", $"¿Deseas eliminar el objetivo: '{eventoDestruir.Titulo}'?", "BORRAR", "ABORTAR");
+            _eventoSeleccionadoParaDestruir = eventoDestruir;
 
-            if (confirmar)
+            string textoFormateado = $"¿DESEAS ELIMINAR EL OBJETIVO:\n'{eventoDestruir.Titulo.ToUpper()}'?";
+            TxtPreguntaBorrar.Text = textoFormateado;
+            TxtPreguntaBorrarSombra.Text = textoFormateado;
+
+            // ============================================================
+            // 💡 BLINDAJE DE MEMORIA GRÁFICA EN CALIENTE (CERO CONFLICTOS)
+            // ============================================================
+            // Detiene cualquier hilo o inercia anterior directamente sobre el Grid de fondo
+            ContenedorPopupBorrar.CancelAnimations();
+
+            // Reset estricto de seguridad para forzar a la GPU a arrancar de cero
+            ContenedorPopupBorrar.Scale = 0.01;
+            ContenedorPopupBorrar.Opacity = 0;
+
+            // Encendemos la capa translúcida
+            ContenedorPopupBorrar.IsVisible = true;
+
+            // 🚀 INFLADO CINEMÁTICO REGULAR POR HARDWARE (MÉTODO ASÍNCRONO PURO)
+            // Escalamos rápidamente el cartel rojo hasta un 108% en 280ms
+            await Task.WhenAll(
+                ContenedorPopupBorrar.ScaleToAsync(1.08, 280, Easing.CubicOut),
+                ContenedorPopupBorrar.FadeToAsync(1, 220, Easing.CubicOut)
+            );
+
+            // 🎯 ASENTAMIENTO DE ALTO RENDIMIENTO CON FIRMA ASÍNCRONA ACTUALIZADA
+            // Regresa del 108% al 100% real en 80ms de manera regular sin advertencias de obsolescencia
+            await ContenedorPopupBorrar.ScaleToAsync(1.00, 80, Easing.Linear);
+
+            _borradoTaskSource = new TaskCompletionSource<bool>();
+            bool confirmar = await _borradoTaskSource.Task;
+
+            if (confirmar && _eventoSeleccionadoParaDestruir != null)
             {
                 var dbService = App.Current?.Handler?.MauiContext?.Services.GetService<Services.DatabaseService>();
                 if (dbService != null)
                 {
-                    // 💡 SOLUCIÓN: Llamamos a tu método real idéntico al de tu DatabaseService.cs
-                    await dbService.BorrarEventoAsync(eventoDestruir);
-
-                    // Forzamos el refresco reactivo de la lista de tu Agenda
-                    await _viewModel.LoadEventosAsync();
+                    await dbService.BorrarEventoAsync(_eventoSeleccionadoParaDestruir);
+                    if (_viewModel != null)
+                    {
+                        await _viewModel.LoadEventosAsync();
+                    }
                 }
             }
+
+            _eventoSeleccionadoParaDestruir = null;
         }
     }
 
+    private async void OnConfirmarBorradoPunkClicked(object? sender, EventArgs e)
+    {
+        // Limpieza de inercia antes del colapso inverso hacia el centro
+        ContenedorPopupBorrar.CancelAnimations();
 
+        await Task.WhenAll(
+            ContenedorPopupBorrar.ScaleToAsync(0.01, 160, Easing.CubicIn),
+            ContenedorPopupBorrar.FadeToAsync(0, 140, Easing.CubicIn)
+        );
 
+        ContenedorPopupBorrar.IsVisible = false;
+        _borradoTaskSource?.SetResult(true);
+    }
+
+    private async void OnCancelarBorradoPunkClicked(object? sender, EventArgs e)
+    {
+        // Limpieza de inercia antes del colapso inverso hacia el centro
+        ContenedorPopupBorrar.CancelAnimations();
+
+        await Task.WhenAll(
+            ContenedorPopupBorrar.ScaleToAsync(0.01, 160, Easing.CubicIn),
+            ContenedorPopupBorrar.FadeToAsync(0, 140, Easing.CubicIn)
+        );
+
+        ContenedorPopupBorrar.IsVisible = false;
+        _borradoTaskSource?.SetResult(false);
+    }
+
+    private async void OnBtnInfiltracionMouseIn(object? sender, Microsoft.Maui.Controls.PointerEventArgs e)
+    {
+        if (BtnInfiltracion == null) return;
+
+        // Cancelamos cualquier inercia gráfica previa en la GPU
+        BtnInfiltracion.CancelAnimations();
+
+        // 🚀 EFECTO INFLADO EMBOSCADA: Se estira al 112% y se tuerce más en diagonal (4 a 7 grados)
+        // Usamos SpringOut para que dé ese pequeño brinco o latigazo elástico al llegar al tope
+        await Task.WhenAll(
+            BtnInfiltracion.ScaleToAsync(1.12, 180, Easing.SpringOut),
+            BtnInfiltracion.RotateToAsync(7, 180, Easing.SpringOut)
+        );
+    }
+
+    private async void OnBtnInfiltracionMouseOut(object? sender, Microsoft.Maui.Controls.PointerEventArgs e)
+    {
+        if (BtnInfiltracion == null) return;
+
+        // Cancelamos hilos de animación latentes
+        BtnInfiltracion.CancelAnimations();
+
+        // Regresa de forma fluida y limpia a sus valores exactos definidos en el XAML original (Scale 1.0, Rotation 4)
+        await Task.WhenAll(
+            BtnInfiltracion.ScaleToAsync(1.0, 140, Easing.CubicIn),
+            BtnInfiltracion.RotateToAsync(4, 140, Easing.CubicIn)
+        );
+    }
+
+    // =======================================================================
+    // 🎸 ANIMACIONES HOVER ASÍNCRONAS PARA EL BOTÓN "BORRAR"
+    // =======================================================================
+    private async void OnBtnBorrarMouseIn(object? sender, Microsoft.Maui.Controls.PointerEventArgs e)
+    {
+        if (BtnBorrarGrid == null) return;
+
+        BtnBorrarGrid.CancelAnimations();
+
+        // Latigazo elástico: se infla un 12% y se inclina a -6 grados (hacia la izquierda)
+        await Task.WhenAll(
+            BtnBorrarGrid.ScaleToAsync(1.12, 180, Easing.SpringOut),
+            BtnBorrarGrid.RotateToAsync(-6, 180, Easing.SpringOut)
+        );
+    }
+
+    private async void OnBtnBorrarMouseOut(object? sender, Microsoft.Maui.Controls.PointerEventArgs e)
+    {
+        if (BtnBorrarGrid == null) return;
+
+        BtnBorrarGrid.CancelAnimations();
+
+        // Retorno limpio al tamaño y rotación originales (Escala 1, Rotación 0)
+        await Task.WhenAll(
+            BtnBorrarGrid.ScaleToAsync(1.0, 140, Easing.CubicIn),
+            BtnBorrarGrid.RotateToAsync(0, 140, Easing.CubicIn)
+        );
+    }
+
+    // =======================================================================
+    // 🎸 ANIMACIONES HOVER ASÍNCRONAS PARA EL BOTÓN "ABORTAR"
+    // =======================================================================
+    private async void OnBtnAbortarMouseIn(object? sender, Microsoft.Maui.Controls.PointerEventArgs e)
+    {
+        if (BtnAbortarGrid == null) return;
+
+        BtnAbortarGrid.CancelAnimations();
+
+        // Latigazo elástico: se infla un 12% y se inclina a 6 grados (hacia la derecha)
+        await Task.WhenAll(
+            BtnAbortarGrid.ScaleToAsync(1.12, 180, Easing.SpringOut),
+            BtnAbortarGrid.RotateToAsync(6, 180, Easing.SpringOut)
+        );
+    }
+
+    private async void OnBtnAbortarMouseOut(object? sender, Microsoft.Maui.Controls.PointerEventArgs e)
+    {
+        if (BtnAbortarGrid == null) return;
+
+        BtnAbortarGrid.CancelAnimations();
+
+        // Retorno limpio al tamaño y rotación originales
+        await Task.WhenAll(
+            BtnAbortarGrid.ScaleToAsync(1.0, 140, Easing.CubicIn),
+            BtnAbortarGrid.RotateToAsync(0, 140, Easing.CubicIn)
+        );
+    }
 
 }

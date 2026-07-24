@@ -3,113 +3,856 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MauiTime.Views.NuevaTareaPopup"
              Title="NUEVO EVENTO PUNK"
-             BackgroundColor="#121212">
+             BackgroundColor="#0D0D0D">
 
-        <VerticalStackLayout Padding="30"
-                             Spacing="12"
-                             VerticalOptions="Center">
+        <!-- Canvas Maestro de Capas Gráficas -->
+        <Grid x:Name="ContenedorPrincipal"
+              Opacity="0"
+              TranslationY="400">
+                <!-- ======================================================================= -->
+                <!-- 🎸 DECORACIÓN DEL FONDO GENERAL RECALIBRADA                             -->
+                <!-- ======================================================================= -->
+                <!-- 1. El gran rayo oblicuo original de tensión -->
+                <Path Data="M -50,120 L 900,680 L 1000,600 L -50,40"
+                      Fill="#161616"
+                      Opacity="0.5"
+                      Aspect="Fill"/>
 
-                <!-- CABECERA INFORMATIVA -->
-                <Label x:Name="LabelFecha"
-                       TextColor="White"
-                       FontSize="18"
-                       FontAttributes="Bold"
-                       HorizontalOptions="Center"/>
+                <!-- 2. Ráfagas de corte secundarias Rojo Fuego en las esquinas -->
+                <Polygon Points="0,0 180,0 0,220"
+                         Fill="#E31D26"
+                         Opacity="0.25"
+                         Aspect="Fill"
+                         HorizontalOptions="Start"
+                         VerticalOptions="Start"/>
+                <Polygon Points="620,500 620,700 350,700"
+                         Fill="Black"
+                         Opacity="0.6"
+                         Aspect="Fill"
+                         HorizontalOptions="End"
+                         VerticalOptions="End"/>
 
-                <!-- CAMPO 1: SELECCIONAR EL DÍA DEL EVENTO (¡NUEVO!) -->
-                <!-- Añadimos el DatePicker para que el usuario pueda cambiar la fecha de la misión libremente -->
-                <Label Text="Fecha de la Misión:"
-                       TextColor="White"
-                       Margin="0,5,0,0"/>
-                <DatePicker x:Name="PickerFecha"
-                            MinimumDate="01/01/2020"
-                            MaximumDate="12/31/2030"
-                            TextColor="White"
-                            BackgroundColor="#1C1A1A"/>
+                <!-- 3. LOGO INFERIOR IZQUIERDA: Ajustado con márgenes estrictos para que nunca se corte abajo -->
+                <Label Text="MAUITIME"
+                       TextColor="#1A1A1A"
+                       FontSize="130"
+                       FontFamily="Impact"
+                       FontAttributes="Bold, Italic"
+                       HorizontalOptions="Start"
+                       VerticalOptions="End"
+                       Margin="15,0,0,15"
+                       Rotation="-10"
+                       Opacity="0.75"/>
 
-                <!-- CAMPO 2: TÍTULO Y DESCRIPCIÓN -->
-                <Entry x:Name="EntryTitulo"
-                       Placeholder="Nombre del evento..."
-                       TextColor="White"
-                       PlaceholderColor="Gray"/>
-                <Editor x:Name="EditorDescripcion"
-                        Placeholder="Descripción..."
-                        HeightRequest="80"
-                        TextColor="White"
-                        PlaceholderColor="Gray"/>
+                <!-- 💡 'TAKE YOUR TIME' a la izquierda superior con rotación rebelde -->
+                <Label Text="TAKE YOUR TIME"
+                       TextColor="#151515"
+                       FontSize="42"
+                       FontFamily="Impact"
+                       FontAttributes="Bold, Italic"
+                       HorizontalOptions="Start"
+                       VerticalOptions="Start"
+                       Margin="30,40,0,0"
+                       Rotation="-6"/>
 
-                <!-- CAMPO 3: FRECUENCIA CON FONDO DE CONTRASTE -->
-                <!-- Envolvemos el Picker en un contenedor gris oscuro para que el texto negro de Windows sea 100% legible -->
-                <Label Text="Frecuencia del Evento:"
-                       TextColor="White"/>
-                <Grid BackgroundColor="#2A2A2A"
-                      Padding="5,0">
-                        <Picker x:Name="PickerFrecuencia"
-                                Title="Toca para seleccionar frecuencia..."
-                                TitleColor="Gray"
-                                TextColor="White">
-                                <Picker.ItemsSource>
-                                        <x:Array Type="{x:Type x:String}">
-                                                <x:String>Ninguna</x:String>
-                                                <x:String>Diario</x:String>
-                                                <x:String>Semanal</x:String>
-                                                <x:String>Mensual</x:String>
-                                                <x:String>Anual</x:String>
-                                        </x:Array>
-                                </Picker.ItemsSource>
-                        </Picker>
-                </Grid>
-
-                <!-- CAMPO 4: HORA EN FORMATO 24 HORAS REAL -->
-                <!-- Al añadir Format="HH:mm" obligamos a Windows a ocultar el selector AM/PM y usar de 00 a 23 -->
-                <Label Text="Hora del Evento (Formato 24h):"
-                       TextColor="White"/>
-                <TimePicker x:Name="PickerHora"
-                            Format="HH:mm"
-                            TextColor="White"
-                            BackgroundColor="#1C1A1A"/>
-
-                <!-- BOTONES DE ACCIÓN -->
-                <Button Text="CREAR EVENTO"
-                        Clicked="OnGuardarClicked"
-                        BackgroundColor="Red"
-                        TextColor="White"
-                        Margin="0,15,0,0"/>
-                <Button Text="ABORTAR"
-                        Clicked="OnCancelarClicked"
-                        BackgroundColor="Transparent"
-                        TextColor="Gray"/>
-
-                <!-- 🚨 CAMPO 6: SWITCH MODO EMBOSCADA REPARADO Y NITIDO -->
-                <Grid ColumnDefinitions="*, Auto"
-                      Margin="5,15,5,15"
-                      VerticalOptions="Center">
-
-                        <!-- TEXTOS BLINDADOS CON MÁXIMO CONTRASTE -->
-                        <VerticalStackLayout Grid.Column="0"
-                                        Spacing="2"
-                                        VerticalOptions="Center">
-                                <Label Text="🚨 MODO EMBOSCADA"
-                                       FontAttributes="Bold"
-                                       TextColor="White"
-                                       FontSize="14"
-                                       FontFamily="Impact"/>
-                                <Label Text="Despierta el móvil con alarma de pantalla completa"
-                                       TextColor="#DDDDDD"
-                                       FontSize="11"
-                                       FontFamily="Arial"/>
-                        </VerticalStackLayout>
-
-                        <!-- SWITCH FORZADO CON COMPORTAMIENTO NATIVO INTEGRADO -->
-                        <Switch Grid.Column="1"
-                                x:Name="SwitchAlarmaAgresiva"
-                                ThumbColor="#E31D26"
-                                OnColor="White"
-                                BackgroundColor="#333333"
-                                HorizontalOptions="End"
-                                VerticalOptions="Center"/>
+                <!-- REEMPLAZO FIRMA: OPCIÓN 1 (STICKER COLLAGE DUOTONO) -->
+                <Grid HorizontalOptions="End"
+                      VerticalOptions="End"
+                      Margin="0,0,35,35"
+                      WidthRequest="130"
+                      HeightRequest="50"
+                      Rotation="6">
+                        <!-- Capa 1: Sombra Sólida Roja Fuego Desplazada -->
+                        <Border BackgroundColor="#E31D26"
+                                StrokeThickness="0"
+                                Margin="5,5,0,0">
+                                <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="0"/>
+                                </Border.StrokeShape>
+                        </Border>
+                        <!-- Capa 2: Cuerpo Principal Negro -->
+                        <Border BackgroundColor="Black"
+                                Stroke="White"
+                                StrokeThickness="2"
+                                Margin="0,0,5,5">
+                                <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="0"/>
+                                </Border.StrokeShape>
+                        </Border>
+                        <!-- Capa 3: Texto de la Firma -->
+                        <Label Text="Joker"
+                               TextColor="White"
+                               FontSize="24"
+                               FontFamily="Bubblegum"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"
+                               Margin="0,0,5,5"/>
                 </Grid>
 
 
-        </VerticalStackLayout>
+                <!-- Contenedor con Scroll para adaptabilidad total de pantallas -->
+                <ScrollView VerticalOptions="Center"
+                            HorizontalOptions="Center"
+                            Margin="15">
+
+                        <!-- Bloque General del HUD (Ancho Rígido 620 Calibrado) -->
+                        <Grid WidthRequest="620"
+                              RowDefinitions="Auto, Auto, *, Auto"
+                              Padding="15">
+
+                                <!-- ======================================================================= -->
+                                <!-- 👑 CABECERA COLLAGE: TITULAR ESTILO NOTA CORTADA                        -->
+                                <!-- ======================================================================= -->
+                                <Grid Grid.Row="0"
+                                      Rotation="-3.5"
+                                      Margin="5,0,0,25"
+                                      HorizontalOptions="Start">
+                                        <Border BackgroundColor="Black"
+                                                StrokeThickness="0"
+                                                Margin="6,6,0,0">
+                                                <Border.StrokeShape>
+                                                        <RoundRectangle CornerRadius="0"/>
+                                                </Border.StrokeShape>
+                                        </Border>
+                                        <Border BackgroundColor="#E31D26"
+                                                Stroke="White"
+                                                StrokeThickness="1.5"
+                                                Margin="0,0,6,6"
+                                                Padding="26,10">
+                                                <Border.StrokeShape>
+                                                        <RoundRectangle CornerRadius="0"/>
+                                                </Border.StrokeShape>
+                                                <Label x:Name="LabelFecha"
+                                                       TextColor="White"
+                                                       FontSize="19"
+                                                       FontAttributes="Italic"
+                                                       FontFamily="Impact"
+                                                       CharacterSpacing="0.5"/>
+                                        </Border>
+                                </Grid>
+
+                                <!-- ======================================================================= -->
+                                <!-- 📝 CUERPO CENTRAL: HOJA DE LIBRETA ENVEJECIDA CON DECORACIÓN INTERNA   -->
+                                <!-- ======================================================================= -->
+                                <Border Grid.Row="2"
+                                        BackgroundColor="#EADFC9"
+                                        Stroke="Black"
+                                        StrokeThickness="3"
+                                        Padding="40,35"
+                                        Rotation="0">
+                                        <Border.StrokeShape>
+                                                <RoundRectangle CornerRadius="20,0,35,5"/>
+                                        </Border.StrokeShape>
+                                        <Border.Shadow>
+                                                <Shadow Brush="Black"
+                                                        Offset="12,12"
+                                                        Radius="0"
+                                                        Opacity="0.85"/>
+                                        </Border.Shadow>
+
+                                        <!-- CONTENEDOR DE ENTRADAS Y GRAFITIS DE LA HOJA -->
+                                        <Grid>
+                                                <Path Data="M 450,10 L 470,25 L 490,10 L 480,35 L 500,50 L 470,45 L 450,60 L 460,35 Z"
+                                                      Fill="Black"
+                                                      Opacity="0.08"
+                                                      Aspect="Fill"
+                                                      HorizontalOptions="End"
+                                                      VerticalOptions="Start"
+                                                      Margin="0,5,10,0"/>
+                                                <Path Data="M 10,10 L 30,10 L 30,80 L 45,70 L 20,100 L -5,70 L 10,80 Z"
+                                                      Fill="#E31D26"
+                                                      Opacity="0.05"
+                                                      Aspect="Fill"
+                                                      HorizontalOptions="End"
+                                                      VerticalOptions="Center"
+                                                      Margin="0,0,40,0"
+                                                      Rotation="15"/>
+
+                                                <VerticalStackLayout Spacing="24">
+
+                                                        <!-- DETALLE DE LIBRETA: Agujeros vectoriales de las anillas -->
+                                                        <AbsoluteLayout HeightRequest="0"
+                                                                        WidthRequest="0"
+                                                                        InputTransparent="True">
+                                                                <Ellipse Fill="#0D0D0D"
+                                                                         WidthRequest="12"
+                                                                         HeightRequest="12"
+                                                                         AbsoluteLayout.LayoutBounds="4, 15, 12, 12"/>
+                                                                <Ellipse Fill="#0D0D0D"
+                                                                         WidthRequest="12"
+                                                                         HeightRequest="12"
+                                                                         AbsoluteLayout.LayoutBounds="4, 110, 12, 12"/>
+                                                                <Ellipse Fill="#0D0D0D"
+                                                                         WidthRequest="12"
+                                                                         HeightRequest="12"
+                                                                         AbsoluteLayout.LayoutBounds="4, 205, 12, 12"/>
+                                                                <Ellipse Fill="#0D0D0D"
+                                                                         WidthRequest="12"
+                                                                         HeightRequest="12"
+                                                                         AbsoluteLayout.LayoutBounds="4, 300, 12, 12"/>
+                                                        </AbsoluteLayout>
+
+                                                        <!-- CAMPO 1: SELECCIONAR EL DÍA -->
+                                                        <VerticalStackLayout Spacing="4">
+                                                                <!-- Título superior -->
+                                                                <Border BackgroundColor="Black"
+                                                                        StrokeThickness="0"
+                                                                        HorizontalOptions="Start"
+                                                                        Padding="15,5">
+                                                                        <Border.StrokeShape>
+                                                                                <RoundRectangle CornerRadius="0"/>
+                                                                        </Border.StrokeShape>
+                                                                        <Label Text="FECHA DE LA MISIÓN"
+                                                                               TextColor="White"
+                                                                               FontSize="12"
+                                                                               FontFamily="HelveticaNowDisplay-ExtraBold"
+                                                                               FontAttributes="Bold"/>
+                                                                </Border>
+
+                                                                <!-- Contenedor principal del Calendario -->
+                                                                <Border BackgroundColor="#DFD3BA"
+                                                                        Stroke="Black"
+                                                                        StrokeThickness="2.5"
+                                                                        Padding="12,6">
+                                                                        <Border.StrokeShape>
+                                                                                <RoundRectangle CornerRadius="0"/>
+                                                                        </Border.StrokeShape>
+
+                                                                        <!-- Definimos 3 filas claras para evitar el solapamiento -->
+                                                                        <Grid RowDefinitions="Auto, Auto, *"
+                                                                              ColumnDefinitions="*"
+                                                                              RowSpacing="10">
+
+                                                                                <!-- Fila 0: Selector de Mes -->
+                                                                                <Border Grid.Row="0"
+                                                                                        BackgroundColor="Black"
+                                                                                        Stroke="#E31D26"
+                                                                                        StrokeThickness="2"
+                                                                                        Padding="15,12"
+                                                                                        Margin="0,0,0,8">
+                                                                                        <Border.StrokeShape>
+                                                                                                <RoundRectangle CornerRadius="16"/>
+                                                                                        </Border.StrokeShape>
+                                                                                        <Grid ColumnDefinitions="Auto,*,Auto"
+                                                                                              VerticalOptions="Center">
+                                                                                                <Button x:Name="BtnMesAnterior"
+                                                                                                        Text="◀"
+                                                                                                        FontFamily="Impact"
+                                                                                                        FontSize="24"
+                                                                                                        TextColor="White"
+                                                                                                        BackgroundColor="#E31D26"
+                                                                                                        CornerRadius="12"
+                                                                                                        WidthRequest="50"
+                                                                                                        HeightRequest="50"
+                                                                                                        Clicked="OnMesAnteriorClicked"/>
+
+                                                                                                <!-- MES MÁS GRANDE -->
+                                                                                                <Label x:Name="LabelMesAno"
+                                                                                                       Grid.Column="1"
+                                                                                                       Text="JULIO DE 2026"
+                                                                                                       TextColor="White"
+                                                                                                       FontFamily="Impact"
+                                                                                                       FontSize="22"
+                                                                                                       HorizontalTextAlignment="Center"
+                                                                                                       VerticalTextAlignment="Center"
+                                                                                                       CharacterSpacing="1"/>
+
+                                                                                                <Button x:Name="BtnMesSiguiente"
+                                                                                                        Grid.Column="2"
+                                                                                                        Text="▶"
+                                                                                                        FontFamily="Impact"
+                                                                                                        FontSize="24"
+                                                                                                        TextColor="White"
+                                                                                                        BackgroundColor="#E31D26"
+                                                                                                        CornerRadius="12"
+                                                                                                        WidthRequest="50"
+                                                                                                        HeightRequest="50"
+                                                                                                        Clicked="OnMesSiguienteClicked"/>
+                                                                                        </Grid>
+                                                                                </Border>
+                                                                                <!-- Fila 1: Encabezados (L, M, X, J, V, S, D) con fuente Bubblegum -->
+                                                                                <Grid Grid.Row="1"
+                                                                                      ColumnDefinitions="*,*,*,*,*,*,*"
+                                                                                      ColumnSpacing="6"
+                                                                                      Margin="0,0,0,10">
+                                                                                        <Label Grid.Column="0"
+                                                                                               Text="L"
+                                                                                               TextColor="Black"
+                                                                                               FontFamily="Bubblegum"
+                                                                                               FontSize="18"
+                                                                                               HorizontalTextAlignment="Center"/>
+                                                                                        <Label Grid.Column="1"
+                                                                                               Text="M"
+                                                                                               TextColor="Black"
+                                                                                               FontFamily="Bubblegum"
+                                                                                               FontSize="18"
+                                                                                               HorizontalTextAlignment="Center"/>
+                                                                                        <Label Grid.Column="2"
+                                                                                               Text="X"
+                                                                                               TextColor="Black"
+                                                                                               FontFamily="Bubblegum"
+                                                                                               FontSize="18"
+                                                                                               HorizontalTextAlignment="Center"/>
+                                                                                        <Label Grid.Column="3"
+                                                                                               Text="J"
+                                                                                               TextColor="Black"
+                                                                                               FontFamily="Bubblegum"
+                                                                                               FontSize="18"
+                                                                                               HorizontalTextAlignment="Center"/>
+                                                                                        <Label Grid.Column="4"
+                                                                                               Text="V"
+                                                                                               TextColor="Black"
+                                                                                               FontFamily="Bubblegum"
+                                                                                               FontSize="18"
+                                                                                               HorizontalTextAlignment="Center"/>
+
+                                                                                        <Border Grid.Column="5"
+                                                                                                BackgroundColor="Black"
+                                                                                                Padding="2"
+                                                                                                HorizontalOptions="Fill">
+                                                                                                <Border.StrokeShape>
+                                                                                                        <RoundRectangle CornerRadius="6"/>
+                                                                                                </Border.StrokeShape>
+                                                                                                <Label Text="S"
+                                                                                                       TextColor="White"
+                                                                                                       FontFamily="Bubblegum"
+                                                                                                       FontSize="18"
+                                                                                                       HorizontalTextAlignment="Center"/>
+                                                                                        </Border>
+                                                                                        <Border Grid.Column="6"
+                                                                                                BackgroundColor="#E31D26"
+                                                                                                Padding="2"
+                                                                                                HorizontalOptions="Fill">
+                                                                                                <Border.StrokeShape>
+                                                                                                        <RoundRectangle CornerRadius="6"/>
+                                                                                                </Border.StrokeShape>
+                                                                                                <Label Text="D"
+                                                                                                       TextColor="White"
+                                                                                                       FontFamily="Bubblegum"
+                                                                                                       FontSize="18"
+                                                                                                       HorizontalTextAlignment="Center"/>
+                                                                                        </Border>
+                                                                                </Grid>
+
+                                                                                <!-- Fila 2: La grilla de números (se llena desde el C#) -->
+                                                                                <Grid x:Name="GridDiasCalendario"
+                                                                                      Grid.Row="2"
+                                                                                      ColumnSpacing="6"
+                                                                                      RowSpacing="6"
+                                                                                      ColumnDefinitions="*,*,*,*,*,*,*"
+                                                                                      RowDefinitions="*,*,*,*,*,*"
+                                                                                      VerticalOptions="Start"/>
+                                                                        </Grid>
+                                                                </Border>
+
+                                                                <DatePicker x:Name="PickerFecha"
+                                                                            IsVisible="False"/>
+                                                        </VerticalStackLayout>
+
+                                                        <!-- CAMPO 2: TÍTULO DEL EVENTO -->
+                                                        <VerticalStackLayout Spacing="4">
+                                                                <Border BackgroundColor="#E31D26"
+                                                                        StrokeThickness="0"
+                                                                        HorizontalOptions="Start"
+                                                                        Padding="15,5">
+                                                                        <Border.StrokeShape>
+                                                                                <RoundRectangle CornerRadius="0"/>
+                                                                        </Border.StrokeShape>
+                                                                        <Label Text="NOMBRE DEL EVENTO"
+                                                                               TextColor="White"
+                                                                               FontSize="12"
+                                                                               FontFamily="HelveticaNowDisplay-ExtraBold"
+                                                                               FontAttributes="Bold"
+                                                                               CharacterSpacing="0.5"/>
+                                                                </Border>
+                                                                <Entry x:Name="EntryTitulo"
+                                                                       Placeholder="Escribe el objetivo aquí..."
+                                                                       TextColor="Black"
+                                                                       PlaceholderColor="#766C56"
+                                                                       FontSize="16"
+                                                                       FontAttributes="Bold"
+                                                                       FontFamily="HelveticaNowDisplay-ExtraBold"
+                                                                       BackgroundColor="Transparent"
+                                                                       HeightRequest="42"
+                                                                       VerticalTextAlignment="Center"
+                                                                       Margin="5,2,0,0"/>
+                                                                <BoxView HeightRequest="2.5"
+                                                                         BackgroundColor="Black"/>
+                                                        </VerticalStackLayout>
+                                                        <!-- CAMPO 3: DESCRIPCIÓN -->
+                                                        <VerticalStackLayout Spacing="4">
+                                                                <Border BackgroundColor="Black"
+                                                                        StrokeThickness="0"
+                                                                        HorizontalOptions="Start"
+                                                                        Padding="15,5">
+                                                                        <Border.StrokeShape>
+                                                                                <RoundRectangle CornerRadius="0"/>
+                                                                        </Border.StrokeShape>
+                                                                        <Label Text="DETALLES DE LA INFILTRACIÓN"
+                                                                               TextColor="White"
+                                                                               FontSize="12"
+                                                                               FontFamily="HelveticaNowDisplay-ExtraBold"
+                                                                               FontAttributes="Bold"
+                                                                               CharacterSpacing="0.5"/>
+                                                                </Border>
+                                                                <Editor x:Name="EditorDescripcion"
+                                                                        Placeholder="Escribe las notas de campo..."
+                                                                        HeightRequest="90"
+                                                                        TextColor="Black"
+                                                                        PlaceholderColor="#766C56"
+                                                                        FontSize="15"
+                                                                        FontAttributes="Bold"
+                                                                        FontFamily="HelveticaNowDisplay-ExtraBold"
+                                                                        BackgroundColor="Transparent"
+                                                                        Margin="5,2,0,2"/>
+                                                                <BoxView HeightRequest="2.5"
+                                                                         BackgroundColor="Black"
+                                                                         Opacity="0.8"/>
+                                                        </VerticalStackLayout>
+
+                                                        <!-- CAMPO 4: FRECUENCIA DEL EVENTO (ESTRUCTURA 100% PLANA Y ALINEADA) -->
+                                                        <VerticalStackLayout Spacing="4">
+                                                                <!-- Título sin Sombra Dura Desfasada y 100% Horizontal -->
+                                                                <!-- 🎨 ANTÍDOTO DEFINTIVO: Cambiamos Rotation a 0 en ambas capas del título -->
+                                                                <Grid HorizontalOptions="Start">
+                                                                        <Border BackgroundColor="Black"
+                                                                                StrokeThickness="0"
+                                                                                TranslationX="0"
+                                                                                TranslationY="0"
+                                                                                Rotation="0"
+                                                                                Padding="15,4">
+                                                                                <Border.StrokeShape>
+                                                                                        <RoundRectangle CornerRadius="0"/>
+                                                                                </Border.StrokeShape>
+                                                                                <Label Text="FRECUENCIA DEL EVENTO"
+                                                                                       FontSize="11.5"
+                                                                                       FontFamily="HelveticaNowDisplay-ExtraBold"/>
+                                                                        </Border>
+                                                                        <Border BackgroundColor="Black"
+                                                                                StrokeThickness="0"
+                                                                                Rotation="0"
+                                                                                Padding="15,4">
+                                                                                <Border.StrokeShape>
+                                                                                        <RoundRectangle CornerRadius="0"/>
+                                                                                </Border.StrokeShape>
+                                                                                <Label Text="FRECUENCIA DEL EVENTO"
+                                                                                       TextColor="White"
+                                                                                       FontSize="11.5"
+                                                                                       FontFamily="HelveticaNowDisplay-ExtraBold"
+                                                                                       FontAttributes="Bold"/>
+                                                                        </Border>
+                                                                </Grid>
+
+                                                                <!-- CONTENEDOR MAESTRO DEL DROPDOWN -->
+                                                                <VerticalStackLayout WidthRequest="230"
+                                                                                     HorizontalOptions="Start"
+                                                                                     Margin="5,8,0,8">
+
+                                                                        <!-- CABECERA DEL DROPDOWN (HORIZONTAL PLANA AS MAESTRA) -->
+                                                                        <Border BackgroundColor="Black"
+                                                                                StrokeThickness="0"
+                                                                                HeightRequest="40">
+                                                                                <Border.StrokeShape>
+                                                                                        <RoundRectangle CornerRadius="0"/>
+                                                                                </Border.StrokeShape>
+
+                                                                                <Grid ColumnDefinitions="*, Auto"
+                                                                                      Padding="15,0,12,0">
+                                                                                        <Label x:Name="LabelFrecuenciaCustom"
+                                                                                               Grid.Column="0"
+                                                                                               Text="NINGUNA"
+                                                                                               TextColor="White"
+                                                                                               FontFamily="Impact"
+                                                                                               FontSize="18"
+                                                                                               CharacterSpacing="1"
+                                                                                               VerticalOptions="Center"/>
+                                                                                        <Label x:Name="IndicadorAngulo"
+                                                                                               Grid.Column="1"
+                                                                                               Text="◢"
+                                                                                               TextColor="#E31D26"
+                                                                                               FontSize="14"
+                                                                                               VerticalOptions="Center"
+                                                                                               Margin="0,4,0,0"/>
+                                                                                </Grid>
+                                                                                <Border.GestureRecognizers>
+                                                                                        <TapGestureRecognizer Tapped="OnFrecuenciaHeaderTapped"/>
+                                                                                </Border.GestureRecognizers>
+                                                                        </Border>
+
+                                                                        <!-- PERSIANA DESPLEGABLE RECTANGULAR -->
+                                                                        <Border x:Name="ContenedorOpcionesDrop"
+                                                                                Margin="0,2,0,0"
+                                                                                BackgroundColor="#000000"
+                                                                                Stroke="#000000"
+                                                                                StrokeThickness="1">
+                                                                                <Border.StrokeShape>
+                                                                                        <RoundRectangle CornerRadius="0"/>
+                                                                                </Border.StrokeShape>
+
+                                                                                <VerticalStackLayout Spacing="6"
+                                                                                                     Padding="0,15,0,20">
+                                                                                        <Label Text="NINGUNA"
+                                                                                               FontFamily="Impact"
+                                                                                               FontSize="16"
+                                                                                               TextColor="White"
+                                                                                               CharacterSpacing="0.8"
+                                                                                               Padding="20,5"
+                                                                                               HorizontalOptions="Fill">
+                                                                                                <Label.GestureRecognizers>
+                                                                                                        <TapGestureRecognizer Tapped="OnOpcionSeleccionadaTapped"/>
+                                                                                                </Label.GestureRecognizers>
+                                                                                        </Label>
+                                                                                        <Grid Margin="0,4"
+                                                                                              HeightRequest="36">
+                                                                                                <BoxView BackgroundColor="#E31D26"/>
+                                                                                                <Label Text="DIARIO"
+                                                                                                       FontFamily="Impact"
+                                                                                                       FontSize="16"
+                                                                                                       TextColor="White"
+                                                                                                       FontAttributes="Bold"
+                                                                                                       CharacterSpacing="1"
+                                                                                                       Padding="25,0"
+                                                                                                       VerticalTextAlignment="Center"
+                                                                                                       HorizontalOptions="Fill">
+                                                                                                        <Label.GestureRecognizers>
+                                                                                                                <TapGestureRecognizer Tapped="OnOpcionSeleccionadaTapped"/>
+                                                                                                        </Label.GestureRecognizers>
+                                                                                                </Label>
+                                                                                        </Grid>
+                                                                                        <Label Text="SEMANAL"
+                                                                                               FontFamily="Impact"
+                                                                                               FontSize="16"
+                                                                                               TextColor="White"
+                                                                                               CharacterSpacing="0.8"
+                                                                                               Padding="20,5"
+                                                                                               HorizontalOptions="Fill">
+                                                                                                <Label.GestureRecognizers>
+                                                                                                        <TapGestureRecognizer Tapped="OnOpcionSeleccionadaTapped"/>
+                                                                                                </Label.GestureRecognizers>
+                                                                                        </Label>
+                                                                                        <Grid Margin="0,4"
+                                                                                              HeightRequest="36">
+                                                                                                <BoxView BackgroundColor="#E31D26"/>
+                                                                                                <Label Text="MENSUAL"
+                                                                                                       FontFamily="Impact"
+                                                                                                       FontSize="16"
+                                                                                                       TextColor="White"
+                                                                                                       FontAttributes="Bold"
+                                                                                                       CharacterSpacing="1"
+                                                                                                       Padding="25,0"
+                                                                                                       VerticalTextAlignment="Center"
+                                                                                                       HorizontalOptions="Fill">
+                                                                                                        <Label.GestureRecognizers>
+                                                                                                                <TapGestureRecognizer Tapped="OnOpcionSeleccionadaTapped"/>
+                                                                                                        </Label.GestureRecognizers>
+                                                                                                </Label>
+                                                                                        </Grid>
+                                                                                        <Label Text="ANUAL"
+                                                                                               FontFamily="Impact"
+                                                                                               FontSize="16"
+                                                                                               TextColor="White"
+                                                                                               CharacterSpacing="0.8"
+                                                                                               Padding="20,5"
+                                                                                               HorizontalOptions="Fill">
+                                                                                                <Label.GestureRecognizers>
+                                                                                                        <TapGestureRecognizer Tapped="OnOpcionSeleccionadaTapped"/>
+                                                                                                </Label.GestureRecognizers>
+                                                                                        </Label>
+                                                                                </VerticalStackLayout>
+                                                                        </Border>
+                                                                </VerticalStackLayout>
+                                                        </VerticalStackLayout>
+
+                                                        <!-- CAMPO 5: HORA DEL EVENTO RECONSTRUIDO CON CORTE FÍSICO DE CAPAS -->
+                                                        <VerticalStackLayout Spacing="4">
+                                                                <Border BackgroundColor="Black"
+                                                                        StrokeThickness="0"
+                                                                        HorizontalOptions="Start"
+                                                                        Padding="15,5">
+                                                                        <Border.StrokeShape>
+                                                                                <RoundRectangle CornerRadius="0"/>
+                                                                        </Border.StrokeShape>
+                                                                        <Label Text="HORA DEL EVENTO (24H)"
+                                                                               TextColor="White"
+                                                                               FontSize="11.5"
+                                                                               FontFamily="HelveticaNowDisplay-ExtraBold"
+                                                                               FontAttributes="Bold"/>
+                                                                </Border>
+
+                                                                <!-- ======================================================================= -->
+                                                                <!-- 🚀 CONTENEDOR ENVOLVENTE MULTIPLATAFORMA (Reloj a la izquierda, Sello a la derecha) -->
+                                                                <!-- ======================================================================= -->
+                                                                <Grid ColumnDefinitions="*, *"
+                                                                      HorizontalOptions="Fill"
+                                                                      Margin="25,10,25,10">
+
+                                                                        <!-- ⏰ COLUMNA 0: TU RELOJ PUNK ORIGINAL ORIGINAL (Mantenemos tu ancho estricto e IsClipped) -->
+                                                                        <Grid Grid.Column="0"
+                                                                              HeightRequest="120"
+                                                                              WidthRequest="240"
+                                                                              HorizontalOptions="Start"
+                                                                              IsClippedToBounds="True">
+
+                                                                                <!-- VISOR CENTRAL ROJO FIJO DE 40PX -->
+                                                                                <BoxView BackgroundColor="#E31D26"
+                                                                                         HeightRequest="40"
+                                                                                         VerticalOptions="Center"/>
+
+                                                                                <!-- Cuadrícula con 3 filas simétricas de 40px -->
+                                                                                <Grid RowDefinitions="40, 40, 40"
+                                                                                      ColumnDefinitions="*, Auto, *">
+
+                                                                                        <!-- LISTA DE HORAS (Ocupa las 3 filas del contenedor) -->
+                                                                                        <CollectionView x:Name="ListaHoras"
+                                                                                                        Grid.Column="0"
+                                                                                                        Grid.RowSpan="3"
+                                                                                                        HeightRequest="120"
+                                                                                                        SelectionMode="None"
+                                                                                                        VerticalScrollBarVisibility="Never">
+                                                                                                <CollectionView.ItemsLayout>
+                                                                                                        <LinearItemsLayout Orientation="Vertical"
+                                                                                                                           ItemSpacing="0"/>
+                                                                                                </CollectionView.ItemsLayout>
+                                                                                                <CollectionView.ItemTemplate>
+                                                                                                        <DataTemplate>
+                                                                                                                <Label Text="{Binding .}"
+                                                                                                                       FontFamily="Impact"
+                                                                                                                       FontSize="28"
+                                                                                                                       TextColor="Black"
+                                                                                                                       HorizontalTextAlignment="Center"
+                                                                                                                       VerticalTextAlignment="Center"
+                                                                                                                       HeightRequest="40"/>
+                                                                                                        </DataTemplate>
+                                                                                                </CollectionView.ItemTemplate>
+                                                                                        </CollectionView>
+
+                                                                                        <!-- DOS PUNTOS PUNK (Fijados exclusivamente en la fila central) -->
+                                                                                        <Label Grid.Column="1"
+                                                                                               Grid.Row="1"
+                                                                                               Text=":"
+                                                                                               FontFamily="Impact"
+                                                                                               FontSize="30"
+                                                                                               TextColor="Black"
+                                                                                               HorizontalTextAlignment="Center"
+                                                                                               VerticalTextAlignment="Center"
+                                                                                               Margin="5,0,5,5"/>
+
+                                                                                        <!-- LISTA DE MINUTOS (Ocupa las 3 filas del contenedor) -->
+                                                                                        <CollectionView x:Name="ListaMinutos"
+                                                                                                        Grid.Column="2"
+                                                                                                        Grid.RowSpan="3"
+                                                                                                        HeightRequest="120"
+                                                                                                        SelectionMode="None"
+                                                                                                        VerticalScrollBarVisibility="Never">
+                                                                                                <CollectionView.ItemsLayout>
+                                                                                                        <LinearItemsLayout Orientation="Vertical"
+                                                                                                                           ItemSpacing="0"/>
+                                                                                                </CollectionView.ItemsLayout>
+                                                                                                <CollectionView.ItemTemplate>
+                                                                                                        <DataTemplate>
+                                                                                                                <Label Text="{Binding .}"
+                                                                                                                       FontFamily="Impact"
+                                                                                                                       FontSize="28"
+                                                                                                                       TextColor="Black"
+                                                                                                                       HorizontalTextAlignment="Center"
+                                                                                                                       VerticalTextAlignment="Center"
+                                                                                                                       HeightRequest="40"/>
+                                                                                                        </DataTemplate>
+                                                                                                </CollectionView.ItemTemplate>
+                                                                                        </CollectionView>
+                                                                                </Grid>
+                                                                        </Grid>
+
+                                                                        <!-- ======================================================================= -->
+                                                                        <!-- 📥 COLUMNA 1: EL SELLO EN TAMAÑO MASIVO RECALIBRADO PARA EL HUECO       -->
+                                                                        <!-- ======================================================================= -->
+                                                                        <Image x:Name="selloEvento"
+                                                                               Grid.Column="1"
+                                                                               Source="selloevento.png"
+                                                                               Opacity="0"
+                                                                               Scale="3"
+                                                                               Rotation="22"
+                                                                               HeightRequest="185"
+                                                                               WidthRequest="185"
+                                                                               HorizontalOptions="Center"
+                                                                               VerticalOptions="Center"
+                                                                               Margin="0,0,-40,0"
+                                                                               InputTransparent="True"/>
+
+                                                                </Grid>
+
+
+                                                                <BoxView HeightRequest="2"
+                                                                         BackgroundColor="Black"
+                                                                         Opacity="0.8"/>
+                                                        </VerticalStackLayout>
+
+
+                                                        <!-- 🚨 CAMPO 6: SWITCH MODO EMBOSCADA ENMARCADO -->
+                                                        <Border BackgroundColor="#0D0D0D"
+                                                                Stroke="#E31D26"
+                                                                StrokeThickness="2"
+                                                                Padding="14,10"
+                                                                Margin="0,8,0,0">
+                                                                <Border.StrokeShape>
+                                                                        <RoundRectangle CornerRadius="0"/>
+                                                                </Border.StrokeShape>
+                                                                <Grid ColumnDefinitions="*, Auto"
+                                                                      VerticalOptions="Center">
+                                                                        <VerticalStackLayout Grid.Column="0"
+                                                                                             Spacing="2"
+                                                                                             VerticalOptions="Center">
+                                                                                <Label Text="🚨 MODO EMBOSCADA"
+                                                                                       FontAttributes="Bold, Italic"
+                                                                                       TextColor="White"
+                                                                                       FontSize="15"
+                                                                                       FontFamily="HelveticaNowDisplay-ExtraBold"
+                                                                                       CharacterSpacing="0.3"/>
+                                                                                <Label Text="Despierta el móvil con alarma de pantalla completa"
+                                                                                       TextColor="#AAAAAA"
+                                                                                       FontSize="11.5"
+                                                                                       FontFamily="Arial"/>
+                                                                        </VerticalStackLayout>
+                                                                        <Switch Grid.Column="1"
+                                                                                x:Name="SwitchAlarmaAgresiva"
+                                                                                ThumbColor="#E31D26"
+                                                                                OnColor="#333333"
+                                                                                BackgroundColor="Transparent"
+                                                                                HorizontalOptions="End"
+                                                                                VerticalOptions="Center"
+                                                                                Scale="0.95"/>
+                                                                </Grid>
+                                                        </Border>
+
+                                                </VerticalStackLayout>
+                                                <!-- Cierra el VerticalStackLayout de los campos internos -->
+
+                                                <!-- Parches de cinta aislante negra pegados en las esquinas de la hoja -->
+                                                <Polygon Points="0,0 60,0 0,35"
+                                                         Fill="Black"
+                                                         Rotation="-5"
+                                                         HorizontalOptions="Start"
+                                                         VerticalOptions="Start"
+                                                         Margin="-42,-37,0,0"
+                                                         InputTransparent="True"/>
+                                                <Polygon Points="50,0 50,40 0,40"
+                                                         Fill="Black"
+                                                         Rotation="12"
+                                                         HorizontalOptions="End"
+                                                         VerticalOptions="End"
+                                                         Margin="0,0,-42,-37"
+                                                         InputTransparent="True"/>
+
+                                        </Grid>
+                                        <!-- Cierra el Grid contenedor de grafitis/anillas de la hoja -->
+                                </Border>
+                                <!-- Cierra el Border de la libreta claro -->
+
+                                <!-- ======================================================================= -->
+                                <!-- 🎛️ BOTONES DE CONTROL + CONFIRMACIÓN (Fila final)                     -->
+                                <!-- ======================================================================= -->
+                                <Grid Grid.Row="3">
+                                        <Grid RowDefinitions="Auto, Auto"
+                                              ColumnDefinitions="*"
+                                              Margin="0,25,0,0">
+                                                <Grid Grid.Row="0"
+                                                      ColumnDefinitions="*, *"
+                                                      ColumnSpacing="25">
+                                                        <!-- BOTÓN: CREAR EVENTO -->
+                                                        <Grid x:Name="BtnCrearEventoGrid"
+                                                              Grid.Column="0"
+                                                              HeightRequest="50"
+                                                              Rotation="-3.5">
+                                                                <Border BackgroundColor="Black"
+                                                                        Stroke="White"
+                                                                        StrokeThickness="2"
+                                                                        InputTransparent="True">
+                                                                        <Border.StrokeShape>
+                                                                                <RoundRectangle CornerRadius="0"/>
+                                                                        </Border.StrokeShape>
+                                                                </Border>
+                                                                <Grid HorizontalOptions="Center"
+                                                                      VerticalOptions="Center"
+                                                                      InputTransparent="True">
+                                                                        <Label Text="DESATAR MISIÓN"
+                                                                               TextColor="#E31D26"
+                                                                               FontSize="15"
+                                                                               FontFamily="HelveticaNowDisplay-ExtraBold"
+                                                                               FontAttributes="Bold, Italic"
+                                                                               Margin="2,1,0,0"/>
+                                                                        <Label Text="DESATAR MISIÓN"
+                                                                               TextColor="White"
+                                                                               FontSize="15"
+                                                                               FontFamily="HelveticaNowDisplay-ExtraBold"
+                                                                               FontAttributes="Bold, Italic"/>
+                                                                </Grid>
+                                                                <Button BackgroundColor="Transparent"
+                                                                        Clicked="OnGuardarClicked"
+                                                                        HorizontalOptions="Fill"
+                                                                        VerticalOptions="Fill"/>
+
+                                                                <!-- Detector de Hover por hardware para WinUI3 y Android -->
+                                                                <Grid.GestureRecognizers>
+                                                                        <PointerGestureRecognizer PointerEntered="OnBtnCrearMouseIn"
+                                                                                                  PointerExited="OnBtnCrearMouseOut"/>
+                                                                </Grid.GestureRecognizers>
+                                                        </Grid>
+
+                                                        <!-- BOTÓN: ABORTAR (ESTRUCTURA DE BORDE ÚNICO EN SIMETRÍA CRUDA) -->
+                                                        <Grid x:Name="BtnAbortarGrid"
+                                                              Grid.Column="1"
+                                                              HeightRequest="50"
+                                                              Rotation="3">
+
+                                                                <!-- 🎨 UNICO CONTENEDOR: Caja blanca con un solo borde negro grueso exterior -->
+                                                                <Border BackgroundColor="White"
+                                                                        Stroke="Black"
+                                                                        StrokeThickness="2.5"
+                                                                        InputTransparent="True">
+                                                                        <Border.StrokeShape>
+                                                                                <RoundRectangle CornerRadius="0"/>
+                                                                        </Border.StrokeShape>
+                                                                </Border>
+
+                                                                <!-- CUERPO DE TEXTOS DUOTONO ORIGINALES -->
+                                                                <Grid HorizontalOptions="Center"
+                                                                      VerticalOptions="Center"
+                                                                      InputTransparent="True">
+                                                                        <Label Text="ABORTAR"
+                                                                               TextColor="#111111"
+                                                                               FontSize="15"
+                                                                               FontFamily="HelveticaNowDisplay-ExtraBold"
+                                                                               FontAttributes="Bold, Italic"
+                                                                               Margin="2,1,0,0"
+                                                                               Opacity="0.4"/>
+                                                                        <Label Text="ABORTAR"
+                                                                               TextColor="Black"
+                                                                               FontSize="15"
+                                                                               FontFamily="HelveticaNowDisplay-ExtraBold"
+                                                                               FontAttributes="Bold, Italic"/>
+                                                                </Grid>
+
+                                                                <Button BackgroundColor="Transparent"
+                                                                        Clicked="OnCancelarClicked"
+                                                                        HorizontalOptions="Fill"
+                                                                        VerticalOptions="Fill"/>
+
+                                                                <!-- Detector de Hover por hardware para WinUI3 y Android -->
+                                                                <Grid.GestureRecognizers>
+                                                                        <PointerGestureRecognizer PointerEntered="OnBtnAbortarMouseIn"
+                                                                                                  PointerExited="OnBtnAbortarMouseOut"/>
+                                                                </Grid.GestureRecognizers>
+                                                        </Grid>
+
+                                                </Grid>
+
+                                        </Grid>
+                                </Grid>
+                                <!-- Cierra el Grid de botones inferiores -->
+                        </Grid>
+                        <!-- Cierra el Grid maestro del formulario (Ancho 620) -->
+                </ScrollView>
+
+        </Grid>
+        <!-- Cierra el Grid estructural base de la ContentPage -->
 </ContentPage>

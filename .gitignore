@@ -29,4 +29,4 @@ desktop.ini
 
 # --- Banda Sonora Personalizada ---
 # Ignora el archivo pesado mp3 dentro de los recursos para no saturar GitHub
-**/Resources/Raw/soundtrack.mp3
+**/Resources/Ost

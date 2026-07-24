@@ -7,9 +7,9 @@
              Shell.TabBarIsVisible="False"
              Shell.NavBarIsVisible="False">
 
-    <!-- Cambiamos a Grid completo para que las líneas se calculen sobre el lienzo total -->
+    <!-- Grid completo para el cálculo del lienzo total de la GPU -->
     <Grid>
-        
+
         <!-- CONTENEDOR DE IMPACTO ANIME: Generado dinámicamente -->
         <AbsoluteLayout x:Name="ContenedorLineasAccion"
                         HorizontalOptions="Fill"
@@ -17,21 +17,48 @@
                         Opacity="0"
                         InputTransparent="True"/>
 
-        <!-- CONTENEDOR DE LA LINTERNA -->
+        <!-- CONTENEDOR DE LA LINTERNA (CON GRADIENTE RADIAL REALISTA) -->
         <Border x:Name="FocoLinterna"
                 WidthRequest="260"
                 HeightRequest="260"
-                BackgroundColor="White"
                 StrokeThickness="0"
                 HorizontalOptions="Center"
                 VerticalOptions="Center">
             <Border.StrokeShape>
                 <RoundRectangle CornerRadius="130"/>
             </Border.StrokeShape>
+
+            <!-- 🎨 CORRECCIÓN SUPREMA: Pincel inyectado en la propiedad Background nativa -->
+            <Border.Background>
+                <RadialGradientBrush Center="0.5,0.5"
+                        Radius="0.5">
+                    <!-- Centro del círculo: Blanco puro hiper-brillante -->
+                    <GradientStop Color="#FFFFFF"
+                            Offset="0.0"/>
+
+                    <!-- Haz de luz intermedio: Tono azulado frío/grisáceo de cómic nocturno -->
+                    <GradientStop Color="#D1E4E8"
+                            Offset="0.4"/>
+
+                    <!-- Dispersión de penumbra: Azul acero oscuro traslúcido -->
+                    <GradientStop Color="#405560"
+                            Offset="0.75"/>
+
+                    <!-- Borde exterior: Transparencia absoluta para fundirse con el fondo negro -->
+                    <GradientStop Color="#00000000"
+                            Offset="1.0"/>
+                </RadialGradientBrush>
+            </Border.Background>
+
+            <!-- Sombra difuminada de soporte para WinUI3 -->
             <Border.Shadow>
-                <Shadow Brush="Black" Offset="0,0" Radius="40" Opacity="0.95"/>
+                <Shadow Brush="Black"
+                        Offset="0,0"
+                        Radius="45"
+                        Opacity="0.95"/>
             </Border.Shadow>
 
+            <!-- TEXTO DE INFILTRACIÓN PHANTOM THIEVES -->
             <Label x:Name="TextoLinterna"
                    Text="SEARCHING..."
                    FontFamily="Impact"
@@ -41,6 +68,6 @@
                    VerticalOptions="Center"
                    Rotation="-15"/>
         </Border>
-        
+
     </Grid>
 </ContentPage>

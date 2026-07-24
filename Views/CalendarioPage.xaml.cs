@@ -341,27 +341,26 @@ namespace MauiTime.Views
 
             // Hacemos el calendario visible al 100% de forma inmediata
             GridDiasCollectionView.Opacity = 1.0;
-
-            // =======================================================================
-            // 🎯 RE-CALIBRACIÓN DE ENFOQUE: GARANTIZAR EL CENTRADO REAL EN PANTALLA
-            // =======================================================================
-            // Ejecutamos el scroll un frame después de que el layout esté listo,
-            // forzando a Windows a romper cualquier bloqueo de renderizado nativo.
-            Dispatcher.Dispatch(async () =>
-            {
-                // Buscamos el objeto de la celda de hoy dentro de tu colección real de datos
-                var diaHoyModelo = DiasDelMes.FirstOrDefault(d => d.EsHoy);
-                if (diaHoyModelo != null)
-                {
-                    // Forzamos un micro-silencio de 50ms para asegurar el asiento de la UI
-                    await Task.Delay(50);
-
-                    // Hacemos el scroll instantáneo (animate: false) hacia el día de hoy.
-                    // Usamos ScrollToPosition.Center para clavar la fila de hoy en el centro visual exacto.
-                    GridDiasCollectionView.ScrollTo(diaHoyModelo, position: ScrollToPosition.Center, animate: false);
-                }
-            });
         }
+
+
+
+
+        private void OnGridDiasCollectionViewSizeChanged(object? sender, EventArgs e)
+        {
+            // Desenganchamos el evento de inmediato para que solo se ejecute una vez al cargar la página
+            GridDiasCollectionView.SizeChanged -= OnGridDiasCollectionViewSizeChanged;
+
+            // Buscamos el objeto de la celda de hoy dentro de tu colección real de datos
+            var diaHoyModelo = DiasDelMes.FirstOrDefault(d => d.EsHoy);
+            if (diaHoyModelo != null)
+            {
+                // Forzamos el salto instantáneo (animate: false) al centro visual exacto
+                // Como el control ya tiene tamaño real, Windows centrará la fila de hoy (ej. día 22) inmediatamente
+                GridDiasCollectionView.ScrollTo(diaHoyModelo, position: ScrollToPosition.Center, animate: false);
+            }
+        }
+
 
 
         /// Se ejecuta de forma automática en cuanto el puñal de "Hoy" se dibuja físicamente en la pantalla.
@@ -370,6 +369,17 @@ namespace MauiTime.Views
         {
             if (sender is Image objetoCuchillo)
             {
+                // =======================================================================
+                // ⚔️ BYPASS DE FUERZA BRUTA: EL SCROLL SE GATILLA DESDE EL ELEMENTO REAL
+                // =======================================================================
+                var diaHoyModelo = DiasDelMes.FirstOrDefault(d => d.EsHoy);
+                if (diaHoyModelo != null)
+                {
+                    // Forzamos el scroll usando el objeto modelo directamente en caliente.
+                    // Al estar el árbol de WinUI3 ya pintado en este evento, el salto al centro es instantáneo.
+                    GridDiasCollectionView.ScrollTo(diaHoyModelo, position: ScrollToPosition.Center, animate: false);
+                }
+
                 // 🚨 EL CANDADO DEFINITIVO DE FECHA REAL:
                 // Comprobamos si el mes y año que se está renderizando coincide con el mes y año del reloj real de tu PC.
                 bool esElMesActualReal = _mesActualReferencia.Month == DateTime.Today.Month &&
