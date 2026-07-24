@@ -38,8 +38,8 @@ Un tablón de anuncios duotono optimizado que elude los fallos de renderizado en
 - **Sello de Aprobación Dinámico (Hoja Sellada):** Al guardar un objetivo con éxito, el escudo de armas vectorial original de la aplicación impacta con un rebote físico y una rotación elástica en el centro del espacio vacío del reloj, antes de deslizar el documento entero de manera responsiva.
 
 <p align="center">
-  <img src="Resources/Images/formulario_crear_evento.jpg" width="450" alt="Hoja de Crear Evento"/>
-  <img src="Resources/Images/formulario_hoja_sellada.jpg" width="450" alt="Hoja Sellada Aprobada"/>
+  <img src="Resources/Images/nuevoevento_page.jpg" width="450" alt="Hoja de Crear Evento"/>
+  <img src="Resources/Images/crearevento.jpg" width="450" alt="Hoja Sellada Aprobada"/>
 </p>
 
 <p align="center">
