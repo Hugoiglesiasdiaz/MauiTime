@@ -6,38 +6,283 @@
              NavigationPage.HasNavigationBar="False"
              ZIndex="99999">
 
-    <!-- LIENZO DE EMBOSCADA TOTAL (OCUPA EL 100% DEL MONITOR) -->
-    <Grid RowDefinitions="*, Auto" Padding="50" HorizontalOptions="Fill" VerticalOptions="Fill">
-        
-        <VerticalStackLayout Grid.Row="0" VerticalOptions="Center" HorizontalOptions="Center" Spacing="20">
-            <!-- SÍMBOLO GIGANTE DE PELIGRO -->
-            <Border BackgroundColor="Black" Padding="25,10" Rotation="-5" HorizontalOptions="Center">
-                <Label Text="🚨 EMBOSCADA DE TIEMPO 🚨" FontAttributes="Bold" FontSize="36" TextColor="White" FontFamily="Impact"/>
-            </Border>
+    <!-- Canvas Maestro de Capas Gráficas -->
+    <Grid>
+        <!-- ======================================================================= -->
+        <!-- 🎸 CAPA 1: TEXTOS DE FONDO EN REPETICIÓN (RUIDO GRÁFICO / MENTAL)       -->
+        <!-- ======================================================================= -->
+        <Label Text="ALERT ALERT ALERT ALERT ALERT ALERT"
+               FontFamily="Impact"
+               FontSize="70"
+               TextColor="Black"
+               Opacity="0.08"
+               Rotation="-15"
+               HorizontalOptions="Start"
+               VerticalOptions="Start"
+               Margin="-50,40,0,0"
+               CharacterSpacing="5"/>
 
-            <!-- TÍTULO DE LA MISIÓN EN MAYÚSCULAS GIGANTES -->
-            <Label x:Name="LblTituloMision" Text="TITULO DE LA MISION" HorizontalTextAlignment="Center" FontAttributes="Bold" FontSize="42" TextColor="Black" FontFamily="Impact" Rotation="2"/>
-            
-            <!-- DETALLES DE LAS INSTRUCCIONES -->
-            <Label x:Name="LblDescripcionMision" Text="REGLAS DE INFILTRACION..." HorizontalTextAlignment="Center" FontSize="18" TextColor="White" FontFamily="Arial Black" Rotation="-1"/>
-        </VerticalStackLayout>
+        <Label Text="TIME IS RUNNING OUT TIME IS RUNNING OUT"
+               FontFamily="Impact"
+               FontSize="55"
+               TextColor="White"
+               Opacity="0.06"
+               Rotation="35"
+               HorizontalOptions="End"
+               VerticalOptions="End"
+               Margin="0,0,-100,50"
+               CharacterSpacing="2"/>
 
-        <!-- BOTÓN DE APAGADO DE ALARMA CRÍTICA -->
-        <Button Grid.Row="1" 
-                Text="ENTENDIDO (RECLAMAR CORAZÓN)" 
-                Clicked="OnDesactivarAlarmaClicked"
-                BackgroundColor="Black" 
-                TextColor="White" 
-                FontFamily="Impact"
-                FontSize="22" 
-                CornerRadius="0"
-                HeightRequest="60"
-                WidthRequest="380"
-                HorizontalOptions="Center"
-                Rotation="-2">
-            <Button.Shadow>
-                <Shadow Brush="White" Offset="4,4" Radius="0" Opacity="1"/>
-            </Button.Shadow>
-        </Button>
+        <!-- ======================================================================= -->
+        <!-- 🎸 CAPA 2: CUCHILLAS POLIGONALES Y DETALLES GEOMÉTRICOS DE FONDO         -->
+        <!-- ======================================================================= -->
+        <!-- Tu gran franja oblicua original texturizada con una gemela de contratensión -->
+        <Path Data="M -100,-50 L 1200,600 L 1500,450 L -100,-250"
+              Fill="Black"
+              Opacity="0.85"
+              Aspect="Fill"/>
+        <Path Data="M -50,600 L 1500,100 L 1500,180 L -50,680"
+              Fill="#4A0004"
+              Opacity="0.6"
+              Aspect="Fill"/>
+
+        <!-- Esquinas con cortes triangulares agresivos -->
+        <Polygon Points="0,0 250,0 0,180"
+                 Fill="Black"
+                 Opacity="0.4"
+                 Aspect="Fill"
+                 HorizontalOptions="Start"
+                 VerticalOptions="Start"/>
+        <Polygon Points="620,500 620,700 350,700"
+                 Fill="White"
+                 Opacity="0.08"
+                 Aspect="Fill"
+                 HorizontalOptions="End"
+                 VerticalOptions="End"/>
+
+        <!-- ⭐️ ESTRELLAS PUNK DE IMPACTO (Iconografía Persona 5) -->
+        <!-- Estrella superior izquierda -->
+        <Path Data="M 0,25 L 18,35 L 12,55 L 30,42 L 48,55 L 42,35 L 60,25 L 38,25 L 30,5 L 22,25 Z"
+              Fill="White"
+              Opacity="0.15"
+              WidthRequest="60"
+              HeightRequest="60"
+              HorizontalOptions="Start"
+              VerticalOptions="Start"
+              Margin="250,80,0,0"
+              Rotation="-12"/>
+        <!-- Estrella inferior derecha -->
+        <Path Data="M 0,25 L 18,35 L 12,55 L 30,42 L 48,55 L 42,35 L 60,25 L 38,25 L 30,5 L 22,25 Z"
+              Fill="Black"
+              Opacity="0.3"
+              WidthRequest="80"
+              HeightRequest="80"
+              HorizontalOptions="End"
+              VerticalOptions="End"
+              Margin="0,0,180,120"
+              Rotation="18"/>
+
+        <!-- Marco exterior roto de la pantalla -->
+        <Path Data="M 20,20 L 1180,35 L 1160,780 L 40,760 Z"
+              Stroke="Black"
+              StrokeThickness="1.5"
+              Fill="Transparent"
+              Opacity="0.3"
+              Aspect="Fill"
+              Margin="15"/>
+
+        <!-- ======================================================================= -->
+        <!-- 📝 CAPA 3: CONTENEDOR ESTRUCTURAL EN DIAGONAL COMPUESTA                -->
+        <!-- ======================================================================= -->
+        <Grid RowDefinitions="*, Auto"
+              Padding="50"
+              HorizontalOptions="Fill"
+              VerticalOptions="Fill">
+
+            <VerticalStackLayout Grid.Row="0"
+                                 VerticalOptions="Center"
+                                 HorizontalOptions="Center"
+                                 Spacing="28">
+
+                <!-- 🚨 SÍMBOLO GIGANTE DE PELIGRO (Mantenemos tu cabecera impecable) -->
+                <Border BackgroundColor="Black"
+                        Stroke="White"
+                        StrokeThickness="3"
+                        Padding="35,12"
+                        Rotation="-5"
+                        HorizontalOptions="Center">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="0"/>
+                    </Border.StrokeShape>
+                    <Label Text="🚨 EMBOSCADA DE TIEMPO 🚨"
+                           FontAttributes="Bold"
+                           FontSize="36"
+                           TextColor="White"
+                           FontFamily="Impact"
+                           CharacterSpacing="1"/>
+                </Border>
+
+                <!-- ======================================================================= -->
+                <!-- 💥 TÍTULO RANSOM DISTORSIONADO (CORREGIDO ERROR CS0103)                 -->
+                <!-- ======================================================================= -->
+                <StackLayout Orientation="Horizontal"
+                        HorizontalOptions="Center"
+                        Spacing="10"
+                        Margin="0,15,0,0">
+
+                    <!-- Bloque 1: ¡ALERTA -->
+                    <Grid Rotation="-6">
+                        <Label Text="¡ALERTA"
+                                FontFamily="Impact"
+                                FontSize="54"
+                                TextColor="Black"
+                                Margin="5,5,0,0"/>
+                        <Label Text="¡ALERTA"
+                                FontFamily="Impact"
+                                FontSize="54"
+                                TextColor="White"/>
+                    </Grid>
+
+                    <!-- Bloque 2: DE -->
+                    <Grid Rotation="8"
+                            Margin="0,5,0,0">
+                        <Border BackgroundColor="Black"
+                                Padding="8,2"
+                                StrokeThickness="0">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="0"/>
+                            </Border.StrokeShape>
+                        </Border>
+                        <Label Text="DE"
+                                FontFamily="Impact"
+                                FontSize="44"
+                                TextColor="#E31D26"
+                                HorizontalOptions="Center"
+                                VerticalOptions="Center"/>
+                    </Grid>
+
+                    <!-- Bloque 3: EMBOSCADA! (Contiene la variable que exige tu C#) -->
+                    <Grid Rotation="-3">
+                        <Label Text="{Binding Source={x:Reference LblTituloMision}, Path=Text}"
+                               FontFamily="Impact"
+                                FontSize="54"
+                                TextColor="Black"
+                                Margin="5,5,0,0"/>
+                        <Label x:Name="LblTituloMision"
+                               Text="EMBOSCADA!"
+                               FontFamily="Impact"
+                               FontSize="54"
+                               TextColor="#FFF0F0"/>
+                    </Grid>
+                </StackLayout>
+
+                <!-- ======================================================================= -->
+                <!-- 📄 DETALLES DE LAS INSTRUCCIONES: CORTADO EN DIAGONAL AGRESIVA          -->
+                <!-- ======================================================================= -->
+                <Grid HorizontalOptions="Center"
+                        Rotation="-2.5"
+                        Margin="0,10,0,0"
+                        WidthRequest="720">
+                    <!-- Tarjeta de fondo negra desalineada hacia abajo -->
+                    <Border BackgroundColor="Black"
+                            StrokeThickness="0"
+                            Margin="8,8,-8,-8">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="0"/>
+                        </Border.StrokeShape>
+                    </Border>
+
+                    <!-- Tarjeta frontal gris oscuro con un tajo rojo en el borde -->
+                    <Border BackgroundColor="#161616"
+                            Stroke="#E31D26"
+                            StrokeThickness="3"
+                            Padding="35,22">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="0"/>
+                        </Border.StrokeShape>
+
+                        <Label x:Name="LblDescripcionMision"
+                               Text="EL OBJETIVO DE PRODUCTIVIDAD ESTÁ EN RIESGO CRÍTICO. ACTÚA DE INMEDIATO."
+                               HorizontalTextAlignment="Center"
+                                FontSize="16"
+                                TextColor="White"
+                                FontFamily="Arial Black"
+                                LineHeight="1.5"
+                                CharacterSpacing="0.5"/>
+                    </Border>
+                </Grid>
+
+                <!-- 🏹 FLECHAS VECTORIALES DE TENSIÓN HACIA EL BOTÓN -->
+                <Grid HorizontalOptions="Center"
+                        HeightRequest="40"
+                        Margin="0,5,0,0"
+                        Opacity="0.4">
+                    <Path Data="M 0,0 L 15,20 L 30,0 L 20,0 L 20,-15 L 10,-15 L 10,0 Z"
+                            Fill="White"
+                            HorizontalOptions="Start"
+                            Margin="-150,0,0,0"
+                            Rotation="15"/>
+                    <Path Data="M 0,0 L 15,20 L 30,0 L 20,0 L 20,-15 L 10,-15 L 10,0 Z"
+                            Fill="Black"
+                            HorizontalOptions="End"
+                            Margin="0,0,-150,0"
+                            Rotation="-15"/>
+                </Grid>
+
+            </VerticalStackLayout>
+
+            <!-- ======================================================================= -->
+            <!-- ⚡ CAPA 4: BOTÓN PUNK CON CAPAS DE CONTRATENSIÓN Y EFECTO HOVER         -->
+            <!-- ======================================================================= -->
+            <Grid x:Name="BtnReclamarGrid"
+                    Grid.Row="1"
+                    HeightRequest="64"
+                    WidthRequest="400"
+                    HorizontalOptions="Center"
+                    Rotation="-2"
+                    Margin="0,0,0,20">
+                <Grid.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnDesactivarAlarmaClicked"/>
+                    <PointerGestureRecognizer PointerEntered="OnBtnReclamarMouseIn"
+                            PointerExited="OnBtnReclamarMouseOut"/>
+                </Grid.GestureRecognizers>
+
+                <!-- Sombra dura roja de fondo -->
+                <Border BackgroundColor="#E31D26"
+                        StrokeThickness="0"
+                        Margin="8,8,-4,-4">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="0"/>
+                    </Border.StrokeShape>
+                </Border>
+
+                <!-- Sombra dura blanca intermedia -->
+                <Border BackgroundColor="White"
+                        StrokeThickness="0"
+                        Margin="4,4,0,0">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="0"/>
+                    </Border.StrokeShape>
+                </Border>
+
+                <!-- Cuerpo principal del botón -->
+                <Border BackgroundColor="Black"
+                        Stroke="White"
+                        StrokeThickness="2">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="0"/>
+                    </Border.StrokeShape>
+
+                    <Label Text="ENTENDIDO [RECLAMAR CORAZÓN]"
+                            FontFamily="Impact"
+                            FontSize="20"
+                            TextColor="White"
+                            HorizontalOptions="Center"
+                            VerticalOptions="Center"
+                            CharacterSpacing="1"/>
+                </Border>
+            </Grid>
+
+        </Grid>
     </Grid>
 </ContentPage>

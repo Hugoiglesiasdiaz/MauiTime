@@ -9,8 +9,8 @@ namespace MauiTime;
 
 public partial class App : Application
 {
-    // Propiedad global para controlar la música desde cualquier otra pantalla de la app
-    public static IAudioPlayer? SoundtrackPlayer { get; private set; }
+    public static IAudioPlayer? BackgroundPlayer { get; private set; }
+    public static IAudioPlayer? AlarmaPlayer { get; private set; }
 
     public App()
     {
@@ -113,27 +113,53 @@ public partial class App : Application
     {
         try
         {
-            // 🎯 BLINDAJE ABSOLUTO GITHUB: Verificamos de forma asíncrona si el asset existe en el paquete compilado
-            bool existeCancion = await FileSystem.Current.AppPackageFileExistsAsync("soundtrack.mp3");
+            var audioManager = AudioManager.Current;
 
-            if (!existeCancion)
+            // =======================================================================
+            // 🎵 CANCIÓN 1: BACKGROUND.MP3 (MÚSICA DE FONDO PERMANENTE)
+            // =======================================================================
+            bool existeBackground = await FileSystem.Current.AppPackageFileExistsAsync("background.mp3");
+
+            if (existeBackground)
             {
-                Console.WriteLine("\n[AUDIO REPOSITORIO] 'Resources/Raw/soundtrack.mp3' no detectado. Modo silencioso activo.\n");
-                return;
+                var streamBg = await FileSystem.OpenAppPackageFileAsync("background.mp3");
+                BackgroundPlayer = audioManager.CreatePlayer(streamBg);
+
+                BackgroundPlayer.Loop = true;
+                BackgroundPlayer.Volume = 0.20; // Mantenemos tu volumen sutil del 20%
+
+                BackgroundPlayer.Play(); // Arranca sonando en la Agenda/Calendario
+                Console.WriteLine("\n[AUDIO] 🎵 ¡ÉXITO! Iniciada música de fondo (background.mp3) desde los assets.\n");
+            }
+            else
+            {
+                Console.WriteLine("\n[AUDIO INFO] 'Resources/Raw/background.mp3' no detectado. Fondo en silencio.\n");
             }
 
-            var streamMusica = await FileSystem.OpenAppPackageFileAsync("soundtrack.mp3");
-            SoundtrackPlayer = AudioManager.Current.CreatePlayer(streamMusica);
+            // =======================================================================
+            // 🎵 CANCIÓN 2: ALARMA.MP3 (MÚSICA DE ALERTA DE EMBOSCADA)
+            // =======================================================================
+            bool existeAlarma = await FileSystem.Current.AppPackageFileExistsAsync("alarma.mp3");
 
-            SoundtrackPlayer.Loop = true;
-            SoundtrackPlayer.Volume = 0.20;
+            if (existeAlarma)
+            {
+                var streamAlarm = await FileSystem.OpenAppPackageFileAsync("alarma.mp3");
+                AlarmaPlayer = audioManager.CreatePlayer(streamAlarm);
 
-            SoundtrackPlayer.Play();
-            Console.WriteLine("\n[AUDIO] 🎵 ¡ÉXITO! Iniciada banda sonora integrada desde los assets del proyecto.\n");
+                AlarmaPlayer.Loop = true;
+                AlarmaPlayer.Volume = 0.45; // Volumen un poco más alto para generar la tensión del combate
+
+                Console.WriteLine("[AUDIO] 🚨 ¡ÉXITO! Pre-cargada música de alerta (alarma.mp3) lista para emboscadas.\n");
+            }
+            else
+            {
+                Console.WriteLine("\n[AUDIO INFO] 'Resources/Raw/alarma.mp3' no detectado. Alerta en silencio.\n");
+            }
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"[AUDIO ERROR] Fallo al procesar el recurso musical empaquetado: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"[AUDIO ERROR] Fallo al procesar los recursos musicales empaquetado: {ex.Message}");
         }
     }
+
 }

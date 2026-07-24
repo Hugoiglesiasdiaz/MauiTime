@@ -72,18 +72,6 @@ namespace MauiTime.Services
                     return;
                 }
 
-                Console.WriteLine("[SQLITE] Base de datos limpia detectada. Insertando Mock inicial por única vez...");
-                
-                var mockEventos = new List<Evento>
-                {
-                    new Evento { Titulo = "Meditación", Descripcion = "10 min de paz", FechaHora = DateTime.Now, Frecuencia = FrecuenciaEvento.Diario },
-                    new Evento { Titulo = "Reunión de Equipo", Descripcion = "Avances", FechaHora = DateTime.Now.AddDays(1), Frecuencia = FrecuenciaEvento.Semanal },
-                    new Evento { Titulo = "Pago Alquiler", Descripcion = "Transferencia", FechaHora = DateTime.Now.AddDays(2), Frecuencia = FrecuenciaEvento.Mensual },
-                    new Evento { Titulo = "Cumpleaños Mamá", Descripcion = "Comprar regalo", FechaHora = DateTime.Now.AddDays(3), Frecuencia = FrecuenciaEvento.Anual }
-                };
-
-                await _dbConnection.InsertAllAsync(mockEventos);
-                Console.WriteLine("[SQLITE] ¡Éxito! 4 registros iniciales inyectados.");
             }
             catch (Exception ex)
             {

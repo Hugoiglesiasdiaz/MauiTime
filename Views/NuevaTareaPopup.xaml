@@ -579,87 +579,108 @@
                                                                                FontAttributes="Bold"/>
                                                                 </Border>
 
-                                                                <!-- Contenedor blindado con IsClippedToBounds para que nada se desborde -->
-                                                                <Grid HeightRequest="120"
-                                                                      WidthRequest="240"
-                                                                      HorizontalOptions="Start"
-                                                                      Margin="5,10,0,10"
-                                                                      IsClippedToBounds="True">
+                                                                <!-- ======================================================================= -->
+                                                                <!-- 🚀 CONTENEDOR ENVOLVENTE MULTIPLATAFORMA (Reloj a la izquierda, Sello a la derecha) -->
+                                                                <!-- ======================================================================= -->
+                                                                <Grid ColumnDefinitions="*, *"
+                                                                      HorizontalOptions="Fill"
+                                                                      Margin="25,10,25,10">
 
-                                                                        <!-- VISOR CENTRAL ROJO FIJO DE 40PX -->
-                                                                        <BoxView BackgroundColor="#E31D26"
-                                                                                 HeightRequest="40"
-                                                                                 VerticalOptions="Center"/>
+                                                                        <!-- ⏰ COLUMNA 0: TU RELOJ PUNK ORIGINAL ORIGINAL (Mantenemos tu ancho estricto e IsClipped) -->
+                                                                        <Grid Grid.Column="0"
+                                                                              HeightRequest="120"
+                                                                              WidthRequest="240"
+                                                                              HorizontalOptions="Start"
+                                                                              IsClippedToBounds="True">
 
-                                                                        <!-- Cuadrícula con 3 filas simétricas de 40px -->
-                                                                        <Grid RowDefinitions="40, 40, 40"
-                                                                              ColumnDefinitions="*, Auto, *">
+                                                                                <!-- VISOR CENTRAL ROJO FIJO DE 40PX -->
+                                                                                <BoxView BackgroundColor="#E31D26"
+                                                                                         HeightRequest="40"
+                                                                                         VerticalOptions="Center"/>
 
-                                                                                <!-- LISTA DE HORAS (Ocupa las 3 filas del contenedor) -->
-                                                                                <CollectionView x:Name="ListaHoras"
-                                                                                                Grid.Column="0"
-                                                                                                Grid.RowSpan="3"
-                                                                                                HeightRequest="120"
-                                                                                                SelectionMode="None"
-                                                                                                VerticalScrollBarVisibility="Never">
-                                                                                        <CollectionView.ItemsLayout>
-                                                                                                <!-- Eliminados los SnapPoints nativos para evitar conflictos de bucle -->
-                                                                                                <LinearItemsLayout Orientation="Vertical"
-                                                                                                                ItemSpacing="0"/>
-                                                                                        </CollectionView.ItemsLayout>
-                                                                                        <CollectionView.ItemTemplate>
-                                                                                                <DataTemplate>
-                                                                                                        <!-- Forzado absoluto a 40px por número sin holguras -->
-                                                                                                        <Label Text="{Binding .}"
-                                                                                                               FontFamily="Impact"
-                                                                                                               FontSize="28"
-                                                                                                               TextColor="Black"
-                                                                                                               HorizontalTextAlignment="Center"
-                                                                                                               VerticalTextAlignment="Center"
-                                                                                                               HeightRequest="40"/>
-                                                                                                </DataTemplate>
-                                                                                        </CollectionView.ItemTemplate>
-                                                                                </CollectionView>
+                                                                                <!-- Cuadrícula con 3 filas simétricas de 40px -->
+                                                                                <Grid RowDefinitions="40, 40, 40"
+                                                                                      ColumnDefinitions="*, Auto, *">
 
-                                                                                <!-- DOS PUNTOS PUNK (Fijados exclusivamente en la fila central) -->
-                                                                                <Label Grid.Column="1"
-                                                                                       Grid.Row="1"
-                                                                                       Text=":"
-                                                                                       FontFamily="Impact"
-                                                                                       FontSize="30"
-                                                                                       TextColor="Black"
-                                                                                       HorizontalTextAlignment="Center"
-                                                                                       VerticalTextAlignment="Center"
-                                                                                       Margin="5,0,5,5"/>
+                                                                                        <!-- LISTA DE HORAS (Ocupa las 3 filas del contenedor) -->
+                                                                                        <CollectionView x:Name="ListaHoras"
+                                                                                                        Grid.Column="0"
+                                                                                                        Grid.RowSpan="3"
+                                                                                                        HeightRequest="120"
+                                                                                                        SelectionMode="None"
+                                                                                                        VerticalScrollBarVisibility="Never">
+                                                                                                <CollectionView.ItemsLayout>
+                                                                                                        <LinearItemsLayout Orientation="Vertical"
+                                                                                                                           ItemSpacing="0"/>
+                                                                                                </CollectionView.ItemsLayout>
+                                                                                                <CollectionView.ItemTemplate>
+                                                                                                        <DataTemplate>
+                                                                                                                <Label Text="{Binding .}"
+                                                                                                                       FontFamily="Impact"
+                                                                                                                       FontSize="28"
+                                                                                                                       TextColor="Black"
+                                                                                                                       HorizontalTextAlignment="Center"
+                                                                                                                       VerticalTextAlignment="Center"
+                                                                                                                       HeightRequest="40"/>
+                                                                                                        </DataTemplate>
+                                                                                                </CollectionView.ItemTemplate>
+                                                                                        </CollectionView>
 
-                                                                                <!-- LISTA DE MINUTOS (Ocupa las 3 filas del contenedor) -->
-                                                                                <CollectionView x:Name="ListaMinutos"
-                                                                                                Grid.Column="2"
-                                                                                                Grid.RowSpan="3"
-                                                                                                HeightRequest="120"
-                                                                                                SelectionMode="None"
-                                                                                                VerticalScrollBarVisibility="Never">
-                                                                                        <CollectionView.ItemsLayout>
-                                                                                                <!-- Eliminados los SnapPoints nativos para evitar conflictos de bucle -->
-                                                                                                <LinearItemsLayout Orientation="Vertical"
-                                                                                                                ItemSpacing="0"/>
-                                                                                        </CollectionView.ItemsLayout>
-                                                                                        <CollectionView.ItemTemplate>
-                                                                                                <DataTemplate>
-                                                                                                        <!-- Forzado absoluto a 40px por número sin holguras -->
-                                                                                                        <Label Text="{Binding .}"
-                                                                                                               FontFamily="Impact"
-                                                                                                               FontSize="28"
-                                                                                                               TextColor="Black"
-                                                                                                               HorizontalTextAlignment="Center"
-                                                                                                               VerticalTextAlignment="Center"
-                                                                                                               HeightRequest="40"/>
-                                                                                                </DataTemplate>
-                                                                                        </CollectionView.ItemTemplate>
-                                                                                </CollectionView>
+                                                                                        <!-- DOS PUNTOS PUNK (Fijados exclusivamente en la fila central) -->
+                                                                                        <Label Grid.Column="1"
+                                                                                               Grid.Row="1"
+                                                                                               Text=":"
+                                                                                               FontFamily="Impact"
+                                                                                               FontSize="30"
+                                                                                               TextColor="Black"
+                                                                                               HorizontalTextAlignment="Center"
+                                                                                               VerticalTextAlignment="Center"
+                                                                                               Margin="5,0,5,5"/>
 
+                                                                                        <!-- LISTA DE MINUTOS (Ocupa las 3 filas del contenedor) -->
+                                                                                        <CollectionView x:Name="ListaMinutos"
+                                                                                                        Grid.Column="2"
+                                                                                                        Grid.RowSpan="3"
+                                                                                                        HeightRequest="120"
+                                                                                                        SelectionMode="None"
+                                                                                                        VerticalScrollBarVisibility="Never">
+                                                                                                <CollectionView.ItemsLayout>
+                                                                                                        <LinearItemsLayout Orientation="Vertical"
+                                                                                                                           ItemSpacing="0"/>
+                                                                                                </CollectionView.ItemsLayout>
+                                                                                                <CollectionView.ItemTemplate>
+                                                                                                        <DataTemplate>
+                                                                                                                <Label Text="{Binding .}"
+                                                                                                                       FontFamily="Impact"
+                                                                                                                       FontSize="28"
+                                                                                                                       TextColor="Black"
+                                                                                                                       HorizontalTextAlignment="Center"
+                                                                                                                       VerticalTextAlignment="Center"
+                                                                                                                       HeightRequest="40"/>
+                                                                                                        </DataTemplate>
+                                                                                                </CollectionView.ItemTemplate>
+                                                                                        </CollectionView>
+                                                                                </Grid>
                                                                         </Grid>
+
+                                                                        <!-- ======================================================================= -->
+                                                                        <!-- 📥 COLUMNA 1: EL SELLO EN TAMAÑO MASIVO RECALIBRADO PARA EL HUECO       -->
+                                                                        <!-- ======================================================================= -->
+                                                                        <Image x:Name="selloEvento"
+                                                                               Grid.Column="1"
+                                                                               Source="selloevento.png"
+                                                                               Opacity="0"
+                                                                               Scale="3"
+                                                                               Rotation="22"
+                                                                               HeightRequest="185"
+                                                                               WidthRequest="185"
+                                                                               HorizontalOptions="Center"
+                                                                               VerticalOptions="Center"
+                                                                               Margin="0,0,-40,0"
+                                                                               InputTransparent="True"/>
+
                                                                 </Grid>
+
 
                                                                 <BoxView HeightRequest="2"
                                                                          BackgroundColor="Black"
@@ -831,18 +852,6 @@
                         </Grid>
                         <!-- Cierra el Grid maestro del formulario (Ancho 620) -->
                 </ScrollView>
-                <!-- 📥 CAPA FLOTANTE CON TU NUEVO SELLO VECTORIAL ORIGINAL -->
-                <Image x:Name="selloEvento"
-                       Source="selloevento.png"
-                       Opacity="0"
-                       Scale="3"
-                       Rotation="25"
-                       HorizontalOptions="Center"
-                       VerticalOptions="Center"
-                       HeightRequest="230"
-                       WidthRequest="230"
-                       Margin="260,0,0,100"
-                       InputTransparent="True"/>
 
         </Grid>
         <!-- Cierra el Grid estructural base de la ContentPage -->
