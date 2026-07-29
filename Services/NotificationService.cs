@@ -4,6 +4,10 @@ using Plugin.LocalNotification;
 using Plugin.LocalNotification.Core.Models;
 using MauiTime.Models;
 
+#if ANDROID
+using Plugin.LocalNotification.Core.Models.AndroidOption;
+#endif
+
 namespace MauiTime.Services;
 
 public class NotificationService
@@ -31,8 +35,8 @@ public class NotificationService
             _ => NotificationRepeat.No
         };
 
-        // Cancelamos registros previos enlazados al mismo ID para evitar ecos
-        LocalNotificationCenter.Current.Cancel(evento.Id);
+        // Cancelamos registros previos enlazados al mismo ID (tanto hora exacta como pre-aviso) para evitar ecos
+        CancelarRecordatorio(evento.Id);
 
         // =========================================================================
         // CIRCUITO 1: NOTIFICACIÓN DE PRE-AVISO (30 MINUTOS)
@@ -55,10 +59,11 @@ public class NotificationService
                 }
             };
 #if ANDROID
-            requestPreAviso.Android = new Plugin.LocalNotification.AndroidOption.AndroidOptions
+            requestPreAviso.Android = new Plugin.LocalNotification.Core.Models.AndroidOption.AndroidOptions
             {
                 ChannelId = "mauitime_misiones",
-                LaunchApp = new Plugin.LocalNotification.AndroidOption.AndroidLaunchApp { ForceAppWindowToForeground = true }
+                Ongoing = false,
+                AutoCancel = true
             };
 #endif
             await LocalNotificationCenter.Current.Show(requestPreAviso);
@@ -86,31 +91,27 @@ public class NotificationService
         };
 
 #if ANDROID
-        // Exigimos el derecho de hardware para la alarma exacta en Android 14+
-        await LocalNotificationCenter.Current.RequestNotificationPermission(new NotificationPermission
-        {
-            RequestPermissionToScheduleExactAlarm = true
-        });
+        // Exigimos el permiso de notificaciones y alarmas exactas
+        await LocalNotificationCenter.Current.RequestNotificationPermission();
 
-        // 🛡️ BIFURCACIÓN DE HARDWARE EN ANDROID: Evaluamos la decisión del botón del usuario
         if (evento.EsAlarmaAgresiva)
         {
-            requestHoraExacta.Android = new Plugin.LocalNotification.AndroidOption.AndroidOptions
+            // 🚨 CIRCUITO ALARMA AGRESIVA (Ocupa la pantalla / Pantalla completa)
+            requestHoraExacta.Android = new Plugin.LocalNotification.Core.Models.AndroidOption.AndroidOptions
             {
-                ChannelId = "mauitime_alarma_critica", // Canal de importancia Máxima
-                Ongoing = true, // No se puede quitar barriendo la pantalla
-                LaunchApp = new Plugin.LocalNotification.AndroidOption.AndroidLaunchApp 
-                { 
-                    ForceAppWindowToForeground = true 
-                }
+                ChannelId = "mauitime_alarma_critica", 
+                Ongoing = false, // Permite descarte mediante deslizamiento táctil (swipe)
+                AutoCancel = true // Autocancelación inmediata al hacer clic en la notificación
             };
         }
         else
         {
-            requestHoraExacta.Android = new Plugin.LocalNotification.AndroidOption.AndroidOptions
+            // 🔔 CIRCUITO PRE-AVISO (Notificación estándar tipo banner)
+            requestHoraExacta.Android = new Plugin.LocalNotification.Core.Models.AndroidOption.AndroidOptions
             {
                 ChannelId = "mauitime_misiones",
-                LaunchApp = new Plugin.LocalNotification.AndroidOption.AndroidLaunchApp { ForceAppWindowToForeground = true }
+                Ongoing = false,
+                AutoCancel = true
             };
         }
 #endif

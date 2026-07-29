@@ -9,11 +9,11 @@ namespace MauiTime.Services
         private SQLiteAsyncConnection? _dbConnection;
         private static readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
 
-        private async Task Init()
+        private async Task InitAsync()
         {
             if (_dbConnection is not null) return;
 
-            await _semaphore.WaitAsync();
+            await _semaphore.WaitAsync().ConfigureAwait(false);
             try
             {
                 if (_dbConnection is null)
@@ -32,13 +32,12 @@ namespace MauiTime.Services
                         dbPath = Path.Combine(carpetaWindows, "MauiTimeApp.db3");
                     }
 
-                    // 🖥️ IMPRESIÓN REAL EN TU TERMINAL DE DOTNET RUN:
                     Console.WriteLine("\n=========================================");
                     Console.WriteLine($"[SQLITE] CONEXIÓN CONFIGURADA EN: {dbPath}");
                     Console.WriteLine("=========================================\n");
 
                     _dbConnection = new SQLiteAsyncConnection(dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.Create | SQLiteOpenFlags.SharedCache);
-                    await _dbConnection.CreateTableAsync<Evento>();
+                    await _dbConnection.CreateTableAsync<Evento>().ConfigureAwait(false);
                 }
             }
             catch (Exception ex)
@@ -53,25 +52,24 @@ namespace MauiTime.Services
 
         public async Task<List<Evento>> ObtenerEventosAsync()
         {
-            await Init();
-            return await _dbConnection!.Table<Evento>().ToListAsync();
+            await InitAsync().ConfigureAwait(false);
+            return await _dbConnection!.Table<Evento>().ToListAsync().ConfigureAwait(false);
         }
 
         public async Task SeedDataAsync()
         {
-            await Init();
+            await InitAsync().ConfigureAwait(false);
 
-            await _semaphore.WaitAsync();
+            await _semaphore.WaitAsync().ConfigureAwait(false);
             try
             {
-                int conteoRegistros = await _dbConnection!.Table<Evento>().CountAsync();
+                int conteoRegistros = await _dbConnection!.Table<Evento>().CountAsync().ConfigureAwait(false);
                 
                 if (conteoRegistros > 0)
                 {
                     Console.WriteLine($"[SQLITE] La base de datos ya tiene {conteoRegistros} elementos. Pasando de largo...");
                     return;
                 }
-
             }
             catch (Exception ex)
             {
@@ -85,20 +83,20 @@ namespace MauiTime.Services
 
         public async Task<int> GuardarEventoAsync(Evento evento)
         {
-            await Init();
+            await InitAsync().ConfigureAwait(false);
 
-            await _semaphore.WaitAsync();
+            await _semaphore.WaitAsync().ConfigureAwait(false);
             try
             {
                 int resultado;
                 if (evento.Id != 0)
                 {
-                    resultado = await _dbConnection!.UpdateAsync(evento);
+                    resultado = await _dbConnection!.UpdateAsync(evento).ConfigureAwait(false);
                     Console.WriteLine($"\n[SQLITE] 📝 EVENTO ACTUALIZADO EN DISCO. ID: {evento.Id}\n");
                 }
                 else
                 {
-                    resultado = await _dbConnection!.InsertAsync(evento);
+                    resultado = await _dbConnection!.InsertAsync(evento).ConfigureAwait(false);
                     Console.WriteLine($"\n[SQLITE] 🚀 ¡NUEVO EVENTO GRABADO CON ÉXITO! ASIGNADO ID: {evento.Id}\n");
                 }
                 return resultado;
@@ -116,11 +114,11 @@ namespace MauiTime.Services
 
         public async Task ResetDatabaseAsync()
         {
-            await Init();
-            await _semaphore.WaitAsync();
+            await InitAsync().ConfigureAwait(false);
+            await _semaphore.WaitAsync().ConfigureAwait(false);
             try
             {
-                await _dbConnection!.DeleteAllAsync<Evento>();
+                await _dbConnection!.DeleteAllAsync<Evento>().ConfigureAwait(false);
                 Console.WriteLine("[SQLITE] Toda la tabla de eventos ha sido vaciada.");
             }
             finally
@@ -131,18 +129,18 @@ namespace MauiTime.Services
 
         public async Task<List<Evento>> ObtenerEventosPorMes(int mes, int anio)
         {
-            await Init();
-            var eventos = await _dbConnection!.Table<Evento>().ToListAsync();
-            return eventos.Where(e => e.FechaHora.Month == mes && e.FechaHora.Year == anio).ToList();
+            await InitAsync().ConfigureAwait(false);
+            var todos = await _dbConnection!.Table<Evento>().ToListAsync().ConfigureAwait(false);
+            return todos.Where(e => e.FechaHora.Month == mes && e.FechaHora.Year == anio).ToList();
         }
 
         public async Task<int> BorrarEventoAsync(Evento evento)
         {
-            await Init();
-            await _semaphore.WaitAsync();
+            await InitAsync().ConfigureAwait(false);
+            await _semaphore.WaitAsync().ConfigureAwait(false);
             try
             {
-                int res = await _dbConnection!.DeleteAsync(evento);
+                int res = await _dbConnection!.DeleteAsync(evento).ConfigureAwait(false);
                 Console.WriteLine($"\n[SQLITE] 💣 REGISTRO ELIMINADO FÍSICAMENTE. ID: {evento.Id}\n");
                 return res;
             }

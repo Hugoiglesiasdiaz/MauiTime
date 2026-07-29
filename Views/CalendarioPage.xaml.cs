@@ -15,6 +15,10 @@ namespace MauiTime.Views
         private DateTime _mesActualReferencia = DateTime.Today;
         private bool _isAnimating = false;
         private readonly DatabaseService _dbService;
+        private double _scrollOffsetInicial = -1;
+        private double _posicionBaseX = 0;
+        private double _posicionBaseY = 0;
+        private int _indiceCeldaHoy = -1;
 
 
         private ObservableCollection<DiaCalendario> _diasDelMes = new();
@@ -43,11 +47,11 @@ namespace MauiTime.Views
             set { _textoAnio = value; OnPropertyChanged(); }
         }
 
-        public CalendarioPage()
+        public CalendarioPage(DatabaseService dbService)
         {
             InitializeComponent();
 
-            _dbService = new DatabaseService(); // Inicializamos tu servicio de base de datos real
+            _dbService = dbService;
             BindingContext = this;
 
             this.Loaded += (s, e) =>
@@ -67,91 +71,108 @@ namespace MauiTime.Views
 
             ConstruirLetrasRansomMes(TextoMes);
 
-            var listaDias = new List<DiaCalendario>();
-            DateTime primerDiaMes = new DateTime(_mesActualReferencia.Year, _mesActualReferencia.Month, 1);
-            int totalDiasMes = DateTime.DaysInMonth(_mesActualReferencia.Year, _mesActualReferencia.Month);
-            int desfaseInicio = ((int)primerDiaMes.DayOfWeek + 6) % 7;
-            Random rand = new Random();
+            int mes = _mesActualReferencia.Month;
+            int anio = _mesActualReferencia.Year;
 
-            // 1. Días del mes anterior
-            DateTime mesAnterior = primerDiaMes.AddMonths(-1);
-            int diasMesAnterior = DateTime.DaysInMonth(mesAnterior.Year, mesAnterior.Month);
-            for (int i = desfaseInicio - 1; i >= 0; i--)
+            // Procesar cálculo de cuadrícula y consulta SQLite en hilo secundario
+            var listaDias = await Task.Run(async () =>
             {
-                listaDias.Add(new DiaCalendario { NumeroDia = (diasMesAnterior - i).ToString(), EsMesActual = false, RotacionCelda = rand.Next(-6, 7) });
-            }
+                var result = new List<DiaCalendario>();
+                DateTime primerDiaMes = new DateTime(anio, mes, 1);
+                int totalDiasMes = DateTime.DaysInMonth(anio, mes);
+                int desfaseInicio = ((int)primerDiaMes.DayOfWeek + 6) % 7;
+                Random rand = new Random();
 
-            // 2. Días del mes actual
-            for (int dia = 1; dia <= totalDiasMes; dia++)
-            {
-                var fecha = new DateTime(_mesActualReferencia.Year, _mesActualReferencia.Month, dia);
-                listaDias.Add(new DiaCalendario
+                // 1. Días del mes anterior
+                DateTime mesAnterior = primerDiaMes.AddMonths(-1);
+                int diasMesAnterior = DateTime.DaysInMonth(mesAnterior.Year, mesAnterior.Month);
+                for (int i = desfaseInicio - 1; i >= 0; i--)
                 {
-                    NumeroDia = dia.ToString(),
-                    FechaCompleta = fecha,
-                    EsMesActual = true,
-                    EsHoy = fecha.Year == DateTime.Today.Year && fecha.Month == DateTime.Today.Month && fecha.Day == DateTime.Today.Day,
-                    RotacionCelda = rand.Next(-6, 7),
-                    ColorFondoCelda = Colors.White
-                });
-            }
+                    result.Add(new DiaCalendario { NumeroDia = (diasMesAnterior - i).ToString(), EsMesActual = false, RotacionCelda = rand.Next(-6, 7) });
+                }
 
-            // 3. Días del mes siguiente
-            int totalCeldasHastaFilaActual = listaDias.Count;
-            int diasParaCerrarSemana = (7 - (totalCeldasHastaFilaActual % 7)) % 7;
-            int celdasObjetivoDinamico = totalCeldasHastaFilaActual + diasParaCerrarSemana;
-            int diaSiguiente = 1;
-            while (listaDias.Count < celdasObjetivoDinamico)
-            {
-                listaDias.Add(new DiaCalendario { NumeroDia = diaSiguiente.ToString(), EsMesActual = false, RotacionCelda = rand.Next(-6, 7) });
-                diaSiguiente++;
-            }
-
-            // =======================================================================
-            // 💾 CONEXIÓN REAL CON TU DATABASESERVICE NATIVO
-            // =======================================================================
-            // =======================================================================
-            // 💾 CONEXIÓN REAL CON TU DATABASESERVICE NATIVO (CONTEO DINÁMICO)
-            // =======================================================================
-            try
-            {
-                // 1. Extraemos de golpe todos los eventos guardados en disco para este mes
-                var eventosDelMes = await _dbService.ObtenerEventosPorMes(_mesActualReferencia.Month, _mesActualReferencia.Year);
-
-                // 2. Evaluamos de forma quirúrgica cada una de las 42 celdas de la grilla
-                foreach (var dia in listaDias)
+                // 2. Días del mes actual
+                for (int dia = 1; dia <= totalDiasMes; dia++)
                 {
-                    if (dia.EsMesActual && dia.FechaCompleta.HasValue)
+                    var fecha = new DateTime(anio, mes, dia);
+                    result.Add(new DiaCalendario
                     {
-                        // Contamos cuántas misiones coinciden exactamente con la fecha de esta celda
-                        int totalMisionesEseDia = eventosDelMes.Count(e => e.FechaHora.Date == dia.FechaCompleta.Value.Date);
+                        NumeroDia = dia.ToString(),
+                        FechaCompleta = fecha,
+                        EsMesActual = true,
+                        EsHoy = fecha.Year == DateTime.Today.Year && fecha.Month == DateTime.Today.Month && fecha.Day == DateTime.Today.Day,
+                        RotacionCelda = rand.Next(-6, 7),
+                        ColorFondoCelda = Colors.White
+                    });
+                }
 
-                        if (totalMisionesEseDia > 0)
-                        {
-                            // 🚨 Activa la muesca y hace brotar la banderita roja en el XAML en cascada
-                            dia.TieneTareasPendientes = true;
+                // 3. Días del mes siguiente
+                int totalCeldasHastaFilaActual = result.Count;
+                int diasParaCerrarSemana = (7 - (totalCeldasHastaFilaActual % 7)) % 7;
+                int celdasObjetivoDinamico = totalCeldasHastaFilaActual + diasParaCerrarSemana;
+                int diaSiguiente = 1;
+                while (result.Count < celdasObjetivoDinamico)
+                {
+                    result.Add(new DiaCalendario { NumeroDia = diaSiguiente.ToString(), EsMesActual = false, RotacionCelda = rand.Next(-6, 7) });
+                    diaSiguiente++;
+                }
 
-                            // 🎯 EL TRUCO DEL CONTADOR PUNK:
-                            // Si solo hay una misión, pintamos tu exclamación original '!'.
-                            // Si hay más, forzamos a que muestre el número acumulado (ej: '+2', '+3').
-                            dia.TextoBanderita = totalMisionesEseDia == 1 ? "!" : $"+{totalMisionesEseDia}";
-                        }
-                        else
+                try
+                {
+                    var eventosDelMes = await _dbService.ObtenerEventosPorMes(mes, anio).ConfigureAwait(false);
+
+                    foreach (var dia in result)
+                    {
+                        if (dia.EsMesActual && dia.FechaCompleta.HasValue)
                         {
-                            // Limpieza si no hay tareas
-                            dia.TieneTareasPendientes = false;
-                            dia.TextoBanderita = "!";
+                            int totalMisionesEseDia = eventosDelMes.Count(e => e.FechaHora.Date == dia.FechaCompleta.Value.Date);
+
+                            if (totalMisionesEseDia > 0)
+                            {
+                                dia.TieneTareasPendientes = true;
+                                dia.TextoBanderita = totalMisionesEseDia == 1 ? "!" : $"+{totalMisionesEseDia}";
+                            }
+                            else
+                            {
+                                dia.TieneTareasPendientes = false;
+                                dia.TextoBanderita = "!";
+                            }
                         }
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Error SQLite al contar misiones: {ex.Message}");
-            }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Error SQLite al contar misiones: {ex.Message}");
+                }
 
-            // Volcado final atómico en la colección reactiva
-            DiasDelMes = new ObservableCollection<DiaCalendario>(listaDias);
+                return result;
+            }).ConfigureAwait(false);
+
+            // Volcado final en el hilo principal
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                DiasDelMes = new ObservableCollection<DiaCalendario>(listaDias);
+                _scrollOffsetInicial = -1;
+
+                bool esElMesActualReal = _mesActualReferencia.Month == DateTime.Today.Month &&
+                                         _mesActualReferencia.Year == DateTime.Today.Year;
+
+                // Encontrar el índice de "Hoy"
+                _indiceCeldaHoy = -1;
+                for (int i = 0; i < listaDias.Count; i++)
+                {
+                    if (listaDias[i].EsHoy)
+                    {
+                        _indiceCeldaHoy = i;
+                        break;
+                    }
+                }
+
+                if (objetoCuchillo != null)
+                {
+                    objetoCuchillo.IsVisible = esElMesActualReal && _indiceCeldaHoy >= 0;
+                }
+            });
         }
 
 
@@ -160,12 +181,19 @@ namespace MauiTime.Views
         {
             if (sender is BindableObject border && border.BindingContext is DiaCalendario dia && dia.EsMesActual && dia.FechaCompleta.HasValue)
             {
-                // Pasamos la fecha y tu servicio real al formulario
-                var popupFormulario = new NuevaTareaPopup(dia.FechaCompleta.Value, _dbService);
+                // 1. Resolvemos el NotificationService mediante el contenedor de dependencias inyectado o el servicio global ya optimizado
+                var notificationService = App.Current?.Handler?.MauiContext?.Services.GetService<Services.NotificationService>();
+
+                // 2. Instanciamos el popup pasándole los tres parámetros requeridos por su constructor refactorizado
+                var popupFormulario = new NuevaTareaPopup(dia.FechaCompleta.Value, _dbService, notificationService!);
+
                 await Navigation.PushModalAsync(popupFormulario);
 
-                // Al volver de la ventana modal, refrescamos la cuadrícula automáticamente
-                RefrescarCalendario();
+                // 3. Refresco no bloqueante en segundo plano para mantener la fluidez en Android
+                _ = Task.Run(async () =>
+                {
+                    RefrescarCalendario();
+                });
             }
         }
 
@@ -363,96 +391,146 @@ namespace MauiTime.Views
 
 
 
+        private bool _isScrollingHandled = false;
+
+        private void OnGridDiasScrolled(object? sender, ItemsViewScrolledEventArgs e)
+        {
+            if (objetoCuchillo == null || !objetoCuchillo.IsVisible) return;
+
+            // Capturamos el desplazamiento real del scroll
+            double scrollActual = e.VerticalOffset;
+
+            // Capturamos la línea base del scroll (posición donde el cuchillo "aterrizó")
+            if (_scrollOffsetInicial < 0)
+            {
+                _scrollOffsetInicial = scrollActual;
+            }
+
+            // 🎯 ACOPLAMIENTO MAGNÉTICO: El cuchillo se mueve solidariamente con la grilla.
+            // La diferencia (scrollOffsetInicial - scrollActual) da exactamente los píxeles
+            // que la grilla se ha desplazado desde que el cuchillo se posicionó.
+            // Ese delta se RESTA de la posición base Y para que el cuchillo "viaje" con el día.
+            double deltaScroll = scrollActual - _scrollOffsetInicial;
+            objetoCuchillo.TranslationX = _posicionBaseX;
+            objetoCuchillo.TranslationY = _posicionBaseY - deltaScroll;
+        }
+
         /// Se ejecuta de forma automática en cuanto el puñal de "Hoy" se dibuja físicamente en la pantalla.
-        /// </summary>
+        
         private void OnCuchilloLoaded(object? sender, EventArgs e)
         {
-            if (sender is Image objetoCuchillo)
+            if (objetoCuchillo == null) return;
+
+            // 🚨 EL CANDADO DEFINITIVO DE FECHA REAL:
+            bool esElMesActualReal = _mesActualReferencia.Month == DateTime.Today.Month &&
+                                     _mesActualReferencia.Year == DateTime.Today.Year;
+
+            if (!esElMesActualReal || _indiceCeldaHoy < 0)
             {
-                // =======================================================================
-                // ⚔️ BYPASS DE FUERZA BRUTA: EL SCROLL SE GATILLA DESDE EL ELEMENTO REAL
-                // =======================================================================
-                var diaHoyModelo = DiasDelMes.FirstOrDefault(d => d.EsHoy);
-                if (diaHoyModelo != null)
-                {
-                    // Forzamos el scroll usando el objeto modelo directamente en caliente.
-                    // Al estar el árbol de WinUI3 ya pintado en este evento, el salto al centro es instantáneo.
-                    GridDiasCollectionView.ScrollTo(diaHoyModelo, position: ScrollToPosition.Center, animate: false);
-                }
-
-                // 🚨 EL CANDADO DEFINITIVO DE FECHA REAL:
-                // Comprobamos si el mes y año que se está renderizando coincide con el mes y año del reloj real de tu PC.
-                bool esElMesActualReal = _mesActualReferencia.Month == DateTime.Today.Month &&
-                                         _mesActualReferencia.Year == DateTime.Today.Year;
-
-                if (!esElMesActualReal)
-                {
-                    // Si el usuario está mirando Agosto, Septiembre o cualquier otro mes, 
-                    // forzamos el pintado estático en frío y abortamos la caída y el sismo.
-                    if (objetoCuchillo.BindingContext is MauiTime.Models.DiaCalendario diaActual && diaActual.EsHoy)
-                    {
-                        diaActual.ColorFondoCelda = Color.FromArgb("#E31D26");
-
-                        var contextoTemporal = objetoCuchillo.BindingContext;
-                        objetoCuchillo.BindingContext = null;
-                        objetoCuchillo.BindingContext = contextoTemporal;
-                    }
-
-                    objetoCuchillo.Opacity = 1;
-                    objetoCuchillo.TranslationY = 0;
-                    objetoCuchillo.TranslationX = 0;
-                    objetoCuchillo.Rotation = 0;
-                    objetoCuchillo.Scale = 1.0;
-                    return; // ❌ Bloqueo absoluto de animaciones secundarias
-                }
-
-                // ---------------------------------------------------------------------
-                // COREOGRAFÍA CINEMÁTICA DE BIENVENIDA (Solo corre en el mes real actual)
-                // ---------------------------------------------------------------------
                 objetoCuchillo.Opacity = 0;
-                objetoCuchillo.TranslationY = -250;
-                objetoCuchillo.TranslationX = 80;
-                objetoCuchillo.Rotation = -45;
-
-                Dispatcher.Dispatch(async () =>
-                {
-                    await Task.Delay(200);
-
-                    // Trayectoria de caída suave
-                    objetoCuchillo.Opacity = 1;
-                    await Task.WhenAll(
-                        objetoCuchillo.TranslateToAsync(0, 0, 350, Easing.CubicIn),
-                        objetoCuchillo.RotateToAsync(0, 350, Easing.CubicIn)
-                    );
-
-                    // Impacto visual
-                    if (objetoCuchillo.BindingContext is MauiTime.Models.DiaCalendario diaActual && diaActual.EsHoy)
-                    {
-                        diaActual.ColorFondoCelda = Color.FromArgb("#E31D26");
-
-                        var contextoTemporal = objetoCuchillo.BindingContext;
-                        objetoCuchillo.BindingContext = null;
-                        objetoCuchillo.BindingContext = contextoTemporal;
-                    }
-
-                    _ = objetoCuchillo.ScaleToAsync(1.4, 40, Easing.CubicOut)
-                        .ContinueWith(t => MainThread.BeginInvokeOnMainThread(() => objetoCuchillo.ScaleToAsync(1.0, 100, Easing.SpringOut)));
-
-                    // Terremoto general unificado
-                    if (!_isAnimating)
-                    {
-                        _isAnimating = true;
-                        try
-                        {
-                            await EjecutarTemblorSismico(GridDiasCollectionView);
-                        }
-                        finally
-                        {
-                            _isAnimating = false;
-                        }
-                    }
-                });
+                objetoCuchillo.IsVisible = false;
+                return;
             }
+
+            // =======================================================================
+            // ⚔️ POSICIONAMIENTO GEOMÉTRICO: Calculamos las coordenadas exactas 
+            //    de la celda de hoy dentro de la cuadrícula de 7 columnas.
+            //    El cuchillo vive en Grid.Row="3" (misma fila que el CollectionView),
+            //    así que su (0,0) coincide con la esquina superior izquierda de la grilla.
+            // =======================================================================
+            int col = _indiceCeldaHoy % 7;
+            int row = _indiceCeldaHoy / 7;
+
+            if (DeviceInfo.Current.Platform == DevicePlatform.Android)
+            {
+                // Métricas Android: celda 48w + 2 spacing = 50 step, 68h + 4 spacing = 72 step
+                // Margin del CollectionView: 4,0,4,5
+                double anchoCollectionView = GridDiasCollectionView.Width > 0 ? GridDiasCollectionView.Width : 360;
+                double anchoCelda = (anchoCollectionView - (6 * 2)) / 7.0; // 7 cols, 6 gaps de 2px
+                double pasoX = anchoCelda + 2;
+                double pasoY = 68 + 4; // HeightRequest + VerticalItemSpacing
+
+                double inicioX = col * pasoX;
+                double inicioY = row * pasoY;
+
+                double anchoCuchillo = objetoCuchillo.WidthRequest > 0 ? objetoCuchillo.WidthRequest : 80;
+                double altoCuchillo = objetoCuchillo.HeightRequest > 0 ? objetoCuchillo.HeightRequest : 80;
+
+                // 🎯 ALINEACIÓN MÁGICA DE LA PUNTA: El vértice inferior izquierdo del PNG (donde está la punta) coincide con la esquina superior derecha de la celda
+                _posicionBaseX = inicioX + anchoCelda - (anchoCuchillo * 0.15);
+                _posicionBaseY = inicioY - (altoCuchillo * 0.68);
+            }
+            else // WinUI / Windows
+            {
+                double anchoCelda = 140;
+                double pasoX = 140 + 14; // WidthRequest + HorizontalItemSpacing
+                double pasoY = 140 + 16; // HeightRequest + VerticalItemSpacing
+
+                double inicioX = col * pasoX;
+                double inicioY = row * pasoY;
+
+                double anchoCuchillo = objetoCuchillo.WidthRequest > 0 ? objetoCuchillo.WidthRequest : 150;
+                double altoCuchillo = objetoCuchillo.HeightRequest > 0 ? objetoCuchillo.HeightRequest : 150;
+
+                // 🎯 ALINEACIÓN MÁGICA DE LA PUNTA: El vértice inferior izquierdo del PNG (donde está la punta) coincide con la esquina superior derecha de la celda
+                _posicionBaseX = inicioX + anchoCelda - (anchoCuchillo * 0.15);
+                _posicionBaseY = inicioY - (altoCuchillo * 0.85);
+            }
+
+            // Scroll a la celda de hoy para centrarla en pantalla
+            var diaHoyModelo = DiasDelMes.FirstOrDefault(d => d.EsHoy);
+            if (diaHoyModelo != null)
+            {
+                GridDiasCollectionView.ScrollTo(diaHoyModelo, position: ScrollToPosition.Center, animate: false);
+            }
+
+            // Reseteamos la línea base del scroll (se capturará en el primer evento Scrolled)
+            _scrollOffsetInicial = -1;
+
+            // ---------------------------------------------------------------------
+            // COREOGRAFÍA CINEMÁTICA DE BIENVENIDA (Solo corre en el mes real actual)
+            // El cuchillo cae desde arriba y aterriza CLAVADO en la celda de hoy.
+            // ---------------------------------------------------------------------
+            objetoCuchillo.Opacity = 0;
+            objetoCuchillo.TranslationX = _posicionBaseX + 80;
+            objetoCuchillo.TranslationY = _posicionBaseY - 250;
+            objetoCuchillo.Rotation = -45;
+
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                await Task.Delay(200);
+
+                // Trayectoria de caída suave con GPU: aterriza en las coordenadas exactas del día
+                objetoCuchillo.Opacity = 1;
+                await Task.WhenAll(
+                    objetoCuchillo.TranslateToAsync(_posicionBaseX, _posicionBaseY, 350, Easing.CubicIn),
+                    objetoCuchillo.RotateToAsync(0, 350, Easing.CubicIn)
+                );
+
+                // Impacto visual: Coloreamos la celda de hoy en rojo
+                var diaHoy = DiasDelMes.FirstOrDefault(d => d.EsHoy);
+                if (diaHoy != null)
+                {
+                    diaHoy.ColorFondoCelda = Color.FromArgb("#E31D26");
+                }
+
+                _ = objetoCuchillo.ScaleToAsync(1.4, 40, Easing.CubicOut)
+                    .ContinueWith(t => MainThread.BeginInvokeOnMainThread(() => objetoCuchillo.ScaleToAsync(1.0, 100, Easing.SpringOut)));
+
+                // Terremoto general unificado con candado anti-reentrada
+                if (!_isAnimating)
+                {
+                    _isAnimating = true;
+                    try
+                    {
+                        await EjecutarTemblorSismico(GridDiasCollectionView);
+                    }
+                    finally
+                    {
+                        _isAnimating = false;
+                    }
+                }
+            });
         }
 
         // =========================================================================

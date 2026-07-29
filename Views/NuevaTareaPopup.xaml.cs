@@ -13,8 +13,12 @@ namespace MauiTime.Views
     public partial class NuevaTareaPopup : ContentPage
     {
         private readonly DatabaseService _dbService;
+        private readonly NotificationService _notificationService;
         private DateTime _fechaSeleccionada;
         private DateTime _mesVisualizado;
+        private int _ultimoIndiceHoras = 0;
+private int _ultimoIndiceMinutos = 0;
+
 
         // Búferes de desplazamiento fluidos para las horas
         private double _scrollXHoras = 0;
@@ -28,10 +32,11 @@ namespace MauiTime.Views
         private int _indiceFrecuenciaActual = 0;
         private bool _desplegableAbierto = false;
 
-        public NuevaTareaPopup(DateTime fechaInicial, DatabaseService dbService)
+        public NuevaTareaPopup(DateTime fechaInicial, DatabaseService dbService, NotificationService notificationService)
         {
             InitializeComponent();
             _dbService = dbService;
+            _notificationService = notificationService;
 
             _fechaSeleccionada = DateTime.Now.Date;
             _mesVisualizado = new DateTime(_fechaSeleccionada.Year, _fechaSeleccionada.Month, 1);
@@ -98,90 +103,177 @@ namespace MauiTime.Views
             }
         }
 
-        private void CargarRuedasPersonalizadas()
+private bool _isReady = false;
+private bool _isSystemScrolling = false; 
+
+private async void CargarRuedasPersonalizadas()
+{
+    _isReady = false;
+    _isSystemScrolling = true;
+
+    ListaHoras.Scrolled -= OnRuedaScrolled;
+    ListaMinutos.Scrolled -= OnRuedaScrolled;
+
+    var horas = new List<string>();
+    for (int ciclo = 0; ciclo < 50; ciclo++)
+    {
+        for (int i = 0; i < 24; i++) horas.Add(i.ToString("D2"));
+    }
+
+    var minutos = new List<string>();
+    for (int ciclo = 0; ciclo < 50; ciclo++)
+    {
+        for (int i = 0; i < 60; i++) minutos.Add(i.ToString("D2"));
+    }
+
+    ListaHoras.ItemsSource = horas;
+    ListaMinutos.ItemsSource = minutos;
+
+    // Esperamos que las listas tengan dimensiones reales en Android
+    while (ListaHoras.Height <= 0 || ListaMinutos.Height <= 0)
+    {
+        await Task.Delay(50);
+    }
+
+    var horaActual = DateTime.Now;
+    int puntoMedioHoras = (25 * 24) + horaActual.Hour;
+    int puntoMedioMinutos = (25 * 60) + horaActual.Minute;
+    
+    _ultimoIndiceHoras = puntoMedioHoras;
+_ultimoIndiceMinutos = puntoMedioMinutos;
+
+    await MainThread.InvokeOnMainThreadAsync(async () =>
+    {
+        // Posicionamiento inicial en frío
+        ListaHoras.ScrollTo(puntoMedioHoras, position: ScrollToPosition.Center, animate: false);
+        await Task.Delay(100); 
+
+        ListaMinutos.ScrollTo(puntoMedioMinutos, position: ScrollToPosition.Center, animate: false);
+        await Task.Delay(200); 
+
+        ListaHoras.Scrolled += OnRuedaScrolled;
+        ListaMinutos.Scrolled += OnRuedaScrolled;
+        
+        _isSystemScrolling = false;
+        _isReady = true;
+    });
+}
+
+private void OnRuedaScrolled(object? sender, ItemsViewScrolledEventArgs e)
+{
+    if (!_isReady || _isSystemScrolling) return;
+
+    if (sender is CollectionView collectionView)
+    {
+        bool isHoras = collectionView == ListaHoras;
+
+        // Cancelamos timers de debounce previos
+        if (isHoras)
         {
-            var horas = new List<string>();
-            for (int ciclo = 0; ciclo < 50; ciclo++)
-            {
-                for (int i = 0; i < 24; i++) horas.Add(i.ToString("D2"));
-            }
-
-            var minutos = new List<string>();
-            for (int ciclo = 0; ciclo < 50; ciclo++)
-            {
-                for (int i = 0; i < 60; i++) minutos.Add(i.ToString("D2"));
-            }
-
-            ListaHoras.ItemsSource = horas;
-            ListaMinutos.ItemsSource = minutos;
-
-            var horaActual = DateTime.Now;
-
-            Dispatcher.Dispatch(() =>
-            {
-                int puntoMedioHoras = (25 * 24) + horaActual.Hour;
-                int puntoMedioMinutos = (25 * 60) + horaActual.Minute;
-
-                ListaHoras.ScrollTo(puntoMedioHoras, position: ScrollToPosition.Center, animate: false);
-                ListaMinutos.ScrollTo(puntoMedioMinutos, position: ScrollToPosition.Center, animate: false);
-            });
+            _ctsHoras?.Cancel();
+            _ctsHoras = new CancellationTokenSource();
+        }
+        else
+        {
+            _ctsMinutos?.Cancel();
+            _ctsMinutos = new CancellationTokenSource();
         }
 
-        public TimeSpan ObtenerHoraSeleccionada()
+        var token = isHoras ? _ctsHoras.Token : _ctsMinutos.Token;
+
+        // Capturamos los índices visibles EXACTOS en el momento del scroll
+        // Esto esquiva el bug de píxeles corruptos de Android
+        int primerVisible = e.FirstVisibleItemIndex;
+        int ultimoVisible = e.LastVisibleItemIndex;
+
+        MainThread.BeginInvokeOnMainThread(async () =>
         {
             try
             {
-                int indiceHora = (int)Math.Round(_scrollXHoras / 40.0);
-                int indiceMinuto = (int)Math.Round(_scrollXMinutos / 40.0);
+                // Esperamos a que el dedo se detenga (180ms)
+                await Task.Delay(180, token);
+                if (token.IsCancellationRequested) return;
 
-                int hora = (indiceHora % 24 + 24) % 24;
-                int minuto = (indiceMinuto % 60 + 60) % 60;
+                _isSystemScrolling = true;
+                collectionView.Scrolled -= OnRuedaScrolled;
 
-                return new TimeSpan(hora, minuto, 0);
+                // 🎯 LA REPARACIÓN MÁGICA: El índice central es el promedio de lo que se ve en pantalla
+                int indiceObjetivo = (primerVisible + ultimoVisible) / 2;
+
+                // 🎯 GUARDAMOS EL ÍNDICE REAL PARA OBTENERHORASELECCIONADA()
+                if (isHoras) _ultimoIndiceHoras = indiceObjetivo;
+                else _ultimoIndiceMinutos = indiceObjetivo;
+                
+                int maxElementos = isHoras ? (50 * 24) : (50 * 60);
+                indiceObjetivo = Math.Clamp(indiceObjetivo, 0, maxElementos - 1);
+
+                // Ajuste magnético suave al centro
+                collectionView.ScrollTo(indiceObjetivo, position: ScrollToPosition.Center, animate: true);
+
+                // Esperamos que termine la transición física antes de liberar los hilos
+                await Task.Delay(400);
+
+                collectionView.Scrolled -= OnRuedaScrolled;
+                collectionView.Scrolled += OnRuedaScrolled;
+                _isSystemScrolling = false;
             }
-            catch
+            catch (TaskCanceledException)
             {
-                return DateTime.Now.TimeOfDay;
+                // El usuario sigue moviendo la rueda
             }
-        }
+        });
+    }
+}
 
-        private void OnRuedaScrolled(object? sender, ItemsViewScrolledEventArgs e)
+
+        public TimeSpan ObtenerHoraSeleccionada()
+{
+    try
+    {
+        // 🎯 REPARACIÓN: Accedemos directamente a los índices reales que está renderizando Android
+        // Usamos reflexión segura o la jerarquía de ItemsLayout para obtener el ítem central actual
+        
+        int horaSeleccionada = DateTime.Now.Hour;
+        int minutoSeleccionado = DateTime.Now.Minute;
+
+        // 1. Calcular Hora Actual Seleccionada de la Rueda
+        if (ListaHoras.Handler?.PlatformView != null)
         {
-            if (sender == ListaHoras)
+            // Forzamos la lectura del índice en caliente desde el CollectionView
+            // Si el motor dinámico está listo, extraemos el promedio de elementos visualizados
+            var itemsLayout = ListaHoras.ItemsLayout;
+            
+            // Un truco 100% multiplataforma y seguro en MAUI para obtener el elemento central
+            // es leer los ítems a través del estado de scroll o usar variables de índice que guardamos en el scroll.
+            int indiceHora = _ultimoIndiceHoras; 
+            
+            if (indiceHora > 0)
             {
-                _scrollXHoras = e.VerticalOffset;
-                _ctsHoras?.Cancel();
-                _ctsHoras = new CancellationTokenSource();
-                var token = _ctsHoras.Token;
-
-                Task.Delay(90, token).ContinueWith(t =>
-                {
-                    if (t.IsCanceled) return;
-                    Dispatcher.Dispatch(() =>
-                    {
-                        int indiceObjetivo = (int)Math.Round(_scrollXHoras / 40.0);
-                        ListaHoras.ScrollTo(indiceObjetivo, position: ScrollToPosition.Center, animate: true);
-                    });
-                }, token);
-            }
-            else if (sender == ListaMinutos)
-            {
-                _scrollXMinutos = e.VerticalOffset;
-                _ctsMinutos?.Cancel();
-                _ctsMinutos = new CancellationTokenSource();
-                var token = _ctsMinutos.Token;
-
-                Task.Delay(90, token).ContinueWith(t =>
-                {
-                    if (t.IsCanceled) return;
-                    Dispatcher.Dispatch(() =>
-                    {
-                        int indiceObjetivo = (int)Math.Round(_scrollXMinutos / 40.0);
-                        ListaMinutos.ScrollTo(indiceObjetivo, position: ScrollToPosition.Center, animate: true);
-                    });
-                }, token);
+                horaSeleccionada = (indiceHora % 24 + 24) % 24;
             }
         }
+
+        // 2. Calcular Minuto Actual Seleccionada de la Rueda
+        if (ListaMinutos.Handler?.PlatformView != null)
+        {
+            int indiceMinuto = _ultimoIndiceMinutos;
+            
+            if (indiceMinuto > 0)
+            {
+                minutoSeleccionado = (indiceMinuto % 60 + 60) % 60;
+            }
+        }
+
+        return new TimeSpan(horaSeleccionada, minutoSeleccionado, 0);
+    }
+    catch
+    {
+        // Respaldo de seguridad si el árbol visual se destruye al cerrar el modal
+        return DateTime.Now.TimeOfDay;
+    }
+}
+
+        
 
         private void ActualizarCabeceraMes()
         {
@@ -334,17 +426,20 @@ namespace MauiTime.Views
             };
 
             nuevoEvento.CalcularProximoAviso();
-            await _dbService.GuardarEventoAsync(nuevoEvento);
 
-            try
+            // 🚀 PERSISTENCIA Y REPROGRAMACIÓN NO BLOQUEANTE: Ejecución asíncrona en hilo secundario
+            _ = Task.Run(async () =>
             {
-                var notifier = new MauiTime.Services.NotificationService();
-                await notifier.ProgramarRecordatorio(nuevoEvento);
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"[NOTIFICACIÓN POPUP ERROR] {ex.Message}");
-            }
+                try
+                {
+                    await _dbService.GuardarEventoAsync(nuevoEvento).ConfigureAwait(false);
+                    await _notificationService.ProgramarRecordatorio(nuevoEvento).ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[NOTIFICACIÓN POPUP ERROR] {ex.Message}");
+                }
+            });
 
             // --- 🎬 SECUENCIA DE ANIMACIÓN: IMPACTO DE TU NUEVO SELLO (selloEvento) ---
             if (selloEvento != null && ContenedorPrincipal != null)

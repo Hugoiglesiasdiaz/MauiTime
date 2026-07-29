@@ -9,14 +9,18 @@ using Microsoft.Maui.Layouts; // <--- ASEGÚRATE DE QUE ESTA LÍNEA ESTÉ AQUÍ 
 public partial class AgendaPage : ContentPage
 {
     private readonly AgendaViewModel _viewModel;
+    private readonly Services.DatabaseService _dbService;
+    private readonly Services.NotificationService _notificationService;
     // Campo de control para pausar el hilo de ejecución hasta que el usuario decida
     private TaskCompletionSource<bool>? _borradoTaskSource;
     private Models.Evento? _eventoSeleccionadoParaDestruir;
 
-    public AgendaPage(AgendaViewModel viewModel)
+    public AgendaPage(AgendaViewModel viewModel, Services.DatabaseService dbService, Services.NotificationService notificationService)
     {
         InitializeComponent();
         _viewModel = viewModel;
+        _dbService = dbService;
+        _notificationService = notificationService;
         BindingContext = _viewModel;
 
         // 1. LLAMAMOS AL GENERADOR DEL TÍTULO ESTILO P5 AQUÍ
@@ -401,30 +405,25 @@ public partial class AgendaPage : ContentPage
     // =======================================================================
     // ➕ ACCIÓN 1: LANZAR LA PANTALLA POPUP PARA CREAR PROYECTOS / EVENTOS
     // =======================================================================
+    // =======================================================================
+    // ➕ ACCIÓN 1: LANZAR LA PANTALLA POPUP PARA CREAR PROYECTOS / EVENTOS
+    // =======================================================================
     private async void OnCrearProyectoClicked(object? sender, EventArgs e)
     {
-        // 💡 TRUCO ARQUITECTÓNICO: Si tu ViewModel ya tiene inyectada la conexión real,
-        // la extraemos directamente a través del motor de dependencias global de .NET 10.
-        var dbServiceGlobal = App.Current?.Handler?.MauiContext?.Services.GetService<Services.DatabaseService>();
+        // 🚀 INYECCIÓN DIRECTA DE DEPENDENCIAS: Usamos las instancias inyectadas en el constructor
+        var popupFormulario = new NuevaTareaPopup(DateTime.Today, _dbService, _notificationService);
+        await Navigation.PushModalAsync(popupFormulario);
 
-        if (dbServiceGlobal != null)
+        Console.WriteLine("[AGENDA] Regresando del formulario modal. Solicitando refresco al ViewModel en segundo plano...");
+
+        // ⚡ NAVEGACIÓN MODAL OPTIMIZADA: Desacoplamos la recarga pesada para que la transición visual de retorno sea inmediata
+        _ = Task.Run(async () =>
         {
-            // Pasamos exactamente el mismo canal de conexión física
-            var popupFormulario = new NuevaTareaPopup(DateTime.Today, dbServiceGlobal);
-            await Navigation.PushModalAsync(popupFormulario);
-
-            Console.WriteLine("[AGENDA] Regresando del formulario modal. Solicitando refresco al ViewModel...");
-
-            // Le ordenamos a tu ViewModel que vuelva a leer el disco duro físico
-            await _viewModel.LoadEventosAsync();
-        }
-        else
-        {
-            Console.WriteLine("[AGENDA ERROR] No se pudo recuperar el DatabaseService global del contenedor.");
-        }
+            await _viewModel.LoadEventosAsync().ConfigureAwait(false);
+        });
     }
 
-    private async void OnMitigarAlarmaTargetClicked(object? sender, EventArgs e)
+    private void OnMitigarAlarmaTargetClicked(object? sender, EventArgs e)
     {
         // 1. Validar el remitente (Grid Maestro) y extraer el Evento de forma segura
         if (sender is not Grid gridMaestro || gridMaestro.BindingContext is not Models.Evento eventoModificado)
@@ -433,51 +432,32 @@ public partial class AgendaPage : ContentPage
         // 2. Conmutación booleana bidireccional (Toggle)
         eventoModificado.EsAlarmaAgresiva = !eventoModificado.EsAlarmaAgresiva;
 
-        // 3. Recuperar servicios nativos desde el contenedor de dependencias
-        var dbService = App.Current?.Handler?.MauiContext?.Services.GetService<Services.DatabaseService>();
-        var notificationService = App.Current?.Handler?.MauiContext?.Services.GetService<Services.NotificationService>();
+        // 3. Feedback visual ultrarrápido en UI sin bloquear el hilo principal
+        foreach (var hijo in gridMaestro.Children)
+        {
+            if (hijo is Grid capaVisual)
+            {
+                capaVisual.IsVisible = eventoModificado.EsAlarmaAgresiva;
+            }
+        }
 
-        if (dbService != null)
+        // 4. Persistencia asíncrona aislada y reprogramación de hardware en HILO DE FONDO
+        _ = Task.Run(async () =>
         {
             try
             {
-                // 4. Persistencia asíncrona aislada en tu SQLite (HILO DE FONDO)
-                _ = Task.Run(async () =>
-                {
-                    await dbService.GuardarEventoAsync(eventoModificado);
-                });
-
-                // 5. Reprogramación segura de hardware usando tu servicio del doble carril
-                if (notificationService != null)
-                {
-                    await notificationService.ProgramarRecordatorio(eventoModificado);
-                }
-
-                // ============================================================
-                // 💡 REPARACIÓN ULTRARÁPIDA: CONMUTACIÓN DIRECTA EN ELEMENTO HIJO
-                // ============================================================
-                // Buscamos al Grid secundario que tiene el nombre "CapaRojoFuego" entre los hijos del contenedor pulsado
-                var capaRojo = gridMaestro.Children.FirstOrDefault(c => c is Grid g && g.StyleId == "CapaRojoFuego" || (c is Grid visualGrid && visualGrid.IsVisible != eventoModificado.EsAlarmaAgresiva)) as Grid;
-
-                // Si el motor de renderizado no lo encuentra por tipado indirecto, forzamos la actualización directa del árbol visual de la celda
-                foreach (var hijo in gridMaestro.Children)
-                {
-                    if (hijo is Grid capaVisual)
-                    {
-                        // Forzamos a la Capa 2 a igualar la visibilidad booleana real del objeto de forma instantánea
-                        capaVisual.IsVisible = eventoModificado.EsAlarmaAgresiva;
-                    }
-                }
+                await _dbService.GuardarEventoAsync(eventoModificado).ConfigureAwait(false);
+                await _notificationService.ProgramarRecordatorio(eventoModificado).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"[MAUI-INTERACTIVO] Excepción mitigada: {ex.Message}");
             }
-        }
+        });
 
-        // 6. Feedback háptico opcional para dispositivos móviles
+        // 5. Feedback háptico en dispositivos móviles
 #if ANDROID || IOS
-    try { HapticFeedback.Default.Perform(HapticFeedbackType.Click); } catch { }
+        try { HapticFeedback.Default.Perform(HapticFeedbackType.Click); } catch { }
 #endif
     }
 
@@ -494,25 +474,17 @@ public partial class AgendaPage : ContentPage
             // ============================================================
             // 💡 BLINDAJE DE MEMORIA GRÁFICA EN CALIENTE (CERO CONFLICTOS)
             // ============================================================
-            // Detiene cualquier hilo o inercia anterior directamente sobre el Grid de fondo
             ContenedorPopupBorrar.CancelAnimations();
 
-            // Reset estricto de seguridad para forzar a la GPU a arrancar de cero
             ContenedorPopupBorrar.Scale = 0.01;
             ContenedorPopupBorrar.Opacity = 0;
-
-            // Encendemos la capa translúcida
             ContenedorPopupBorrar.IsVisible = true;
 
-            // 🚀 INFLADO CINEMÁTICO REGULAR POR HARDWARE (MÉTODO ASÍNCRONO PURO)
-            // Escalamos rápidamente el cartel rojo hasta un 108% en 280ms
             await Task.WhenAll(
                 ContenedorPopupBorrar.ScaleToAsync(1.08, 280, Easing.CubicOut),
                 ContenedorPopupBorrar.FadeToAsync(1, 220, Easing.CubicOut)
             );
 
-            // 🎯 ASENTAMIENTO DE ALTO RENDIMIENTO CON FIRMA ASÍNCRONA ACTUALIZADA
-            // Regresa del 108% al 100% real en 80ms de manera regular sin advertencias de obsolescencia
             await ContenedorPopupBorrar.ScaleToAsync(1.00, 80, Easing.Linear);
 
             _borradoTaskSource = new TaskCompletionSource<bool>();
@@ -520,18 +492,21 @@ public partial class AgendaPage : ContentPage
 
             if (confirmar && _eventoSeleccionadoParaDestruir != null)
             {
-                var dbService = App.Current?.Handler?.MauiContext?.Services.GetService<Services.DatabaseService>();
-                if (dbService != null)
-                {
-                    await dbService.BorrarEventoAsync(_eventoSeleccionadoParaDestruir);
-                    if (_viewModel != null)
-                    {
-                        await _viewModel.LoadEventosAsync();
-                    }
-                }
-            }
+                var eventoABorrar = _eventoSeleccionadoParaDestruir;
+                _eventoSeleccionadoParaDestruir = null;
 
-            _eventoSeleccionadoParaDestruir = null;
+                _ = Task.Run(async () =>
+                {
+                    // 🎯 LIMPIEZA DE NOTIFICACIONES HUÉRFANAS: Cancelamos hora exacta y pre-aviso (Punto Ciego 2)
+                    _notificationService.CancelarRecordatorio(eventoABorrar.Id);
+                    await _dbService.BorrarEventoAsync(eventoABorrar).ConfigureAwait(false);
+                    await _viewModel.LoadEventosAsync().ConfigureAwait(false);
+                });
+            }
+            else
+            {
+                _eventoSeleccionadoParaDestruir = null;
+            }
         }
     }
 

@@ -1,4 +1,4 @@
-﻿using MauiTime.Services;
+using MauiTime.Services;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -22,12 +22,14 @@ public partial class App : Application
             var ex = (Exception)error.ExceptionObject;
             try
             {
-                System.IO.File.WriteAllText(@"D:\Error_Crash_Maui.txt", ex.ToString());
+                var crashPath = Path.Combine(FileSystem.AppDataDirectory, "Error_Crash_Maui.txt");
+                System.IO.File.WriteAllText(crashPath, ex.ToString());
             }
             catch { }
         };
     }
 
+    [System.Runtime.Versioning.SupportedOSPlatform("android23.0")]
     protected override Window CreateWindow(IActivationState? activationState)
     {
         // Creamos la ventana de forma nativa e impecable
@@ -43,29 +45,58 @@ public partial class App : Application
                 await dbService.SeedDataAsync();
             }
 
-            // 2. 📱 SOLICITUD DE PERMISOS EN CALIENTE (ANDROID) - REUBICADO CON SEGURIDAD
+            // 2. 📱 SOLICITUD DE PERMISOS EN CALIENTE Y PURGA NATIVA (ANDROID) - REUBICADO CON SEGURIDAD
 #if ANDROID
-            if (await LocalNotificationCenter.Current.AreNotificationsEnabled() == false)
+            try
             {
-                await LocalNotificationCenter.Current.RequestNotificationPermission();
-            }
+                // Purga explícita de notificaciones activas o huérfanas al iniciar la actividad principal
+                var notificationManager = Android.App.Application.Context.GetSystemService(Android.Content.Context.NotificationService) as Android.App.NotificationManager;
+                notificationManager?.CancelAll();
 
-            // Permiso de superposición para invadir la pantalla en Android si está en otra App
-            if (!Android.Provider.Settings.CanDrawOverlays(Android.App.Application.Context))
+                if (await LocalNotificationCenter.Current.AreNotificationsEnabled() == false)
+                {
+                    await LocalNotificationCenter.Current.RequestNotificationPermission();
+                }
+
+                // Permiso de superposición para invadir la pantalla en Android si está en otra App (API 23+)
+                if (Android.OS.Build.VERSION.SdkInt >= Android.OS.BuildVersionCodes.M)
+                {
+                    if (!Android.Provider.Settings.CanDrawOverlays(Android.App.Application.Context))
+                    {
+                        var intent = new Android.Content.Intent(
+                            Android.Provider.Settings.ActionManageOverlayPermission,
+                            Android.Net.Uri.Parse($"package:{Android.App.Application.Context.PackageName}"));
+                        intent.SetFlags(Android.Content.ActivityFlags.NewTask);
+                        Android.App.Application.Context.StartActivity(intent);
+                    }
+                }
+            }
+            catch (Exception ex)
             {
-                var intent = new Android.Content.Intent(
-                    Android.Provider.Settings.ActionManageOverlayPermission,
-                    Android.Net.Uri.Parse($"package:{Android.App.Application.Context.PackageName}"));
-                intent.Flags = Android.Content.ActivityFlags.NewTask;
-                Android.App.Application.Context.StartActivity(intent);
+                System.Diagnostics.Debug.WriteLine($"[ANDROID PERMISOS ERROR] {ex.Message}");
             }
 #endif
+
+            // 🎯 MECANISMO DE AUTOCANCELACIÓN POR CLIC (Punto Ciego 1 y 2)
+            LocalNotificationCenter.Current.NotificationActionTapped += (e) =>
+            {
+                int id = e.Request.NotificationId;
+                LocalNotificationCenter.Current.Cancel(id);
+                if (id < 100000)
+                {
+                    LocalNotificationCenter.Current.Cancel(id + 100000);
+                }
+                else
+                {
+                    LocalNotificationCenter.Current.Cancel(id - 100000);
+                }
+            };
 
             // 3. 🎵 INICIALIZACIÓN DE LA BANDA SONORA INTEGRADA (ESTILO GITHUB)
             await InicializarAudioProyectoAsync();
 
             // =========================================================================
-            // 🚨 EL DETONADOR DE EMBOSCADAS DE WINDOWS (INTEGRADO Y REPARADO)
+            // 🚨 EL DETONADOR DE EMBOSCADAS (INTEGRADO Y REPARADO)
             // =========================================================================
             LocalNotificationCenter.Current.NotificationReceived += async (e) =>
             {

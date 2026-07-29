@@ -1,5 +1,5 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://microsoft.com">
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
 	<!-- 📱 PERMISOS MULTIMEDIA Y ALARMAS EXACTAS (OBJETIVO ANDROID 13+) -->
 	<uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
@@ -8,6 +8,7 @@
 	<uses-permission android:name="android.permission.VIBRATE" />
 	<uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" android:maxSdkVersion="32" />
 	<uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+	<uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
 	<!-- Tus permisos de red originales -->
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />

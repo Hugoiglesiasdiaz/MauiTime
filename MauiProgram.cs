@@ -1,8 +1,7 @@
-﻿using MauiTime.ViewModels;
+using MauiTime.ViewModels;
 using MauiTime.Views;
 using Microsoft.Extensions.Logging;
-
-
+using Plugin.LocalNotification;
 
 namespace MauiTime;
 
@@ -10,9 +9,11 @@ public static class MauiProgram
 {
 	public static MauiApp CreateMauiApp()
 	{
+
 		var builder = MauiApp.CreateBuilder();
 		builder
 			.UseMauiApp<App>()
+			.UseLocalNotification()
 			.ConfigureFonts(fonts =>
 			{
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
@@ -27,6 +28,7 @@ public static class MauiProgram
 		builder.Services.AddTransient<AgendaViewModel>();
 		builder.Services.AddTransient<AgendaPage>();
 		builder.Services.AddTransient<CalendarioPage>();
+		builder.Services.AddTransient<NuevaTareaPopup>();
 
 #if DEBUG
 		builder.Logging.AddDebug();

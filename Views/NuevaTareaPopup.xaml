@@ -79,24 +79,18 @@
                                         <RoundRectangle CornerRadius="0"/>
                                 </Border.StrokeShape>
                         </Border>
-                        <!-- Capa 3: Texto de la Firma -->
-                        <Label Text="Joker"
-                               TextColor="White"
-                               FontSize="24"
-                               FontFamily="Bubblegum"
-                               HorizontalOptions="Center"
-                               VerticalOptions="Center"
-                               Margin="0,0,5,5"/>
+                        
                 </Grid>
 
 
                 <!-- Contenedor con Scroll para adaptabilidad total de pantallas -->
                 <ScrollView VerticalOptions="Center"
                             HorizontalOptions="Center"
-                            Margin="15">
+                            Margin="{OnPlatform Android='5', WinUI='15'}">
 
-                        <!-- Bloque General del HUD (Ancho Rígido 620 Calibrado) -->
-                        <Grid WidthRequest="620"
+                        <!-- Bloque General del HUD (Ancho Rígido 620 en WinUI, Flexible en Android) -->
+                        <Grid WidthRequest="{OnPlatform Android=-1, WinUI=620}"
+                              HorizontalOptions="{OnPlatform Android=Fill, WinUI=Center}"
                               RowDefinitions="Auto, Auto, *, Auto"
                               Padding="15">
 

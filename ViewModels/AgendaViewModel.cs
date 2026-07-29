@@ -12,6 +12,7 @@ namespace MauiTime.ViewModels
     public class AgendaViewModel : BaseViewModel
     {
         private readonly DatabaseService _databaseService;
+        private readonly NotificationService _notificationService;
         private bool _isBusy;
 
         public ObservableCollection<Evento> Eventos { get; } = new();
@@ -27,9 +28,10 @@ namespace MauiTime.ViewModels
         public ICommand EventoCompletadoCommand { get; }
 
         // Modifica o añade esto en tu constructor del ViewModel:
-        public AgendaViewModel(DatabaseService databaseService)
+        public AgendaViewModel(DatabaseService databaseService, NotificationService notificationService)
         {
             _databaseService = databaseService;
+            _notificationService = notificationService;
             CargarEventosCommand = new Command(async () => await LoadEventosAsync());
 
             // Comando preparado para cuando el usuario completa un evento en la lista
@@ -48,13 +50,15 @@ namespace MauiTime.ViewModels
 
             if (evento.Frecuencia == Evento.FrecuenciaEvento.Ninguna)
             {
-                // Si no se repite, se extirpa del disco duro tras completarse
+                // Si no se repite, se extirpa del disco duro tras completarse y se borran notificaciones (Punto Ciego 2)
+                _notificationService.CancelarRecordatorio(evento.Id);
                 await _databaseService.BorrarEventoAsync(evento);
             }
             else
             {
-                // Si es frecuente, se actualiza su nueva fecha recalculada en SQLite
+                // Si es frecuente, se actualiza su nueva fecha recalculada en SQLite y se reprograman alertas
                 await _databaseService.GuardarEventoAsync(evento);
+                await _notificationService.ProgramarRecordatorio(evento);
             }
 
             // Refrescar la UI de forma limpia
@@ -62,50 +66,47 @@ namespace MauiTime.ViewModels
         }
 
         public async Task LoadEventosAsync()
+{
+    // Si ya está ocupado, salimos inmediatamente para evitar solapamientos
+    if (IsBusy) return;
+
+    try
+    {
+        // Activamos el indicador de carga
+        IsBusy = true;
+
+        // 1. Obtención de datos en hilo secundario de forma segura
+        var lista = await Task.Run(async () =>
         {
-            if (IsBusy) return;
+            await _databaseService.SeedDataAsync().ConfigureAwait(false);
+            var raw = await _databaseService.ObtenerEventosAsync().ConfigureAwait(false);
+            return raw.OrderBy(e => e.FechaHora).ToList();
+        }).ConfigureAwait(false);
 
-            try
+        // 2. Volcado directo y limpio en el hilo de interfaz de usuario
+        await MainThread.InvokeOnMainThreadAsync(() =>
+        {
+            Eventos.Clear();
+            foreach (var item in lista)
             {
-                IsBusy = true;
-
-                // 1. Verificar datos iniciales en SQLite
-                await _databaseService.SeedDataAsync();
-
-                // 2. Extraer todos los eventos de la base de datos
-                var lista = await _databaseService.ObtenerEventosAsync();
-
-                // 3. 🎯 ORDEN CRÍTICO ASCENDENTE: Los más cercanos/vencidos van PRIMERO
-                // .OrderBy(e => e.FechaHora) coloca el tiempo menor (más antiguo/cercano) arriba,
-                // y las fechas futuras más lejanas se van acumulando al final de la lista.
-                var listaOrdenada = lista.OrderBy(e => e.FechaHora).ToList();
-
-                // 4. Volcado atómico en el hilo principal de Windows Desktop
-                MainThread.BeginInvokeOnMainThread(async () =>
-            {
-                // 1. Vaciamos la lista por completo
-                Eventos.Clear();
-
-                // 2. ⚡ TRUCO MAUI WINDOWS: Forzamos un micro-retraso asíncrono.
-                // Esto obliga al motor gráfico a procesar que la lista está vacía y destruir las celdas viejas.
-                await Task.Delay(10);
-
-                // 3. Inyectamos los elementos limpios y ordenados cronológicamente
-                foreach (var item in listaOrdenada)
-                {
-                    Eventos.Add(item);
-                }
-            });
+                Eventos.Add(item);
             }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"[ViewModel Error] {ex.Message}");
-            }
-            finally
-            {
-                IsBusy = false;
-            }
-        }
+        });
+    }
+    catch (Exception ex)
+    {
+        // Registramos el error exacto en la consola de depuración para ver si algo falla por dentro
+        System.Diagnostics.Debug.WriteLine($"[ERROR CRITICO EN RECARGA]: {ex.Message}");
+    }
+    finally
+    {
+        // 3. APAGADO BLINDADO: Garantizamos en el hilo principal que IsBusy pase a false pase lo que pase
+        await MainThread.InvokeOnMainThreadAsync(() =>
+        {
+            IsBusy = false;
+        });
+    }
+}
 
     }
 }

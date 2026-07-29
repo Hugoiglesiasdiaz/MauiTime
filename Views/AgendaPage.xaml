@@ -44,73 +44,57 @@
                   Opacity="0.15"
                   Aspect="Fill"/>
 
-            <!-- Bloque decorativo de estrellas tipo grafiti (Esquina inferior derecha) -->
-            <AbsoluteLayout HorizontalOptions="End"
-                            VerticalOptions="End"
-                            Margin="0,0,60,40"
-                            Opacity="0.4">
-                <Polygon Points="25,0 32,15 49,18 37,30 40,47 25,39 9,47 13,30 1,18 17,15"
-                         Fill="White"
-                         Scale="3.0"
-                         AbsoluteLayout.LayoutBounds="0,0,50,50"/>
-                <Polygon Points="25,0 32,15 49,18 37,30 40,47 25,39 9,47 13,30 1,18 17,15"
-                         Fill="#E31D26"
-                         Scale="1.8"
-                         Rotation="28"
-                         AbsoluteLayout.LayoutBounds="45,20,50,50"/>
-            </AbsoluteLayout>
+        </Grid>  
 
-            <!-- Trama de ruido/periódico sutil -->
-            <Grid BackgroundColor="Transparent"
-                  Opacity="0.04">
-                <BoxView Color="White"
-                         VerticalOptions="Fill"
-                         HorizontalOptions="Fill"/>
-            </Grid>
-        </Grid>
+        <!-- ==================== CAPA DEL CONTENIDO (VERTICAL ANDROID / COLLAGE WINUI) ==================== -->
+        <Grid RowDefinitions="{OnPlatform Android='Auto, Auto, Auto, *, Auto', WinUI='Auto, *, Auto'}"
+              Padding="{OnPlatform Android='8,10,8,8', WinUI='20'}">
 
-        <!-- ==================== CAPA DEL CONTENIDO (INTERFAZ) ==================== -->
-        <Grid RowDefinitions="Auto, Auto, *"
-              Padding="20">
-
-            <!-- TÍTULO PRINCIPAL DINÁMICO (ESTILO NOTA DE RESCATE EN C#) -->
-            <Border BackgroundColor="#E31D26"
+            <!-- FILA 0: TÍTULO PRINCIPAL (AGENDA DE EVENTOS) -->
+            <Border Grid.Row="{OnPlatform Android=0, WinUI=0}"
+                    BackgroundColor="#E31D26"
                     HorizontalOptions="Start"
+                    VerticalOptions="Start"
                     StrokeThickness="0"
-                    Rotation="-5"
-                    Margin="10,20,0,25"
-                    Padding="20,10">
+                    Rotation="{OnPlatform Android=-2, WinUI=-5}"
+                    Margin="{OnPlatform Android='0,10,0,12', WinUI='10,20,0,0'}"
+                    Padding="{OnPlatform Android='12,6', WinUI='20,10'}"
+                    ZIndex="{OnPlatform Android=0, WinUI=2}">
                 <Border.Shadow>
                     <Shadow Brush="Black"
-                            Offset="6,6"
+                            Offset="{OnPlatform Android='3,3', WinUI='6,6'}"
                             Radius="0"
                             Opacity="0.8"/>
                 </Border.Shadow>
-                <!-- El archivo C# buscará este x:Name para inyectar los bloques de letras -->
                 <FlexLayout x:Name="ContenedorTitulo"
                             Wrap="Wrap"
                             HorizontalOptions="Center"
                             VerticalOptions="Center"/>
             </Border>
 
-            <!-- BOTONES DE PESTAÑA ASIMÉTRICOS (VERSION AMPLIADA Y CORREGIDA) -->
-            <Grid Grid.Row="1"
-                  ColumnDefinitions="Auto, Auto"
-                  Margin="15,0,0,25"
-                  HorizontalOptions="Start">
+            <!-- FILA 1 (Android) / capa collage (WinUI): PESTAÑAS AGENDA / CALENDARIO -->
+            <Grid Grid.Row="{OnPlatform Android=1, WinUI=0}"
+                  ColumnDefinitions="{OnPlatform Android='*, *', WinUI='Auto, Auto'}"
+                  ColumnSpacing="{OnPlatform Android=8, WinUI=0}"
+                  HorizontalOptions="{OnPlatform Android=Fill, WinUI=Start}"
+                  VerticalOptions="{OnPlatform Android=Center, WinUI=Start}"
+                  Rotation="{OnPlatform Android=0, WinUI=0}"
+                  Margin="{OnPlatform Android='0,0,0,8', WinUI='15,95,0,20'}"
+                  ZIndex="{OnPlatform Android=0, WinUI=2}">
 
-                <!-- 1. PESTAÑA AGENDA (UNIFICADA EN TAMAÑO Y AIRE) -->
                 <Border x:Name="TabAgenda"
                         Grid.Column="0"
                         BackgroundColor="Black"
                         Stroke="White"
                         StrokeThickness="2"
-                        Rotation="-4"
-                        ZIndex="2"
-                        Padding="30,12">
+                        Rotation="{OnPlatform Android=-2, WinUI=-4}"
+                        HorizontalOptions="{OnPlatform Android=Fill, WinUI=Start}"
+                        ZIndex="{OnPlatform Android=0, WinUI=2}"
+                        Padding="{OnPlatform Android='22,8', WinUI='30,12'}"
+                        MinimumHeightRequest="{OnPlatform Android=48, WinUI=48}">
                     <Border.Shadow>
                         <Shadow Brush="Black"
-                                Offset="5,5"
+                                Offset="{OnPlatform Android='3,3', WinUI='5,5'}"
                                 Radius="0"
                                 Opacity="0.8"/>
                     </Border.Shadow>
@@ -120,29 +104,29 @@
                                                   PointerExited="OnTabAgendaMouseOut"/>
                     </Border.GestureRecognizers>
 
-                    <!-- Cambiamos CharacterSpacing a 0 para que expanda horizontalmente en perfecta simetría -->
                     <Label Text="AGENDA"
                            TextColor="#E31D26"
-                           FontSize="21"
+                           FontSize="{OnPlatform Android=16, WinUI=21}"
                            FontAttributes="Bold, Italic"
                            FontFamily="Impact"
+                           HorizontalOptions="Center"
                            CharacterSpacing="0"/>
                 </Border>
 
-                <!-- 2. PESTAÑA CALENDARIO (CALIBRADA EN TAMAÑO Y AIRE) -->
-                <!-- Incrementamos el Padding a 35,12 y cambiamos el margen izquierdo a -25 para ajustar el solape -->
                 <Border x:Name="TabCalendario"
                         Grid.Column="1"
                         BackgroundColor="#E5E5E5"
                         Stroke="Black"
                         StrokeThickness="1.5"
-                        Rotation="3"
-                        ZIndex="1"
-                        Margin="-25,2,0,0"
-                        Padding="35,12">
+                        Rotation="{OnPlatform Android=2, WinUI=3}"
+                        HorizontalOptions="{OnPlatform Android=Fill, WinUI=Start}"
+                        ZIndex="{OnPlatform Android=0, WinUI=1}"
+                        Margin="{OnPlatform Android='0,0,0,0', WinUI='-25,2,0,0'}"
+                        Padding="{OnPlatform Android='22,8', WinUI='35,12'}"
+                        MinimumHeightRequest="{OnPlatform Android=48, WinUI=48}">
                     <Border.Shadow>
                         <Shadow Brush="Black"
-                                Offset="4,4"
+                                Offset="{OnPlatform Android='2,2', WinUI='4,4'}"
                                 Radius="0"
                                 Opacity="0.5"/>
                     </Border.Shadow>
@@ -152,35 +136,92 @@
                                                   PointerExited="OnTabCalendarioMouseOut"/>
                     </Border.GestureRecognizers>
 
-                    <!-- Subimos FontSize a 21 y eliminamos el CharacterSpacing negativo para expandirla horizontalmente -->
                     <Label Text="CALENDARIO"
                            TextColor="#222222"
-                           FontSize="21"
+                           FontSize="{OnPlatform Android=15, WinUI=21}"
                            FontAttributes="Bold, Italic"
                            FontFamily="Impact"
-                           CharacterSpacing="0"/>
+                           HorizontalOptions="Center"
+                           CharacterSpacing="0"
+                           LineBreakMode="NoWrap"/>
                 </Border>
             </Grid>
 
-            <!-- CONTENEDOR DE LA LISTA Y EL SCROLLBAR PERSONALIZADO -->
-            <Grid Grid.Row="2"
+            <!-- FILA 2 (Android) / capa collage (WinUI): INICIAR INFILTRACIÓN -->
+            <Grid x:Name="BtnInfiltracion"
+                  Grid.Row="{OnPlatform Android=2, WinUI=0}"
+                  HorizontalOptions="{OnPlatform Android=Fill, WinUI=End}"
+                  VerticalOptions="{OnPlatform Android=Center, WinUI=Start}"
+                  Margin="{OnPlatform Android='0,0,0,10', WinUI='0,88,0,0'}"
+                  Rotation="{OnPlatform Android=0, WinUI=4}"
+                  HeightRequest="{OnPlatform Android=50, WinUI=48}"
+                  ZIndex="{OnPlatform Android=0, WinUI=999}">
+
+                <Grid.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnCrearProyectoClicked"/>
+                    <PointerGestureRecognizer PointerEntered="OnBtnInfiltracionMouseIn"
+                                              PointerExited="OnBtnInfiltracionMouseOut"/>
+                </Grid.GestureRecognizers>
+
+                <Border BackgroundColor="Black"
+                        Stroke="White"
+                        StrokeThickness="1.5"
+                        InputTransparent="True">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="0"/>
+                    </Border.StrokeShape>
+                </Border>
+
+                <Grid ColumnDefinitions="Auto, *"
+                      Padding="{OnPlatform Android='14,0', WinUI='32,0'}"
+                      InputTransparent="True"
+                      VerticalOptions="Center">
+
+                    <Grid Grid.Column="0"
+                          WidthRequest="14"
+                          HeightRequest="14"
+                          VerticalOptions="Center"
+                          Rotation="15"
+                          Margin="0,0,10,0">
+                        <Path Data="M 7,0 L 14,7 L 7,14 L 0,7 Z"
+                              Fill="#E31D26"/>
+                        <Path Data="M 7,0 L 14,7 L 7,14 L 0,7 Z"
+                              Stroke="White"
+                              StrokeThickness="1"/>
+                        <Path Data="M 7,3 L 7,11 M 3,7 L 11,7"
+                              Stroke="White"
+                              StrokeThickness="1.5"/>
+                    </Grid>
+
+                    <Label Grid.Column="1"
+                           Text="INICIAR INFILTRACIÓN"
+                           TextColor="#F0F0F0"
+                           FontSize="{OnPlatform Android=14, WinUI=20}"
+                           FontFamily="Impact"
+                           CharacterSpacing="0"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"/>
+                </Grid>
+            </Grid>
+
+            <!-- FILA 3 (Android) / FILA 1 (WinUI): LISTA DE EVENTOS + SCROLLBAR -->
+            <Grid Grid.Row="{OnPlatform Android=3, WinUI=1}"
                   ColumnDefinitions="*, 20">
 
-                <RefreshView Grid.Column="0"
-                             Command="{Binding CargarEventosCommand}"
-                             IsRefreshing="{Binding IsBusy}">
                     <!-- Ocultamos la barra nativa con VerticalScrollBarVisibility="Never" -->
                     <!-- Conectamos con el evento Scrolled del archivo C# -->
                     <CollectionView x:Name="ListaEventos"
+                                    Grid.Column="0"
                                     ItemsSource="{Binding Eventos}"
                                     VerticalScrollBarVisibility="Never"
                                     Scrolled="OnListaEventosScrolled">
                         <CollectionView.ItemTemplate>
                             <DataTemplate x:DataType="models:Evento">
-                                <!-- Cambiamos la columna a 125 para dar espacio al nuevo HUD extendido -->
-                                <Grid ColumnDefinitions="125, *"
-                                      Margin="0,5"
-                                      Padding="8,10">
+                                <!-- Piezas de puzle roto: HUD de fecha + tarjeta negra ensanchada en Android -->
+                                <Grid ColumnDefinitions="{OnPlatform Android='100, *', WinUI='125, *'}"
+                                      Margin="{OnPlatform Android='0,5', WinUI='0,5'}"
+                                      Padding="{OnPlatform Android='2,10', WinUI='8,10'}"
+                                      HorizontalOptions="Fill">
 
 
                                     <!-- ==================== NUEVO HUD DE FECHA ESTILO P5 ==================== -->
@@ -205,8 +246,9 @@
                                         BackgroundColor="Black"
                                         Stroke="White"
                                         StrokeThickness="2"
-                                        Margin="-15,0,0,0"
-                                        Padding="35,16,15,16"
+                                        HorizontalOptions="Fill"
+                                        Margin="{OnPlatform Android='-24,0,0,0', WinUI='-15,0,0,0'}"
+                                        Padding="{OnPlatform Android='28,16,10,16', WinUI='35,16,15,16'}"
                                         VerticalOptions="Center"
                                         ZIndex="1">
                                         <Border.Shadow>
@@ -429,7 +471,7 @@
                         </CollectionView.ItemTemplate>
 
                     </CollectionView>
-                </RefreshView>
+                
 
 
                 <!-- ==================== SCROLLBAR ESTILO PERSONA 5 (CALIBRACIÓN MILIMÉTRICA) ==================== -->
@@ -473,81 +515,29 @@
 
             </Grid>
 
-
-            <!-- ======================================================================= -->
-            <!-- ➕ BOTÓN SUPREMO: GATILLO DE REGISTRO FLOTANTE - CABECERA UNIFICADA (P5) -->
-            <!-- ======================================================================= -->
-            <!-- 💡 ADICIÓN: Añadimos x:Name para poder animarlo desde el C# -->
-            <Grid x:Name="BtnInfiltracion"
-                  Grid.Row="0"
-                  HorizontalOptions="End"
-                  VerticalOptions="Center"
-                  Margin="0,20,20,0"
-                  ZIndex="999"
-                  HeightRequest="48"
-                  Rotation="4">
-
-                <Grid.GestureRecognizers>
-                    <!-- Clic / Toque Original -->
-                    <TapGestureRecognizer Tapped="OnCrearProyectoClicked"/>
-
-                    <!-- 💡 NUEVOS DETECTORES DE RATÓN (HOVER ESTILO P5) -->
-                    <PointerGestureRecognizer PointerEntered="OnBtnInfiltracionMouseIn"
-                                              PointerExited="OnBtnInfiltracionMouseOut"/>
-                </Grid.GestureRecognizers>
-
-                <!-- CUERPO PRINCIPAL NEGRO SÓLIDO -->
-                <Border BackgroundColor="Black"
-                        Stroke="White"
-                        StrokeThickness="1.5"
-                        InputTransparent="True">
-                    <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="0"/>
-                    </Border.StrokeShape>
-                </Border>
-
-                <!-- DISTRIBUIDOR INTERNO -->
-                <Grid ColumnDefinitions="Auto, *"
-                      Padding="32,0"
-                      InputTransparent="True"
-                      VerticalOptions="Center">
-
-                    <!-- ICONO: ROMBO VECTORIAL ROJO -->
-                    <Grid Grid.Column="0"
-                          WidthRequest="14"
-                          HeightRequest="14"
-                          VerticalOptions="Center"
-                          Rotation="15"
-                          Margin="0,0,10,0">
-                        <Path Data="M 7,0 L 14,7 L 7,14 L 0,7 Z"
-                              Fill="#E31D26"/>
-                        <Path Data="M 7,0 L 14,7 L 7,14 L 0,7 Z"
-                              Stroke="White"
-                              StrokeThickness="1"/>
-                        <Path Data="M 7,3 L 7,11 M 3,7 L 11,7"
-                              Stroke="White"
-                              StrokeThickness="1.5"/>
-                    </Grid>
-
-                    <!-- TEXTO SÓLIDO MAXIMIZADO CON SUAVIZADO ÓPTICO -->
-                    <Label Grid.Column="1"
-                           Text="INICIAR INFILTRACIÓN"
-                           TextColor="#F0F0F0"
-                           FontSize="20"
-                           FontFamily="Impact"
-                           CharacterSpacing="0"
-                           HorizontalOptions="Center"
-                           VerticalOptions="Center"/>
-                </Grid>
-            </Grid>
-
+            <!-- FILA 4 (Android) / FILA 2 (WinUI): ESTRELLA DECORATIVA INFERIOR -->
+            <AbsoluteLayout Grid.Row="{OnPlatform Android=4, WinUI=2}"
+                            HorizontalOptions="End"
+                            VerticalOptions="End"
+                            Margin="{OnPlatform Android='0,0,60,40', WinUI='0,0,60,40'}"
+                            Opacity="0.4">
+                <Polygon Points="25,0 32,15 49,18 37,30 40,47 25,39 9,47 13,30 1,18 17,15"
+                         Fill="White"
+                         Scale="3.0"
+                         AbsoluteLayout.LayoutBounds="0,0,50,50"/>
+                <Polygon Points="25,0 32,15 49,18 37,30 40,47 25,39 9,47 13,30 1,18 17,15"
+                         Fill="#E31D26"
+                         Scale="1.8"
+                         Rotation="28"
+                         AbsoluteLayout.LayoutBounds="45,20,50,50"/>
+            </AbsoluteLayout>
 
             <!-- ======================================================================= -->
             <!-- 🎭 POPUP DE CONFIRMACIÓN: CUADRO SÓLIDO DE ÁNGULOS DUROS                -->
             <!-- ======================================================================= -->
             <Grid x:Name="ContenedorPopupBorrar"
-                  Grid.RowSpan="5"
-                  Grid.ColumnSpan="4"
+                  Grid.RowSpan="{OnPlatform Android=5, WinUI=3}"
+                  Grid.ColumnSpan="1"
                   BackgroundColor="#A5000000"
                   ZIndex="9999"
                   IsVisible="False"
@@ -727,7 +717,6 @@
 
 
             <!-- ======================================================================= -->
-
 
         </Grid>
     </Grid>

@@ -1,5 +1,6 @@
 using Microsoft.Maui.Controls;
 using System;
+using Plugin.LocalNotification;
 
 namespace MauiTime.Views;
 
@@ -63,6 +64,9 @@ public partial class AlarmaCriticaPage : ContentPage
 
     private async void OnDesactivarAlarmaClicked(object? sender, EventArgs? e)
     {
+        // 🎯 PURGA DE BARRA DE ESTADO EN ANDROID: Cancela las notificaciones activas al apagar la alarma
+        LocalNotificationCenter.Current.CancelAll();
+
         // 🔄 REVERSO DE AUDIO: Silenciamos el combate y despertamos la rutina diaria
         if (App.AlarmaPlayer != null && App.AlarmaPlayer.IsPlaying)
         {

@@ -19,26 +19,26 @@
                     StrokeThickness="2"
                     HorizontalOptions="End"
                     VerticalOptions="Fill"
-                    WidthRequest="250"
-                    Rotation="3"
+                    WidthRequest="{OnPlatform Android=120, WinUI=250}"
+                    Rotation="{OnPlatform Android=2, WinUI=3}"
                     Margin="0,-50,-50,-50">
                 <Border.Shadow>
                     <Shadow Brush="Black"
-                            Offset="-5,0"
+                            Offset="{OnPlatform Android='-2,0', WinUI='-5,0'}"
                             Radius="0"
-                            Opacity="0.5"/>
+                            Opacity="{OnPlatform Android=0.2, WinUI=0.5}"/>
                 </Border.Shadow>
             </Border>
 
             <!-- POLÍGONO NEGRO SUPERIOR IZQUIERDO: Tu forma exacta que enmarca de forma brutal las pestañas -->
-            <Polygon Points="0,0 600,0 450,400 0,350"
+            <Polygon Points="{OnPlatform Android='0,0 350,0 250,250 0,220', WinUI='0,0 600,0 450,400 0,350'}"
                      Fill="#0A0A0A"
                      Opacity="0.95"/>
 
             <!-- BARRA DIAGONAL CENTRAL CORREGIDA: Le bajamos la opacidad al 35% para proteger la lectura de tus números -->
             <BoxView Color="White"
-                     HeightRequest="12"
-                     Rotation="-15"
+                     HeightRequest="{OnPlatform Android=6, WinUI=12}"
+                     Rotation="{OnPlatform Android=-10, WinUI=-15}"
                      VerticalOptions="Center"
                      HorizontalOptions="Fill"
                      Margin="-50,0"
@@ -50,7 +50,8 @@
                          Opacity="0.15"
                          HorizontalOptions="Start"
                          VerticalOptions="Fill"
-                         Margin="80,0,0,0">
+                         Margin="80,0,0,0"
+                         IsVisible="{OnPlatform Android=False, WinUI=True}">
                 <BoxView Color="White"
                          WidthRequest="2"
                          VerticalOptions="Fill"/>
@@ -64,23 +65,24 @@
 
             <!-- CÍRCULOS DE IMPACTO CONCÉNTRICOS: Tu estructura original intacta abajo a la izquierda -->
             <Ellipse Fill="White"
-                     WidthRequest="150"
-                     HeightRequest="150"
+                     WidthRequest="{OnPlatform Android=90, WinUI=150}"
+                     HeightRequest="{OnPlatform Android=90, WinUI=150}"
                      HorizontalOptions="Start"
                      VerticalOptions="End"
-                     Margin="-75,0,0,-75"
+                     Margin="{OnPlatform Android='-45,0,0,-45', WinUI='-75,0,0,-75'}"
                      Opacity="0.15"/>
             <Ellipse Fill="#E31D26"
-                     WidthRequest="100"
-                     HeightRequest="100"
+                     WidthRequest="{OnPlatform Android=60, WinUI=100}"
+                     HeightRequest="{OnPlatform Android=60, WinUI=100}"
                      HorizontalOptions="Start"
                      VerticalOptions="End"
-                     Margin="-50,0,0,-50"
+                     Margin="{OnPlatform Android='-30,0,0,-30', WinUI='-50,0,0,-50'}"
                      Opacity="0.35"/>
 
             <!-- Trama de grano de fanzine sutil al 3% para unificar la textura de la Agenda -->
             <Grid BackgroundColor="Transparent"
-                  Opacity="0.03">
+                  Opacity="0.03"
+                  IsVisible="{OnPlatform Android=False, WinUI=True}">
                 <BoxView Color="White"
                          VerticalOptions="Fill"
                          HorizontalOptions="Fill"/>
@@ -92,15 +94,15 @@
         <!-- ==================== CAPA DEL CONTENIDO PRINCIPAL ==================== -->
         <Grid x:Name="ContenedorContenido"
               RowDefinitions="Auto, Auto, Auto, *"
-              Padding="20">
+              Padding="{OnPlatform Android='8,10,8,8', WinUI='20'}">
 
             <!-- 1. PESTAÑAS DE NAVEGACIÓN SUPERIORES (BLINDADAS CONTRA ESTIRAMIENTO) -->
             <Grid Grid.Row="0"
                   ColumnDefinitions="Auto, Auto"
-                  Margin="15,0,0,15"
+                  Margin="{OnPlatform Android='5,0,0,10', WinUI='15,0,0,15'}"
                   HorizontalOptions="Start"
                   VerticalOptions="Start"
-                  HeightRequest="65">
+                  HeightRequest="{OnPlatform Android=52, WinUI=65}">
 
                 <!-- PESTAÑA AGENDA -->
                 <Border x:Name="TabAgenda"
@@ -108,14 +110,14 @@
                         BackgroundColor="#E5E5E5"
                         Stroke="Black"
                         StrokeThickness="1.5"
-                        Rotation="-4"
+                        Rotation="{OnPlatform Android=-2, WinUI=-4}"
                         ZIndex="1"
-                        Padding="30,12"
+                        Padding="{OnPlatform Android='18,8', WinUI='30,12'}"
                         VerticalOptions="Start"
-                        HeightRequest="48">
+                        HeightRequest="{OnPlatform Android=48, WinUI=48}">
                     <Border.Shadow>
                         <Shadow Brush="Black"
-                                Offset="4,4"
+                                Offset="{OnPlatform Android='2,2', WinUI='4,4'}"
                                 Radius="0"
                                 Opacity="0.5"/>
                     </Border.Shadow>
@@ -126,7 +128,7 @@
                     </Border.GestureRecognizers>
                     <Label Text="AGENDA"
                            TextColor="#222222"
-                           FontSize="21"
+                           FontSize="{OnPlatform Android=16, WinUI=21}"
                            FontFamily="Impact"
                            VerticalOptions="Center"/>
                 </Border>
@@ -137,15 +139,15 @@
                         BackgroundColor="Black"
                         Stroke="White"
                         StrokeThickness="2"
-                        Rotation="3"
+                        Rotation="{OnPlatform Android=2, WinUI=3}"
                         ZIndex="2"
-                        Margin="-25,2,0,0"
-                        Padding="35,12"
+                        Margin="{OnPlatform Android='-15,2,0,0', WinUI='-25,2,0,0'}"
+                        Padding="{OnPlatform Android='22,8', WinUI='35,12'}"
                         VerticalOptions="Start"
-                        HeightRequest="48">
+                        HeightRequest="{OnPlatform Android=48, WinUI=48}">
                     <Border.Shadow>
                         <Shadow Brush="Black"
-                                Offset="5,5"
+                                Offset="{OnPlatform Android='3,3', WinUI='5,5'}"
                                 Radius="0"
                                 Opacity="0.8"/>
                     </Border.Shadow>
@@ -155,7 +157,7 @@
                     </Border.GestureRecognizers>
                     <Label Text="CALENDARIO"
                            TextColor="#E31D26"
-                           FontSize="21"
+                           FontSize="{OnPlatform Android=16, WinUI=21}"
                            FontFamily="Impact"
                            VerticalOptions="Center"/>
                 </Border>
@@ -166,14 +168,14 @@
             <!-- 2. CABECERA HUD EXTIDILO PHANTOM THIEVES (REDISEÑO TOTAL AGRESIVO) -->
             <Grid Grid.Row="1"
                   ColumnDefinitions="Auto, *, Auto"
-                  Margin="10,5,10,20"
+                  Margin="{OnPlatform Android='4,2,4,10', WinUI='10,5,10,20'}"
                   VerticalOptions="Center">
 
                 <!-- BOTÓN MES ANTERIOR: Machetazo Diagonal Masivo estilo Navaja -->
                 <Grid Grid.Column="0"
-                      WidthRequest="55"
-                      HeightRequest="50"
-                      Rotation="-12"
+                      WidthRequest="{OnPlatform Android=48, WinUI=55}"
+                      HeightRequest="{OnPlatform Android=48, WinUI=50}"
+                      Rotation="{OnPlatform Android=-8, WinUI=-12}"
                       VerticalOptions="Center">
                     <!-- Sombra sólida negra -->
                     <Polygon Points="8,10 55,0 42,50 0,40"
@@ -188,7 +190,7 @@
                     <Label Text="&lt;"
                            TextColor="White"
                            FontFamily="Impact"
-                           FontSize="26"
+                           FontSize="{OnPlatform Android=22, WinUI=26}"
                            HorizontalOptions="Center"
                            VerticalOptions="Center"
                            Margin="-4,-2,0,0"/>
@@ -202,9 +204,9 @@
                 <Grid Grid.Column="1"
                       HorizontalOptions="Center"
                       VerticalOptions="Center"
-                      WidthRequest="360"
-                      HeightRequest="180"
-                      Margin="0,-30,0,-10">
+                      WidthRequest="{OnPlatform Android=230, WinUI=360}"
+                      HeightRequest="{OnPlatform Android=130, WinUI=180}"
+                      Margin="{OnPlatform Android='0,-15,0,-5', WinUI='0,-30,0,-10'}">
 
                     <!-- CAPA 1: EL AÑO (Arriba a la Izquierda, Masivo) -->
                     <!-- Actúa como el dígito dominante con rotación agresiva hacia la izquierda -->
@@ -214,19 +216,19 @@
                                 AlignItems="Center"
                                 HorizontalOptions="Start"
                                 VerticalOptions="Start"
-                                HeightRequest="70"
-                                Rotation="-15"
-                                Margin="30,5,0,0"
+                                HeightRequest="{OnPlatform Android=48, WinUI=70}"
+                                Rotation="{OnPlatform Android=-8, WinUI=-15}"
+                                Margin="{OnPlatform Android='10,5,0,0', WinUI='30,5,0,0'}"
                                 ZIndex="2"/>
 
 
                     <!-- CAPA 2: EL MES (Abajo a la Derecha - CALIBRADO PREMIUM AL PÍXEL) -->
                     <Grid HorizontalOptions="End"
                           VerticalOptions="End"
-                          WidthRequest="430"
-                          HeightRequest="75"
-                          Rotation="8"
-                          Margin="0,0,10,10"
+                          WidthRequest="{OnPlatform Android=260, WinUI=430}"
+                          HeightRequest="{OnPlatform Android=55, WinUI=75}"
+                          Rotation="{OnPlatform Android=4, WinUI=8}"
+                          Margin="{OnPlatform Android='0,0,5,5', WinUI='0,0,10,10'}"
                           ZIndex="3">
 
                         <!-- Sombra trasera asimétrica ampliada -->
@@ -239,7 +241,7 @@
                         <Polygon Points="0,0 430,0 422,100 6,100"
                                  Fill="Black"
                                  Stroke="#E31D26"
-                                 StrokeThickness="3.5"
+                                 StrokeThickness="{OnPlatform Android=2, WinUI=3.5}"
                                  Aspect="Fill"
                                  ZIndex="2"/>
 
@@ -248,7 +250,7 @@
                                     Direction="Row"
                                     JustifyContent="Center"
                                     AlignItems="Center"
-                                    Margin="15,0,15,4"
+                                    Margin="{OnPlatform Android='8,0,8,2', WinUI='15,0,15,4'}"
                                     ZIndex="3"/>
                     </Grid>
 
@@ -257,7 +259,7 @@
                              Fill="Black"
                              HorizontalOptions="Start"
                              VerticalOptions="Start"
-                             Margin="20,0,0,0"
+                             Margin="{OnPlatform Android='10,0,0,0', WinUI='20,0,0,0'}"
                              Rotation="-40"
                              ZIndex="4"/>
                 </Grid>
@@ -265,9 +267,9 @@
 
                 <!-- BOTÓN MES SIGUIENTE: Machetazo Diagonal Inverso -->
                 <Grid Grid.Column="2"
-                      WidthRequest="55"
-                      HeightRequest="50"
-                      Rotation="14"
+                      WidthRequest="{OnPlatform Android=48, WinUI=55}"
+                      HeightRequest="{OnPlatform Android=48, WinUI=50}"
+                      Rotation="{OnPlatform Android=8, WinUI=14}"
                       VerticalOptions="Center">
                     <!-- Sombra sólida negra -->
                     <Polygon Points="0,10 47,0 55,40 13,50"
@@ -282,7 +284,7 @@
                     <Label Text="&gt;"
                            TextColor="White"
                            FontFamily="Impact"
-                           FontSize="26"
+                           FontSize="{OnPlatform Android=22, WinUI=26}"
                            HorizontalOptions="Center"
                            VerticalOptions="Center"
                            Margin="4,-2,0,0"/>
@@ -514,22 +516,23 @@
             <CollectionView Grid.Row="3"
                             x:Name="GridDiasCollectionView"
                             ItemsSource="{Binding DiasDelMes}"
-                            Margin="15,0,15,10">
+                            Margin="{OnPlatform Android='4,0,4,5', WinUI='15,0,15,10'}"
+                            Scrolled="OnGridDiasScrolled">
                 <CollectionView.ItemsLayout>
                     <GridItemsLayout Orientation="Vertical"
                                      Span="7"
-                                     HorizontalItemSpacing="14"
-                                     VerticalItemSpacing="16"/>
+                                     HorizontalItemSpacing="{OnPlatform Android=2, WinUI=14}"
+                                     VerticalItemSpacing="{OnPlatform Android=4, WinUI=16}"/>
                 </CollectionView.ItemsLayout>
 
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="models:DiaCalendario">
                         <!-- 
-            LIENZO MAESTRO (140x140): 
-            Garantiza espacio de sobra para el desborde superior del puñal sin cortes en Windows
+            LIENZO MAESTRO: 
+            Garantiza espacio de sobra para el desborde superior del puñal sin cortes
         -->
-                        <Grid HeightRequest="140"
-                              WidthRequest="140"
+                        <Grid HeightRequest="{OnPlatform Android=68, WinUI=140}"
+                              WidthRequest="{OnPlatform Android=48, WinUI=140}"
                               HorizontalOptions="Center"
                               VerticalOptions="Center"
                               IsClippedToBounds="False">
@@ -665,16 +668,6 @@
                                          Rotation="-20"
                                          AbsoluteLayout.LayoutBounds="85, 30, 45, 30"
                                          AbsoluteLayout.LayoutFlags="None"/>
-
-                                <!-- CUCHILLO: Manteniendo tu archivo intacto con su evento Loaded -->
-                                <Image Source="punaltransparente.png"
-                                       x:Name="Cuchillo"
-                                       StyleId="Cuchillo"
-                                       Aspect="AspectFit"
-                                       AbsoluteLayout.LayoutBounds="82, -4, 70, 70"
-                                       Rotation="0"
-                                       AbsoluteLayout.LayoutFlags="None"
-                                       Loaded="OnCuchilloLoaded"/>
                             </AbsoluteLayout>
 
                         </Grid>
@@ -771,7 +764,18 @@
                 </Grid>
             </Grid>
 
-
+            <!-- CUCHILLO FLOTANTE EN LA RAÍZ (EXTRAÍDO AL GRID MAESTRO PARA EVITAR CORTES Y Z-INDEX BUGS) -->
+            <Image x:Name="objetoCuchillo"
+                   Source="punaltransparente.png"
+                   Grid.Row="3"
+                   ZIndex="{OnPlatform Android=999, WinUI=1}"
+                   InputTransparent="True"
+                   HorizontalOptions="Start"
+                   VerticalOptions="Start"
+                   HeightRequest="{OnPlatform Android=80, WinUI=150}"
+                   WidthRequest="{OnPlatform Android=80, WinUI=150}"
+                   Margin="0"
+                   Loaded="OnCuchilloLoaded" />
 
         </Grid>
     </Grid>
